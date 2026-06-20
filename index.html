@@ -21,7 +21,6 @@
 </head>
 <body class="font-sans antialiased pb-24">
 
-    <!-- Header Premium Corporativo -->
     <header class="bg-gradient-to-b from-[#1f113a] to-[#120826] border-b border-pink-500/20 py-6 px-4 text-center sticky top-0 z-40 shadow-2xl">
         <div class="inline-flex items-center justify-center bg-pink-500/10 border border-pink-500/30 px-3 py-1 rounded-full mb-2">
             <i class="fa-solid fa-crown text-amber-400 text-3xl mr-2 animate-pulse"></i>
@@ -32,7 +31,6 @@
         </h1>
     </header>
 
-    <!-- Pestañas Superiores con Íconos el triple de grandes -->
     <div class="flex bg-[#120b24] border-b border-purple-900/30 text-center text-xs font-black uppercase tracking-widest">
         <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-active transition-all flex flex-col items-center justify-center gap-1">
             <i class="fa-solid fa-vault text-3xl text-purple-400"></i>
@@ -44,10 +42,8 @@
         </button>
     </div>
 
-    <!-- Contenedor Principal -->
     <main class="max-w-md mx-auto px-4 mt-6">
         
-        <!-- Spinner Animado Avanzado -->
         <div id="loading" class="text-center py-20">
             <div class="relative inline-block">
                 <div class="animate-spin inline-block w-12 h-12 border-[3px] border-purple-500 border-t-transparent rounded-full"></div>
@@ -56,14 +52,12 @@
             <p class="text-[10px] text-purple-400 font-black mt-4 tracking-widest uppercase">Leyendo Servidor...</p>
         </div>
 
-        <!-- ================= VISTA CLIENTE: CRONOGRAMA ================= -->
         <section id="section-sanes" class="hidden space-y-5">
             <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 shadow-xl animate-fade-in">
                 <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione un Grupo Activo:</label>
                 <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-sm"></select>
             </div>
 
-            <!-- NUEVA BANDEJA DE HISTORIAL CREDITICIO PARA CLIENTES -->
             <div id="client-lookup-card" class="bg-gradient-to-r from-[#1e113c] to-[#140b29] p-4 rounded-xl border border-pink-500/20 shadow-md space-y-3 hidden animate-fade-in">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-address-card text-pink-400 text-2xl"></i>
@@ -74,11 +68,9 @@
                     <button onclick="checkClientCreditHistory()" class="bg-pink-600 hover:bg-pink-700 text-white font-black text-[10px] px-4 py-2 rounded uppercase tracking-wider">Ver Mi Record</button>
                 </div>
                 
-                <!-- Contenedor Desplegable del Historial -->
                 <div id="client-history-result" class="hidden bg-[#0c0817] p-3 rounded-lg border border-purple-950 text-xs space-y-2 animate-fade-in"></div>
             </div>
 
-            <!-- Card de Info General -->
             <div id="san-info-card" class="bg-gradient-to-br from-[#1c1236] to-[#120b24] p-5 rounded-2xl border border-purple-900/40 purple-glow hidden animate-fade-in">
                 <h3 id="detail-san-name" class="text-base font-extrabold text-white tracking-wide">---</h3>
                 <div class="grid grid-cols-2 gap-3 mt-4 text-center">
@@ -98,10 +90,8 @@
             </div>
         </section>
 
-        <!-- ================= VISTA CLIENTE: OFERTAS ================= -->
         <section id="section-ofertas" class="hidden grid grid-cols-1 gap-4"></section>
 
-        <!-- ================= VISTA DUEÑA: CONSOLA INTERACTIVA ================= -->
         <section id="section-admin" class="hidden space-y-6 animate-fade-in">
             <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
                 <div class="flex items-center gap-2">
@@ -111,7 +101,6 @@
                 <button onclick="switchTab('sanes')" class="text-[9px] font-black bg-purple-950/60 border border-purple-800/40 px-3 py-1.5 rounded-lg text-purple-300 uppercase">Salir</button>
             </div>
 
-            <!-- Panel de Operaciones -->
             <div class="bg-gradient-to-r from-[#1d123a] to-[#251849] p-4 rounded-xl border border-purple-800/40 shadow-md space-y-3">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-folder-plus text-amber-400 text-2xl"></i>
@@ -122,7 +111,6 @@
                     <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase hover:border-purple-500">Cargar Oferta</button>
                 </div>
 
-                <!-- Formulario San -->
                 <div id="block-add-san" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
                     <input type="text" id="new-san-id" placeholder="ID Único (Ej: SAN-BERA)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold focus:border-pink-500">
                     <input type="text" id="new-san-name" placeholder="Nombre (Ej: Tanda de Motos)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:border-pink-500">
@@ -141,7 +129,6 @@
                     <button onclick="submitAddSan()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-2 rounded font-black text-[10px] uppercase text-white">Crear Todo el San</button>
                 </div>
 
-                <!-- Formulario Oferta -->
                 <div id="block-add-oferta" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
                     <input type="text" id="new-of-prod" placeholder="Nombre del Artículo" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white">
                     <div class="grid grid-cols-2 gap-1.5">
@@ -154,7 +141,6 @@
                 </div>
             </div>
 
-            <!-- Selector Comercial y Destrucción -->
             <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 space-y-3">
                 <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest">Seleccione Tanda a Gestionar:</label>
                 <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-xs focus:outline-none"></select>
@@ -164,7 +150,6 @@
                 </button>
             </div>
 
-            <!-- Mover Cronograma -->
             <div id="admin-cascada-card" class="bg-gradient-to-r from-[#21113a] to-[#120a24] p-4 rounded-xl border border-purple-800/50 space-y-2.5 hidden">
                 <div class="flex justify-between items-center">
                     <span class="text-[10px] font-black text-purple-300 uppercase">Mover Cronograma</span>
@@ -176,12 +161,10 @@
                 </div>
             </div>
 
-            <!-- Bloques Administrativos de Rondas -->
             <div class="space-y-4" id="admin-puestos-container"></div>
         </section>
     </main>
 
-    <!-- Botón Flotante Consola -->
     <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#211342] hover:bg-purple-900 text-pink-400 p-5 rounded-full shadow-2xl border border-purple-700/60 z-50 transition-all duration-300 purple-glow">
         <i class="fa-solid fa-crown text-3xl"></i>
     </button>
@@ -259,7 +242,7 @@
 
             document.getElementById('san-info-card').classList.remove('hidden');
             document.getElementById('san-table-container').classList.remove('hidden');
-            document.getElementById('client-lookup-card').classList.remove('hidden'); // Mostrar bandeja de búsqueda
+            document.getElementById('client-lookup-card').classList.remove('hidden');
             
             document.getElementById('detail-san-name').innerText = nameValor;
             document.getElementById('detail-san-cuota').innerText = `$${parseFloat(cuotaValor).toFixed(2)}`;
@@ -267,14 +250,14 @@
 
             const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.id) === id);
             
-            // Llenar selector de clientes para la consulta personal de historial
+            // Llenar selector de nombres únicos sin duplicados
             const nombresUnicos = [...new Set(todosLosPagos.map(p => p.cliente_asignado || p.cliente).filter(Boolean))];
             document.getElementById('client-name-selector').innerHTML = nombresUnicos.map(n => `<option value="${n}">${n}</option>`).join('');
-            document.getElementById('client-history-result').classList.add('hidden'); // Resetear bandeja de historial
+            document.getElementById('client-history-result').classList.add('hidden');
 
             const rMap = {};
             todosLosPagos.forEach(p => {
-                const r = p.ronda || p.numero_puesto || 1; 
+                const r = parseInt(p.ronda || p.numero_puesto || 1); 
                 if(!rMap[r]) {
                     rMap[r] = {
                         ronda: r,
@@ -294,7 +277,7 @@
             const hoy = new Date();
             hoy.setHours(0,0,0,0);
 
-            container.innerHTML = Object.values(rMap).map((r, idx) => {
+            container.innerHTML = Object.values(rMap).sort((a,b) => a.ronda - b.ronda).map((r, idx) => {
                 let statusText = `📊 Recaudación: ${r.clientesPagados}/${r.totalClientes}`;
                 let badgeClass = "bg-purple-500/10 text-purple-300 border-purple-800/40";
                 
@@ -323,7 +306,6 @@
             }).join('');
         }
 
-        // NUEVA FUNCIÓN: Genera el Historial Crediticio e Información del Cliente seleccionado
         function checkClientCreditHistory() {
             const idSan = document.getElementById('san-selector').value;
             const clienteSelected = document.getElementById('client-name-selector').value;
@@ -334,7 +316,7 @@
             const pagadas = todosLosPagos.filter(p => p.estado_pago.includes("🟢") || p.estado_pago.toLowerCase().includes("pagado")).length;
             const pendientes = totalCuotas - pagadas;
             
-            let historialRondasHtml = todosLosPagos.map(p => {
+            let historialRondasHtml = todosLosPagos.sort((a,b) => parseInt(a.ronda)-parseInt(b.ronda)).map(p => {
                 const est = p.estado_pago.includes("🟢") || p.estado_pago.toLowerCase().includes("pagado") ? 
                     '<span class="text-emerald-400 font-bold">🟢 PAGADO</span>' : '<span class="text-red-400 font-bold">🔴 PENDIENTE</span>';
                 return `<div class="flex justify-between items-center bg-[#170f2c] p-2 rounded border border-purple-900/30 text-[11px]">
@@ -370,7 +352,7 @@
             `;
         }
 
-        // CORRECCIÓN EXACTA EN EL RENDERIZADO ADMINISTRATIVO: Agrupar por bloques limpios sin mezclar ni duplicar
+        // ================= FILTRADO ULTRA-ESTRICTO PARA EVITAR DUPLICACIONES EXTRAÑAS =================
         function renderAdminPuestos() {
             const id = document.getElementById('admin-san-selector').value;
             if(!id) {
@@ -387,37 +369,36 @@
             document.getElementById('admin-cascada-freq').innerText = san.frecuencia || "Semanal";
             document.getElementById('admin-master-date').value = san.fecha_inicio ? san.fecha_inicio.split("T")[0] : "";
 
-            // Agrupamos de manera súper estricta por Ronda
             const rMap = {};
             todosLosPagos.forEach(p => {
-                const r = p.ronda || 1;
+                const r = parseInt(p.ronda || 1);
                 if(!rMap[r]) {
                     rMap[r] = {
                         ronda: r,
                         fecha: p.fecha_pago || p.fecha,
                         beneficiario: p.beneficiario_premio || "Cliente " + r,
                         estadoEntrega: p.estado_entrega || "📦 Retención",
-                        clientes: []
+                        clientesTracker: {} // Asegura unicidad por nombre dentro de esta ronda
                     };
                 }
-                // Insertamos cada registro de pago como un cliente único para ESE ciclo
-                rMap[r].clientes.push({
-                    nombre: p.cliente_asignado || p.cliente || '',
-                    statusPago: p.estado_pago || "🔴 Pendiente"
-                });
+                
+                const cName = p.cliente_asignado || p.cliente || '';
+                if(cName && !rMap[r].clientesTracker[cName]) {
+                    rMap[r].clientesTracker[cName] = p.estado_pago || "🔴 Pendiente";
+                }
             });
 
-            // Renderizamos los bloques por ciclos ordenados
-            container.innerHTML = Object.values(rMap).map((r, idx) => {
+            container.innerHTML = Object.values(rMap).sort((a,b) => a.ronda - b.ronda).map((r, idx) => {
                 const isEntregado = r.estadoEntrega.toLowerCase().includes("entregado");
                 
-                // Mapeo perfecto: Aquí iteramos limpiamente sólo los clientes de ESTA ronda específica
-                const listaAsistenciaHtml = r.clientes.map(c => {
-                    const pagado = c.statusPago.includes("🟢") || c.statusPago.toLowerCase().includes("pagado");
+                // Mapear el tracker asegurando que no se repitan nombres falsamente en la tarjeta
+                const listaAsistenciaHtml = Object.keys(r.clientesTracker).map(nombreCliente => {
+                    const statusPago = r.clientesTracker[nombreCliente];
+                    const pagado = statusPago.includes("🟢") || statusPago.toLowerCase().includes("pagado");
                     return `
                         <div class="flex justify-between items-center bg-[#0c0817] p-2 rounded border border-purple-950/60 gap-3">
-                            <input type="text" value="${c.nombre}" onblur="editClienteNombreDirecto('${id}', '${c.nombre}', this.value)" class="bg-transparent text-xs font-bold text-white border-b border-purple-900/30 focus:border-pink-500 focus:outline-none flex-1 py-0.5 transition-colors">
-                            <button onclick="toggleCuotaAsistencia('${id}', ${r.ronda}, '${c.nombre}', '${c.statusPago}', this)" class="text-[9px] font-black uppercase px-2.5 py-1 rounded border transition-all ${pagado ? 'bg-emerald-500 border-emerald-600 text-black shadow-md':'bg-red-500/10 border-red-500/30 text-red-400'}">
+                            <input type="text" value="${nombreCliente}" onblur="editClienteNombreDirecto('${id}', '${nombreCliente}', this.value)" class="bg-transparent text-xs font-bold text-white border-b border-purple-900/30 focus:border-pink-500 focus:outline-none flex-1 py-0.5 transition-colors">
+                            <button onclick="toggleCuotaAsistencia('${id}', ${r.ronda}, '${nombreCliente}', '${statusPago}', this)" class="text-[9px] font-black uppercase px-2.5 py-1 rounded border transition-all ${pagado ? 'bg-emerald-500 border-emerald-600 text-black shadow-md':'bg-red-500/10 border-red-500/30 text-red-400'}">
                                 ${pagado ? '🟢 Pagó' : '🔴 Pendiente'}
                             </button>
                         </div>`;
@@ -459,12 +440,10 @@
                     mode: "no-cors",
                     body: JSON.stringify({ action: "updateClienteNombre", id_san: idSan, nombre_viejo: nombreViejo, nombre_nuevo: nombreNuevo })
                 });
-                
                 globalData.pagos.forEach(p => {
                     if((p.id_san || p.id) === idSan) {
                         if((p.cliente_asignado || p.cliente || '') === nombreViejo) {
-                            p.cliente_asignado = nombreNuevo;
-                            p.cliente = nombreNuevo;
+                            p.cliente_asignado = nombreNuevo; p.cliente = nombreNuevo;
                         }
                         if(p.beneficiario_premio === nombreViejo) p.beneficiario_premio = nombreNuevo;
                     }
@@ -531,17 +510,10 @@
         async function deleteCurrentSan() {
             const id = document.getElementById('admin-san-selector').value;
             if(!id) return;
-            
-            if(confirm(`⚠️ ¿Seguro que deseas eliminar el San [${id}]?\nEsta acción es irreversible y borrará todos los cobros y configuraciones en Google Sheets.`)) {
-                if(confirm(`🚨 ÚLTIMA CONFIRMACIÓN:\n¿Borrar por completo el San y vaciar sus datos?`)) {
-                    document.getElementById('loading').classList.remove('hidden');
-                    await fetch(API_URL, {
-                        method: "POST",
-                        mode: "no-cors",
-                        body: JSON.stringify({ action: "deleteSan", id_san: id })
-                    });
-                    setTimeout(() => init(), 1500);
-                }
+            if(confirm(`⚠️ ¿Eliminar el San [${id}]?`)) {
+                document.getElementById('loading').classList.remove('hidden');
+                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "deleteSan", id_san: id }) });
+                setTimeout(() => init(), 1500);
             }
         }
 
@@ -549,13 +521,8 @@
             const id = document.getElementById('admin-san-selector').value;
             const nuevaFecha = document.getElementById('admin-master-date').value;
             if(!nuevaFecha) return alert("Seleccione la fecha inicial.");
-            
             document.getElementById('loading').classList.remove('hidden');
-            await fetch(API_URL, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify({ action: "recascadeFechas", id_san: id, fecha_inicio: nuevaFecha })
-            });
+            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "recascadeFechas", id_san: id, fecha_inicio: nuevaFecha }) });
             setTimeout(() => init(), 1500);
         }
 
@@ -566,16 +533,9 @@
             const freq = document.getElementById('new-san-freq').value;
             const total = document.getElementById('new-san-total').value;
             const fInicio = document.getElementById('new-san-date').value;
-
-            if(!id || !name || !cuota || !fInicio) return alert("Complete los datos requeridos.");
-
+            if(!id || !name || !cuota || !fInicio) return alert("Complete los datos.");
             document.getElementById('loading').classList.remove('hidden');
-            await fetch(API_URL, {
-                method: "POST", 
-                mode: "no-cors", 
-                body: JSON.stringify({ action: "addSan", id_san: id, nombre_san: name, cuota: cuota, frecuencia: freq, total_puestos: total, fecha_inicio: fInicio })
-            });
-            document.getElementById('block-add-san').classList.add('hidden');
+            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "addSan", id_san: id, nombre_san: name, cuota: cuota, frecuencia: freq, total_puestos: total, fecha_inicio: fInicio }) });
             setTimeout(() => init(), 1800);
         }
 
@@ -585,23 +545,16 @@
             const disp = document.getElementById('new-of-disp').value;
             const desc = document.getElementById('new-of-desc').value;
             const img = document.getElementById('new-of-img').value;
-
-            if(!prod || !price || !disp) return alert("Complete los campos obligatorios.");
-
+            if(!prod || !price || !disp) return alert("Complete campos.");
             document.getElementById('loading').classList.remove('hidden');
-            await fetch(API_URL, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify({ action: "addOferta", producto: prod, precio_oferta: price, descripcion: desc, disponibilidad: disp, imgUrl: img })
-            });
-            document.getElementById('block-add-oferta').classList.add('hidden');
+            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "addOferta", producto: prod, precio_oferta: price, descripcion: desc, disponibilidad: disp, imgUrl: img }) });
             setTimeout(() => init(), 1500);
         }
 
         function renderOfertas() {
             const container = document.getElementById('section-ofertas');
             if (!globalData.ofertas || globalData.ofertas.length === 0) {
-                container.innerHTML = `<p class="text-xs text-purple-400/40 text-center py-12 font-bold uppercase tracking-widest">Sin promociones vigentes.</p>`;
+                container.innerHTML = `<p class="text-xs text-purple-400/40 text-center py-12 font-bold uppercase">Sin promociones.</p>`;
                 return;
             }
             container.innerHTML = globalData.ofertas.map((o, idx) => {
@@ -609,7 +562,7 @@
                 return `
                     <div class="bg-[#170f2c] rounded-2xl border border-purple-900/30 overflow-hidden flex flex-col justify-between shadow-lg animate-fade-in" style="animation-delay: ${idx * 0.04}s">
                         <div class="p-4 flex space-x-4">
-                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl bg-purple-950 flex-shrink-0 border border-purple-900/40">
+                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl bg-purple-950 border border-purple-900/40">
                             <div class="flex-1 min-w-0">
                                 <span class="text-[8px] font-black text-amber-400 uppercase block mb-0.5">${o.disponibilidad || 'Disponible'}</span>
                                 <h4 class="text-xs font-black text-white truncate uppercase tracking-wider">${o.producto || 'Artículo'}</h4>
@@ -618,16 +571,14 @@
                         </div>
                         <div class="bg-[#120b24]/60 px-4 py-3 border-t border-purple-900/20 flex items-center justify-between">
                             <span class="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">$${parseFloat(o.precio_oferta || 0).toFixed(2)}</span>
-                            <button onclick="orderViaWhatsApp('${o.producto}', '${o.precio_oferta}')" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-black text-[10px] py-2 px-3.5 rounded-lg flex items-center uppercase tracking-widest">
-                                Pedir
-                            </button>
+                            <button onclick="orderViaWhatsApp('${o.producto}', '${o.precio_oferta}')" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-black text-[10px] py-2 px-3.5 rounded-lg uppercase tracking-widest">Pedir</button>
                         </div>
                     </div>`;
             }).join('');
         }
 
         function orderViaWhatsApp(name, price) {
-            const message = encodeURIComponent("¡Hola! Me interesa apartar el artículo en oferta:\n\n📦 *Producto:* " + name + "\n💰 *Precio:* $" + parseFloat(price).toFixed(2));
+            const message = encodeURIComponent("¡Hola! Me interesa apartar:\n\n📦 *Producto:* " + name + "\n💰 *Precio:* $" + parseFloat(price).toFixed(2));
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
         }
 
