@@ -3,98 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Gestión de Sanes e Inversiones</title>
+    <title>Portal Corporativo de Sanes & Ofertas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #0b0f19; color: #f3f4f6; }
-        .gold-glow { box-shadow: 0 0 20px rgba(234, 179, 8, 0.12); }
-        .tab-active { border-bottom: 3px solid #eab308; color: #eab308; }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        body { background-color: #0c0817; color: #f3f4f6; }
+        .purple-glow { box-shadow: 0 0 25px rgba(139, 92, 246, 0.2); }
+        .tab-active { border-bottom: 3px solid #d946ef; color: #d946ef; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.4) sepia(1) saturate(3) hue-rotate(270deg); cursor: pointer; }
     </style>
 </head>
 <body class="font-sans antialiased pb-24">
 
-    <header class="bg-[#111827] border-b border-gray-800 py-5 px-4 text-center sticky top-0 z-40 shadow-md">
-        <h1 class="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-500 uppercase">
-            Sistemas Sanes & Ofertas Especiales
+    <!-- Header Principal -->
+    <header class="bg-[#170f2c] border-b border-purple-900/40 py-5 px-4 text-center sticky top-0 z-40 shadow-lg">
+        <h1 class="text-xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-400 uppercase">
+            Sanes & Ofertas Velvet
         </h1>
-        <p class="text-[11px] text-gray-400 mt-0.5">Control de cuotas automático y catálogo unificado</p>
+        <p class="text-[10px] text-purple-300/70 mt-0.5 tracking-wider font-medium">Plataforma de Control e Inversión Automatizada</p>
     </header>
 
-    <div class="flex bg-[#111827] border-b border-gray-800 text-center text-xs font-bold uppercase tracking-wider">
+    <!-- Pestañas de Navegación -->
+    <div class="flex bg-[#120b24] border-b border-purple-900/30 text-center text-xs font-black uppercase tracking-widest">
         <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-active transition-all">
-            <i class="fa-solid fa-piggy-bank mr-2 text-yellow-500"></i>Mis Sanes
+            <i class="fa-solid fa-vault mr-2 text-purple-400"></i>Estatus Sanes
         </button>
-        <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 text-gray-400 transition-all">
-            <i class="fa-solid fa-bolt mr-2 text-amber-500"></i>Ofertas del Día
+        <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 text-purple-400/50 transition-all">
+            <i class="fa-solid fa-tags mr-2 text-pink-400"></i>Catálogo Club
         </button>
     </div>
 
+    <!-- Contenedor Principal -->
     <main class="max-w-md mx-auto px-4 mt-6">
         
+        <!-- Spinner de Carga Estilizado -->
         <div id="loading" class="text-center py-20">
-            <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-yellow-500 rounded-full"></div>
-            <p class="text-xs text-gray-400 mt-3 tracking-widest uppercase">Consultando base de datos...</p>
+            <div class="animate-spin inline-block w-8 h-8 border-[3px] border-purple-500 border-t-transparent rounded-full"></div>
+            <p class="text-[10px] text-purple-400 font-bold mt-4 tracking-widest uppercase">Sincronizando Sistema Velvet...</p>
         </div>
 
+        <!-- ================= MODO CLIENTE: VISTA DE SANES ================= -->
         <section id="section-sanes" class="hidden space-y-5">
-            <div class="bg-[#111827] p-4 rounded-xl border border-gray-800 shadow-inner">
-                <label class="block text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Seleccione un plan activo:</label>
-                <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#1f2937] text-white p-3 rounded-lg border border-gray-700 focus:outline-none focus:border-yellow-500 font-bold text-sm"></select>
+            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 shadow-xl">
+                <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione una Tanda Comercial:</label>
+                <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 focus:outline-none focus:border-pink-500 font-bold text-sm cursor-pointer"></select>
             </div>
 
-            <div id="san-info-card" class="bg-gradient-to-br from-[#111827] to-[#1f2937] p-5 rounded-2xl border border-gray-800 gold-glow hidden">
+            <!-- Información General en Bloque Fijo -->
+            <div id="san-info-card" class="bg-gradient-to-br from-[#1c1236] to-[#120b24] p-5 rounded-2xl border border-purple-900/40 purple-glow hidden">
                 <h3 id="detail-san-name" class="text-base font-extrabold text-white tracking-wide">---</h3>
                 <div class="grid grid-cols-2 gap-3 mt-4 text-center">
-                    <div class="bg-[#0b0f19] p-3 rounded-xl border border-gray-800">
-                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider">Cuota Base</span>
-                        <span id="detail-san-cuota" class="text-lg font-black text-yellow-400">$0.00</span>
+                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
+                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Cuota Requerida</span>
+                        <span id="detail-san-cuota" class="text-lg font-black text-amber-400">$0.00</span>
                     </div>
-                    <div class="bg-[#0b0f19] p-3 rounded-xl border border-gray-800">
-                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider">Frecuencia</span>
-                        <span id="detail-san-frecuencia" class="text-xs font-bold text-gray-200 mt-1 block tracking-wide">---</span>
+                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
+                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Periodicidad</span>
+                        <span id="detail-san-frecuencia" class="text-xs font-bold text-gray-200 mt-1 block">---</span>
                     </div>
                 </div>
             </div>
 
-            <div id="san-table-container" class="hidden space-y-2">
-                <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Cronograma General de Puestos</h4>
-                <div class="space-y-2.5" id="client-puestos-container"></div>
+            <div id="san-table-container" class="hidden space-y-2.5">
+                <h4 class="text-[10px] font-bold text-purple-400/80 uppercase tracking-widest px-1">Cronograma de Adjudicaciones</h4>
+                <div class="space-y-3" id="client-puestos-container"></div>
             </div>
         </section>
 
+        <!-- ================= MODO CLIENTE: CATÁLOGO OFERTAS ================= -->
         <section id="section-ofertas" class="hidden grid grid-cols-1 gap-4"></section>
 
-        <section id="section-admin" class="hidden space-y-5">
-            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h2 class="text-sm font-black text-yellow-500 uppercase tracking-widest"><i class="fa-solid fa-shield-halved mr-2"></i>Consola Dueña</h2>
-                <button onclick="switchTab('sanes')" class="text-[10px] font-bold bg-gray-800 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white uppercase">Cerrar Sesión</button>
+        <!-- ================= CONSOLA EXCLUSIVA DE ADMINISTRACIÓN (BLOQUES) ================= -->
+        <section id="section-admin" class="hidden space-y-6">
+            <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
+                <h2 class="text-xs font-black text-pink-400 uppercase tracking-widest"><i class="fa-solid fa-crown mr-2"></i>Consola Propietaria</h2>
+                <button onclick="switchTab('sanes')" class="text-[9px] font-black bg-purple-950/60 border border-purple-800/40 px-3 py-1.5 rounded-lg text-purple-300 uppercase tracking-wider">Salir</button>
             </div>
 
-            <div class="flex gap-2">
-                <button onclick="openModalAddSan()" class="flex-1 bg-yellow-500/10 border border-yellow-500/20 py-2.5 rounded-xl text-[11px] font-black text-yellow-400 text-center uppercase tracking-wide"><i class="fa-solid fa-plus mr-1"></i> Inicializar San</button>
-                <button onclick="openModalAddOferta()" class="flex-1 bg-amber-500/10 border border-amber-500/20 py-2.5 rounded-xl text-[11px] font-black text-amber-400 text-center uppercase tracking-wide"><i class="fa-solid fa-tag mr-1"></i> Cargar Oferta</button>
+            <!-- BLOQUE: Gestor de Creación Rápida -->
+            <div class="bg-gradient-to-r from-[#1d123a] to-[#251849] p-4 rounded-xl border border-purple-800/40 shadow-md space-y-3">
+                <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest block"><i class="fa-solid fa-folder-plus mr-1"></i> Inicialización de Módulos</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="toggleForm('block-add-san')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase tracking-wide hover:border-purple-500 transition-all">➕ Abrir Bloque San</button>
+                    <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase tracking-wide hover:border-purple-500 transition-all">🛍️ Abrir Bloque Oferta</button>
+                </div>
+
+                <!-- SUB-BLOQUE FORMULARIO CREAR SAN -->
+                <div id="block-add-san" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
+                    <input type="text" id="new-san-id" placeholder="ID Corto (Ej: MOTO-01)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold placeholder-purple-400/40 focus:outline-none">
+                    <input type="text" id="new-san-name" placeholder="Nombre Descriptivo del San" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <input type="number" id="new-san-cuota" placeholder="Cuota $" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
+                        <select id="new-san-freq" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                            <option value="Semanal">Semanal</option>
+                            <option value="Quincenal">Quincenal</option>
+                        </select>
+                        <input type="number" id="new-san-total" placeholder="Puestos" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[9px] font-black text-purple-400 uppercase tracking-wider block mb-1">Fecha Base de Inicio:</label>
+                        <input type="date" id="new-san-date" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    </div>
+                    <button onclick="submitAddSan()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-2 rounded font-black text-[10px] uppercase tracking-widest text-white shadow-lg">Inicializar Todo el Bloque</button>
+                </div>
+
+                <!-- SUB-BLOQUE FORMULARIO CREAR OFERTA -->
+                <div id="block-add-oferta" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
+                    <input type="text" id="new-of-prod" placeholder="Nombre del Producto Comercial" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <input type="number" id="new-of-price" placeholder="Precio Especial $" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                        <input type="text" id="new-of-disp" placeholder="Disponibilidad (Ej: Disponible)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    </div>
+                    <input type="text" id="new-of-desc" placeholder="Descripción corta de la oferta" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <input type="text" id="new-of-img" placeholder="Enlace de Imagen (Opcional)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <button onclick="submitAddOferta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 rounded font-black text-[10px] uppercase tracking-widest text-black shadow-lg">Publicar Oferta</button>
+                </div>
             </div>
 
-            <div class="bg-[#111827] p-4 rounded-xl border border-gray-800">
-                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Seleccionar Grupo a Controlar:</label>
-                <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#1f2937] text-white p-3 rounded-lg border border-gray-700 text-xs font-bold focus:outline-none"></select>
+            <!-- BLOQUE MAESTRO: Selector de Control Activo -->
+            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30">
+                <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione el San a Gestionar:</label>
+                <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-xs focus:outline-none"></select>
             </div>
 
-            <div class="space-y-3.5" id="admin-puestos-container"></div>
+            <!-- BLOQUE MAESTRO DE CONTROL DE FECHA EN CADENA (CASCADA) -->
+            <div id="admin-cascada-card" class="bg-gradient-to-r from-[#21113a] to-[#120a24] p-4 rounded-xl border border-purple-800/50 space-y-2.5 hidden shadow-md">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-black text-purple-300 uppercase tracking-widest"><i class="fa-solid fa-link-slash mr-1"></i> Ajuste en Cadena (Cascada)</span>
+                    <span id="admin-cascada-freq" class="text-[9px] font-bold px-2 py-0.5 rounded bg-purple-900/40 text-purple-400 border border-purple-800/50 uppercase">---</span>
+                </div>
+                <p class="text-[10px] text-purple-400 leading-relaxed">Mover la fecha de este calendario recalculará automáticamente el día de cobro de **todos los puestos inferiores** de forma matemática.</p>
+                <div class="flex gap-2">
+                    <input type="date" id="admin-master-date" class="flex-1 bg-[#0c0817] border border-purple-800 p-2 rounded text-xs text-white focus:outline-none">
+                    <button onclick="triggerCascadeFechas()" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded text-[10px] font-black uppercase tracking-wider transition-all">Recalcular</button>
+                </div>
+            </div>
+
+            <!-- Contenedor Dinámico: Bloques de Puestos Independientes -->
+            <div class="space-y-4" id="admin-puestos-container"></div>
         </section>
     </main>
 
-    <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#1f2937] hover:bg-gray-800 text-yellow-500 p-4 rounded-full shadow-2xl border border-gray-700 z-50 transition-all">
-        <i class="fa-solid fa-user-shield text-lg"></i>
+    <!-- Llave Maestra Acceso Flotante -->
+    <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#211342] hover:bg-purple-900 text-pink-400 p-4 rounded-full shadow-2xl border border-purple-700/60 z-50 transition-all purple-glow">
+        <i class="fa-solid fa-crown text-base"></i>
     </button>
 
     <script>
-        // CONFIGURACIÓN DE CONEXIÓN GLOBAL
         const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
         const WHATSAPP_NUMBER = "584242961164"; 
-        const ADMIN_PASSWORD = "30589875"; 
+        const ADMIN_PASSWORD = "1234"; 
         let globalData = {};
 
         async function init() {
@@ -107,28 +165,29 @@
                 populateSelectors();
                 renderOfertas();
             } catch (error) {
-                console.error("Error en sincronización externa:", error);
-                document.getElementById('loading').innerHTML = `<p class="text-red-500 font-bold text-xs tracking-wider uppercase">Fallo de comunicación con la base de datos.</p>`;
+                console.error(error);
+                document.getElementById('loading').innerHTML = `<p class="text-red-500 font-bold text-xs tracking-widest uppercase">Error Crítico de Enlace.</p>`;
             }
         }
 
         function loginAdmin() {
-            const pass = prompt("Introduzca credencial de seguridad de la Administradora:");
-            if (pass === ADMIN_PASSWORD) {
+            if (prompt("Contraseña de Acceso Velvet:") === ADMIN_PASSWORD) {
                 switchTab('admin');
-            } else if (pass !== null) {
-                alert("Acceso denegado. Credencial incorrecta.");
+            } else if (prompt !== null) {
+                alert("Clave incorrecta.");
             }
+        }
+
+        function toggleForm(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
         }
 
         function switchTab(tab) {
             ['sanes', 'ofertas', 'admin'].forEach(t => {
-                const sec = document.getElementById(`section-${t}`);
-                if(sec) sec.classList.add('hidden');
-                const btn = document.getElementById(`tab-${t}`);
-                if(btn) btn.classList.remove('tab-active', 'text-gray-400');
+                if(document.getElementById(`section-${t}`)) document.getElementById(`section-${t}`).classList.add('hidden');
+                if(document.getElementById(`tab-${t}`)) document.getElementById(`tab-${t}`).classList.remove('tab-active', 'text-purple-400/50');
             });
-
             document.getElementById(`section-${tab}`).classList.remove('hidden');
             if(tab !== 'admin') document.getElementById(`tab-${tab}`).classList.add('tab-active');
             if(tab === 'admin') renderAdminPuestos();
@@ -143,7 +202,7 @@
             renderSanDetails();
         }
 
-        // MOTOR RECONSTRUCTOR DE LOGICA DE NEGOCIO EN TIEMPO REAL (CLIENTES)
+        // CONTROL VISUAL EN TIEMPO REAL: REGLAS DE NEGOCIO PARA CLIENTES
         function renderSanDetails() {
             const id = document.getElementById('san-selector').value;
             const san = globalData.sanes.find(s => s.id_san === id);
@@ -163,68 +222,85 @@
 
             container.innerHTML = puestos.map(p => {
                 let estadoCalculado = p.estado_pago;
-                let statusClass = "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"; 
+                let statusClass = "bg-purple-500/10 text-purple-300 border-purple-800/30"; 
 
-                // Evaluador condicional dinámico
                 if (!p.estado_pago.includes("🟢") && p.fecha_pago) {
                     const fechaLimite = new Date(p.fecha_pago.split("T")[0] + "T00:00:00");
                     if (hoy >= fechaLimite) {
                         estadoCalculado = "🚨 ¡Vencido! Pendiente";
-                        statusClass = "bg-red-500/10 text-red-400 border-red-500/20";
+                        statusClass = "bg-red-500/20 text-red-400 border-red-500/30 font-black";
                     } else {
                         estadoCalculado = "⏳ En Espera / Próximo";
-                        statusClass = "bg-blue-500/10 text-blue-400 border-blue-500/20";
+                        statusClass = "bg-blue-500/15 text-blue-400 border-blue-800/40";
                     }
                 } else if (p.estado_pago.includes("🟢")) {
-                    statusClass = "bg-green-500/10 text-green-400 border-green-500/20";
+                    statusClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-bold";
                 }
 
                 return `
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#111827] border border-gray-800">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-7 h-7 rounded-full bg-gray-800 flex items-center justify-center font-black text-yellow-500 text-xs">${p.numero_puesto}</div>
+                    <div class="flex items-center justify-between p-3.5 rounded-xl bg-[#170f2c] border border-purple-900/30 shadow-md">
+                        <div class="flex items-center space-x-3.5">
+                            <div class="w-8 h-8 rounded-full bg-[#0c0817] flex items-center justify-center font-black text-pink-400 text-xs border border-purple-950">${p.numero_puesto}</div>
                             <div>
-                                <h5 class="text-xs font-bold ${p.cliente_asignado.toLowerCase().includes('disponible') ? 'text-gray-500 italic' : 'text-white'}">${p.cliente_asignado}</h5>
-                                <p class="text-[9px] text-gray-400 tracking-wide">Cobro: ${p.fecha_pago ? p.fecha_pago.split("T")[0] : 'Por definir'}</p>
+                                <h5 class="text-xs font-black ${p.cliente_asignado.toLowerCase().includes('disponible') ? 'text-purple-400/40 italic' : 'text-white'}">${p.cliente_asignado}</h5>
+                                <p class="text-[9px] text-purple-400/70 font-medium mt-0.5 tracking-wider">Límite: ${p.fecha_pago ? p.fecha_pago.split("T")[0] : 'No asignada'}</p>
                             </div>
                         </div>
-                        <span class="text-[9px] font-black px-2 py-1 rounded border uppercase tracking-wider ${statusClass}">${estadoCalculado}</span>
+                        <span class="text-[9px] font-black px-2 py-1 rounded border uppercase tracking-widest ${statusClass}">${estadoCalculado}</span>
                     </div>`;
             }).join('');
         }
 
-        // CONTROL DINÁMICO EXCLUSIVO PARA LA DUEÑA (EDICIÓN CELDA POR CELDA)
+        // DISEÑO AVANZADO: BLOQUES INDEPENDIENTES CON BOTONERAS DE UN SOLO TOQUE PARA LA DUEÑA
         function renderAdminPuestos() {
             const id = document.getElementById('admin-san-selector').value;
+            const san = globalData.sanes.find(s => s.id_san === id);
             const puestos = globalData.pagos.filter(p => p.id_san === id);
             const container = document.getElementById('admin-puestos-container');
             
+            if(!san) return;
+            
+            // Renderizar Bloque Maestro de Cascada Arriba
+            document.getElementById('admin-cascada-card').classList.remove('hidden');
+            document.getElementById('admin-cascada-freq').innerText = san.frecuencia;
+            document.getElementById('admin-master-date').value = san.fecha_inicio ? san.fecha_inicio.split("T")[0] : "";
+
             if(puestos.length === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Sin registros correlativos.</p>`;
+                container.innerHTML = `<p class="text-xs text-purple-400 text-center py-4 font-bold">Cargando vinculaciones...</p>`;
                 return;
             }
 
             container.innerHTML = puestos.map(p => {
                 const dateVal = p.fecha_pago ? p.fecha_pago.split("T")[0] : "";
+                
+                // Determinar iluminación activa de botoneras
+                const isAuto = p.estado_pago.includes("🟡") || p.estado_pago.includes("Pendiente");
+                const isPagado = p.estado_pago === "🟢 Pagado";
+                const isEntregado = p.estado_pago.includes("Entregado");
+
                 return `
-                    <div class="bg-[#111827] p-3.5 rounded-xl border border-gray-800 space-y-3 shadow-md">
-                        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                            <span class="text-xs font-black text-yellow-500 tracking-wide">PUESTO NRO. ${p.numero_puesto}</span>
-                            <select onchange="updateCell('${id}', ${p.numero_puesto}, 'estado_pago', this.value)" class="bg-[#1f2937] text-[10px] p-1.5 rounded border border-gray-700 text-white font-black uppercase">
-                                <option value="🟡 Sin pagar" ${p.estado_pago.includes('🟡') || p.estado_pago.includes('Pendiente') ? 'selected' : ''}>🟡 Ciclo Automático</option>
-                                <option value="🟢 Pagado" ${p.estado_pago === '🟢 Pagado' ? 'selected' : ''}>🟢 Cobrado / Pagado</option>
-                                <option value="🟢 Pagado - Entregado" ${p.estado_pago.includes('Entregado') ? 'selected' : ''}>🏆 Entregado</option>
-                            </select>
+                    <div class="bg-gradient-to-b from-[#191031] to-[#110a22] p-4 rounded-xl border ${isPagado || isEntregado ? 'border-emerald-500/30 shadow-emerald-950/20':'border-purple-900/40 shadow-purple-950/20'} space-y-3.5 shadow-lg relative">
+                        <div class="flex justify-between items-center border-b border-purple-900/30 pb-2">
+                            <span class="text-xs font-black text-amber-400 tracking-wider uppercase">Puesto Operativo Nro. ${p.numero_puesto}</span>
+                            <span class="text-[9px] font-black uppercase text-purple-400 tracking-widest">${p.estado_pago}</span>
                         </div>
+                        
                         <div class="space-y-2">
-                            <div>
-                                <label class="text-[9px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Responsable Asignado:</label>
-                                <input type="text" value="${p.cliente_asignado}" onblur="updateCell('${id}', ${p.numero_puesto}, 'cliente_asignado', this.value)" class="w-full bg-[#0b0f19] p-2 rounded text-xs border border-gray-700 text-white focus:border-yellow-500 focus:outline-none">
+                            <div class="bg-[#0c0817] p-2 rounded border border-purple-950 flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-purple-400 uppercase tracking-wider">Cliente:</span>
+                                <input type="text" value="${p.cliente_asignado}" onblur="updateCell('${id}', ${p.numero_puesto}, 'cliente_asignado', this.value)" class="bg-transparent text-right font-black text-xs text-white border-none outline-none w-2/3 focus:text-pink-400">
                             </div>
-                            <div>
-                                <label class="text-[9px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Fecha de Cobro Obligatoria:</label>
-                                <input type="date" value="${dateVal}" onchange="updateCell('${id}', ${p.numero_puesto}, 'fecha_pago', this.value)" class="w-full bg-[#0b0f19] p-2 rounded text-xs border border-gray-700 text-white focus:border-yellow-500 focus:outline-none">
+                            <div class="bg-[#0c0817] p-2 rounded border border-purple-950 flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-purple-400 uppercase tracking-wider">Día Cobro:</span>
+                                <input type="date" value="${dateVal}" onchange="updateCell('${id}', ${p.numero_puesto}, 'fecha_pago', this.value)" class="bg-transparent text-right font-black text-xs text-white border-none outline-none focus:text-pink-400">
                             </div>
+                        </div>
+
+                        <!-- BOTONERA DIRECTA DE UN SOLO TOQUE -->
+                        <div class="grid grid-cols-3 gap-1 pt-1">
+                            <button onclick="updateButtonStatus('${id}', ${p.numero_puesto}, '🟡 Sin pagar', this)" class="py-2 text-[9px] font-black uppercase tracking-wider rounded border ${isAuto ? 'bg-yellow-500 border-yellow-600 text-black shadow-lg':'bg-[#140d28] border-purple-900/40 text-purple-400'} transition-all">⏳ Ciclo</button>
+                            <button onclick="updateButtonStatus('${id}', ${p.numero_puesto}, '🟢 Pagado', this)" class="py-2 text-[9px] font-black uppercase tracking-wider rounded border ${isPagado ? 'bg-emerald-500 border-emerald-600 text-black shadow-lg':'bg-[#140d28] border-purple-900/40 text-purple-400'} transition-all">🟢 Pago</button>
+                            <button onclick="updateButtonStatus('${id}', ${p.numero_puesto}, '🟢 Pagado - Entregado', this)" class="py-2 text-[9px] font-black uppercase tracking-wider rounded border ${isEntregado ? 'bg-pink-600 border-pink-700 text-white shadow-lg':'bg-[#140d28] border-purple-900/40 text-purple-400'} transition-all">🏆 Entrega</button>
                         </div>
                     </div>`;
             }).join('');
@@ -233,80 +309,110 @@
         async function updateCell(idSan, numPuesto, field, value) {
             let payload = { action: "updatePago", id_san: idSan, numero_puesto: numPuesto };
             payload[field] = value;
+            try {
+                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
+                const cache = globalData.pagos.find(p => p.id_san === idSan && parseInt(p.numero_puesto) === numPuesto);
+                if(cache) cache[field] = value;
+            } catch (e) { console.error(e); }
+        }
 
+        async function updateButtonStatus(idSan, numPuesto, valStatus, btnElement) {
+            // Animación reactiva inmediata antes de enviar a la base de datos
+            const rowContainer = btnElement.closest('.grid');
+            rowContainer.querySelectorAll('button').forEach(b => {
+                b.className = "py-2 text-[9px] font-black uppercase tracking-wider rounded border bg-[#140d28] border-purple-900/40 text-purple-400";
+            });
+            
+            if(valStatus.includes('🟡')) btnElement.className = "py-2 text-[9px] font-black uppercase tracking-wider rounded border bg-yellow-500 border-yellow-600 text-black shadow-lg";
+            if(valStatus === '🟢 Pagado') btnElement.className = "py-2 text-[9px] font-black uppercase tracking-wider rounded border bg-emerald-500 border-emerald-600 text-black shadow-lg";
+            if(valStatus.includes('Entregado')) btnElement.className = "py-2 text-[9px] font-black uppercase tracking-wider rounded border bg-pink-600 border-pink-700 text-white shadow-lg";
+
+            await updateCell(idSan, numPuesto, 'estado_pago', valStatus);
+            setTimeout(() => init(), 400); // Recargar caché para refrescar etiquetas descriptivas
+        }
+
+        async function triggerCascadeFechas() {
+            const id = document.getElementById('admin-san-selector').value;
+            const san = globalData.sanes.find(s => s.id_san === id);
+            const nuevaFecha = document.getElementById('admin-master-date').value;
+            
+            if(!nuevaFecha) return alert("Seleccione una fecha base");
+            
+            document.getElementById('loading').classList.remove('hidden');
             try {
                 await fetch(API_URL, {
                     method: "POST",
                     mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ action: "recascadeFechas", id_san: id, fecha_inicio: nuevaFecha, frecuencia: san.frecuencia })
                 });
-                const cache = globalData.pagos.find(p => p.id_san === idSan && parseInt(p.numero_puesto) === numPuesto);
-                if(cache) cache[field] = value;
-            } catch (e) {
-                console.error("Fallo reactivo en celda:", e);
-            }
-        }
-
-        function openModalAddSan() {
-            const id = prompt("Código Único identificador del San (Ej: SAN-MOTO):");
-            if(!id) return;
-            const name = prompt("Nombre descriptivo para los clientes:");
-            const cuota = prompt("Monto de la cuota en dólares ($):");
-            const freq = prompt("Periodicidad del cobro (Ej: Semanal / Quincenal):");
-            const total = prompt("Número total de vacantes/puestos:");
-
-            if(id && name && cuota && freq && total) {
-                executePost({ action: "addSan", id_san: id.toUpperCase().trim(), nombre_san: name, cuota: cuota, frecuencia: freq, total_puestos: total });
-            }
-        }
-
-        function openModalAddOferta() {
-            const producto = prompt("Nombre del Artículo en promoción:");
-            if(!producto) return;
-            const precio = prompt("Precio final especial ($):");
-            const desc = prompt("Descripción puntual:");
-            const disp = prompt("Estado de inventario (Ej: Disponible / Agotado):");
-            const img = prompt("Enlace URL de imagen del producto (Opcional):");
-
-            if(producto && precio && disp) {
-                executePost({ action: "addOferta", id: "OFE-" + Date.now().toString().slice(-4), producto: producto, precio_oferta: precio, descripcion: desc, disponibilidad: disp, imgUrl: img });
-            }
-        }
-
-        async function executePost(payload) {
-            document.getElementById('loading').classList.remove('hidden');
-            try {
-                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-                setTimeout(() => init(), 1800); 
+                setTimeout(() => init(), 1500);
             } catch(e) {
-                alert("Error al inyectar comando post.");
+                alert("Fallo al propagar cambios.");
                 document.getElementById('loading').classList.add('hidden');
             }
+        }
+
+        async function submitAddSan() {
+            const id = document.getElementById('new-san-id').value.toUpperCase().trim();
+            const name = document.getElementById('new-san-name').value;
+            const cuota = document.getElementById('new-san-cuota').value;
+            const freq = document.getElementById('new-san-freq').value;
+            const total = document.getElementById('new-san-total').value;
+            const fInicio = document.getElementById('new-san-date').value;
+
+            if(!id || !name || !cuota || !fInicio) return alert("Complete todas las casillas del bloque.");
+
+            document.getElementById('loading').classList.remove('hidden');
+            await fetch(API_URL, {
+                method: "POST", 
+                mode: "no-cors", 
+                body: JSON.stringify({ action: "addSan", id_san: id, nombre_san: name, cuota: cuota, frecuencia: freq, total_puestos: total, fecha_inicio: fInicio })
+            });
+            document.getElementById('block-add-san').classList.add('hidden');
+            setTimeout(() => init(), 1800);
+        }
+
+        async function submitAddOferta() {
+            const prod = document.getElementById('new-of-prod').value;
+            const price = document.getElementById('new-of-price').value;
+            const disp = document.getElementById('new-of-disp').value;
+            const desc = document.getElementById('new-of-desc').value;
+            const img = document.getElementById('new-of-img').value;
+
+            if(!prod || !price || !disp) return alert("Complete los datos requeridos.");
+
+            document.getElementById('loading').classList.remove('hidden');
+            await fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify({ action: "addOferta", producto: prod, precio_oferta: price, descripción: desc, disponibilidad: disp, imgUrl: img })
+            });
+            document.getElementById('block-add-oferta').classList.add('hidden');
+            setTimeout(() => init(), 1500);
         }
 
         function renderOfertas() {
             const container = document.getElementById('section-ofertas');
             if (!globalData.ofertas || globalData.ofertas.length === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-12">No existen promociones vigentes.</p>`;
+                container.innerHTML = `<p class="text-xs text-purple-400/40 text-center py-12 font-bold uppercase tracking-widest">Sin promociones cargadas.</p>`;
                 return;
             }
             container.innerHTML = globalData.ofertas.map(o => {
                 const img = o.imgUrl ? o.imgUrl : 'https://images.unsplash.com/photo-1601524909162-be87252be298?auto=format&fit=crop&w=300&q=80';
                 return `
-                    <div class="bg-[#111827] rounded-2xl border border-gray-800 overflow-hidden flex flex-col justify-between shadow-md">
+                    <div class="bg-[#170f2c] rounded-2xl border border-purple-900/30 overflow-hidden flex flex-col justify-between shadow-lg">
                         <div class="p-4 flex space-x-4">
-                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl bg-gray-800 flex-shrink-0">
+                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl bg-purple-950 flex-shrink-0 border border-purple-900/40">
                             <div class="flex-1 min-w-0">
-                                <span class="text-[8px] font-black text-yellow-500 uppercase tracking-widest block mb-0.5">${o.disponibilidad}</span>
-                                <h4 class="text-xs font-black text-white truncate uppercase">${o.producto}</h4>
-                                <p class="text-[11px] text-gray-400 line-clamp-2 mt-0.5 leading-relaxed">${o.descripcion}</p>
+                                <span class="text-[8px] font-black text-amber-400 uppercase tracking-widest block mb-0.5">${o.disponibilidad}</span>
+                                <h4 class="text-xs font-black text-white truncate uppercase tracking-wider">${o.producto}</h4>
+                                <p class="text-[11px] text-purple-300/70 line-clamp-2 mt-0.5 leading-relaxed font-medium">${o.descripcion || ''}</p>
                             </div>
                         </div>
-                        <div class="bg-[#1f2937]/40 px-4 py-2.5 border-t border-gray-800 flex items-center justify-between">
-                            <span class="text-base font-black text-white">$${parseFloat(o.precio_oferta).toFixed(2)}</span>
-                            <button onclick="orderViaWhatsApp('${o.producto}', '${o.precio_oferta}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[10px] py-1.5 px-3 rounded-md flex items-center uppercase tracking-wider transition-all">
-                                <i class="fa-brands fa-whatsapp text-xs mr-1"></i>Pedir
+                        <div class="bg-[#120b24]/60 px-4 py-3 border-t border-purple-900/20 flex items-center justify-between">
+                            <span class="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">$${parseFloat(o.precio_oferta).toFixed(2)}</span>
+                            <button onclick="orderViaWhatsApp('${o.producto}', '${o.precio_oferta}')" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-black text-[10px] py-2 px-3.5 rounded-lg flex items-center uppercase tracking-widest shadow-md">
+                                <i class="fa-brands fa-whatsapp text-xs mr-1.5"></i>Pedir
                             </button>
                         </div>
                     </div>`;
@@ -314,7 +420,7 @@
         }
 
         function orderViaWhatsApp(name, price) {
-            const message = encodeURIComponent(`¡Hola! Quisiera apartar la oferta especial:\n\n📦 *Producto:* ${name}\n💰 *Precio:* $${parseFloat(price).toFixed(2)}`);
+            const message = encodeURIComponent(`¡Hola! Me interesa la oferta:\n\n📦 *Producto:* ${name}\n💰 *Precio:* $${parseFloat(price).toFixed(2)}`);
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
         }
 
