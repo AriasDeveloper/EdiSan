@@ -3,135 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Sanes y Ofertas</title>
+    <title>Portal de Gestión de Sanes e Inversiones</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #0b0f19; color: #f3f4f6; }
-        .gold-glow { box-shadow: 0 0 15px rgba(234, 179, 8, 0.15); }
+        .gold-glow { box-shadow: 0 0 20px rgba(234, 179, 8, 0.12); }
         .tab-active { border-bottom: 3px solid #eab308; color: #eab308; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     </style>
 </head>
 <body class="font-sans antialiased pb-24">
 
-    <header class="bg-[#111827] border-b border-gray-800 py-6 px-4 text-center sticky top-0 z-40 shadow-md">
-        <h1 class="text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-500">
-            ✨ PORTAL DE SANES & OFERTAS ✨
+    <header class="bg-[#111827] border-b border-gray-800 py-5 px-4 text-center sticky top-0 z-40 shadow-md">
+        <h1 class="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-500 uppercase">
+            Sistemas Sanes & Ofertas Especiales
         </h1>
-        <p class="text-xs text-gray-400 mt-1">Consulta tus estados de cuenta y promociones 24/7</p>
+        <p class="text-[11px] text-gray-400 mt-0.5">Control de cuotas automático y catálogo unificado</p>
     </header>
 
-    <div class="flex bg-[#111827] border-b border-gray-800 text-center text-sm font-bold tracking-wide">
-        <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-active transition-all duration-300">
-            <i class="fa-solid fa-piggy-bank mr-2"></i>Sanes / Tandas
+    <div class="flex bg-[#111827] border-b border-gray-800 text-center text-xs font-bold uppercase tracking-wider">
+        <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-active transition-all">
+            <i class="fa-solid fa-piggy-bank mr-2 text-yellow-500"></i>Mis Sanes
         </button>
-        <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 text-gray-400 transition-all duration-300">
-            <i class="fa-solid fa-fire mr-2 text-amber-500"></i>Ofertas
+        <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 text-gray-400 transition-all">
+            <i class="fa-solid fa-bolt mr-2 text-amber-500"></i>Ofertas del Día
         </button>
     </div>
 
     <main class="max-w-md mx-auto px-4 mt-6">
         
         <div id="loading" class="text-center py-20">
-            <div class="animate-spin inline-block w-10 h-10 border-[4px] border-current border-t-transparent text-yellow-500 rounded-full"></div>
-            <p class="text-sm text-gray-400 mt-3 tracking-widest">Sincronizando portal...</p>
+            <div class="animate-spin inline-block w-8 h-8 border-[3px] border-current border-t-transparent text-yellow-500 rounded-full"></div>
+            <p class="text-xs text-gray-400 mt-3 tracking-widest uppercase">Consultando base de datos...</p>
         </div>
 
-        <section id="section-sanes" class="hidden space-y-6">
-            <div class="bg-[#111827] p-4 rounded-xl border border-gray-800">
-                <label class="block text-xs font-bold text-yellow-500 uppercase tracking-wider mb-2">Selecciona un San activo:</label>
-                <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#1f2937] text-white p-3 rounded-lg border border-gray-700 focus:outline-none focus:border-yellow-500 font-medium">
-                </select>
+        <section id="section-sanes" class="hidden space-y-5">
+            <div class="bg-[#111827] p-4 rounded-xl border border-gray-800 shadow-inner">
+                <label class="block text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-2">Seleccione un plan activo:</label>
+                <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#1f2937] text-white p-3 rounded-lg border border-gray-700 focus:outline-none focus:border-yellow-500 font-bold text-sm"></select>
             </div>
 
             <div id="san-info-card" class="bg-gradient-to-br from-[#111827] to-[#1f2937] p-5 rounded-2xl border border-gray-800 gold-glow hidden">
-                <h3 id="detail-san-name" class="text-lg font-extrabold text-white">---</h3>
-                <div class="grid grid-cols-2 gap-4 mt-4 text-center">
+                <h3 id="detail-san-name" class="text-base font-extrabold text-white tracking-wide">---</h3>
+                <div class="grid grid-cols-2 gap-3 mt-4 text-center">
                     <div class="bg-[#0b0f19] p-3 rounded-xl border border-gray-800">
-                        <span class="block text-[10px] text-gray-400 font-bold uppercase">Cuota</span>
-                        <span id="detail-san-cuota" class="text-xl font-black text-yellow-400">$0.00</span>
+                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider">Cuota Base</span>
+                        <span id="detail-san-cuota" class="text-lg font-black text-yellow-400">$0.00</span>
                     </div>
                     <div class="bg-[#0b0f19] p-3 rounded-xl border border-gray-800">
-                        <span class="block text-[10px] text-gray-400 font-bold uppercase">Frecuencia</span>
-                        <span id="detail-san-frecuencia" class="text-sm font-bold text-gray-200 mt-1 block">---</span>
+                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider">Frecuencia</span>
+                        <span id="detail-san-frecuencia" class="text-xs font-bold text-gray-200 mt-1 block tracking-wide">---</span>
                     </div>
-                </div>
-                <div class="mt-4 flex justify-between items-center text-xs text-gray-400 px-1">
-                    <span>Puestos totales: <strong id="detail-san-puestos" class="text-white">0</strong></span>
-                    <span id="detail-san-estado" class="px-2 py-1 rounded bg-yellow-500/10 text-yellow-400 font-bold">---</span>
                 </div>
             </div>
 
-            <div id="san-table-container" class="hidden">
-                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">Cronograma de puestos</h4>
-                <div class="space-y-3" id="table-body-puestos"></div>
+            <div id="san-table-container" class="hidden space-y-2">
+                <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Cronograma General de Puestos</h4>
+                <div class="space-y-2.5" id="client-puestos-container"></div>
             </div>
         </section>
 
-        <section id="section-ofertas" class="hidden space-y-4">
-            <div id="ofertas-container" class="grid grid-cols-1 gap-4"></div>
-        </section>
+        <section id="section-ofertas" class="hidden grid grid-cols-1 gap-4"></section>
 
-        <section id="section-admin" class="hidden space-y-6 bg-[#111827] p-5 rounded-2xl border border-gray-800 gold-glow">
+        <section id="section-admin" class="hidden space-y-5">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
-                <h2 class="text-lg font-black text-yellow-500"><i class="fa-solid fa-screwdriver-wrench mr-2"></i>Panel de Control</h2>
-                <button onclick="switchTab('sanes')" class="text-xs bg-gray-800 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white">Salir</button>
+                <h2 class="text-sm font-black text-yellow-500 uppercase tracking-widest"><i class="fa-solid fa-shield-halved mr-2"></i>Consola Dueña</h2>
+                <button onclick="switchTab('sanes')" class="text-[10px] font-bold bg-gray-800 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white uppercase">Cerrar Sesión</button>
             </div>
 
-            <form id="form-oferta" onsubmit="submitAdminForm(event, 'addOferta')" class="space-y-3 bg-[#1f2937]/40 p-4 rounded-xl border border-gray-800">
-                <h3 class="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">🎁 Publicar Nueva Oferta</h3>
-                <input type="text" placeholder="Nombre del Producto (Ej: Cargador HP)" required id="of-producto" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="number" step="0.01" placeholder="Precio ($)" required id="of-precio" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                    <input type="text" placeholder="Disponibilidad (Ej: Disponible)" required id="of-disp" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                </div>
-                <input type="text" placeholder="Descripción corta" id="of-desc" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                <input type="text" placeholder="URL de la imagen (Opcional)" id="of-img" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold text-xs py-2.5 rounded-lg tracking-wider uppercase transition-all">Subir Oferta</button>
-            </form>
+            <div class="flex gap-2">
+                <button onclick="openModalAddSan()" class="flex-1 bg-yellow-500/10 border border-yellow-500/20 py-2.5 rounded-xl text-[11px] font-black text-yellow-400 text-center uppercase tracking-wide"><i class="fa-solid fa-plus mr-1"></i> Inicializar San</button>
+                <button onclick="openModalAddOferta()" class="flex-1 bg-amber-500/10 border border-amber-500/20 py-2.5 rounded-xl text-[11px] font-black text-amber-400 text-center uppercase tracking-wide"><i class="fa-solid fa-tag mr-1"></i> Cargar Oferta</button>
+            </div>
 
-            <form id="form-san" onsubmit="submitAdminForm(event, 'addSan')" class="space-y-3 bg-[#1f2937]/40 p-4 rounded-xl border border-gray-800">
-                <h3 class="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">🐷 Crear Nuevo Grupo de San</h3>
-                <input type="text" placeholder="Código Único (Ej: SAN-IPHONE)" required id="san-id" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                <input type="text" placeholder="Nombre Completo del San" required id="san-name" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                <div class="grid grid-cols-3 gap-2">
-                    <input type="number" step="0.01" placeholder="Cuota $" required id="san-cuota" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                    <input type="text" placeholder="Frecuencia" required id="san-freq" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                    <input type="number" placeholder="Puestos" required id="san-total" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                </div>
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs py-2.5 rounded-lg tracking-wider uppercase transition-all">Crear San</button>
-            </form>
+            <div class="bg-[#111827] p-4 rounded-xl border border-gray-800">
+                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Seleccionar Grupo a Controlar:</label>
+                <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#1f2937] text-white p-3 rounded-lg border border-gray-700 text-xs font-bold focus:outline-none"></select>
+            </div>
 
-            <form id="form-pago" onsubmit="submitAdminForm(event, 'addPago')" class="space-y-3 bg-[#1f2937]/40 p-4 rounded-xl border border-gray-800">
-                <h3 class="text-xs font-black text-gray-400 uppercase tracking-wider mb-2">📋 Asignar Puesto o Pago</h3>
-                <input type="text" placeholder="Código del San (Debe coincidir, Ej: SAN-IPHONE)" required id="pag-id" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="number" placeholder="Número de Puesto" required id="pag-puesto" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                    <input type="date" required id="pag-fecha" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                </div>
-                <input type="text" placeholder="Nombre del Cliente (O 'Disponible')" required id="pag-cliente" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="number" step="0.01" placeholder="Monto de Cuota $" required id="pag-monto" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                    <select id="pag-estado" class="w-full bg-[#111827] p-2.5 rounded-lg text-sm border border-gray-700 text-white">
-                        <option value="🟢 Pagado">🟢 Pagado</option>
-                        <option value="🟡 Pendiente">🟡 Pendiente</option>
-                        <option value="🟢 Pagado - Entregado">🟢 Pagado - Entregado</option>
-                    </select>
-                </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs py-2.5 rounded-lg tracking-wider uppercase transition-all">Guardar Puesto</button>
-            </form>
+            <div class="space-y-3.5" id="admin-puestos-container"></div>
         </section>
-
     </main>
 
-    <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#1f2937] hover:bg-gray-700 text-yellow-500 p-4 rounded-full shadow-2xl border border-gray-700 transition-all z-50">
-        <i class="fa-solid fa-lock text-lg"></i>
+    <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#1f2937] hover:bg-gray-800 text-yellow-500 p-4 rounded-full shadow-2xl border border-gray-700 z-50 transition-all">
+        <i class="fa-solid fa-user-shield text-lg"></i>
     </button>
 
     <script>
+        // CONFIGURACIÓN DE CONEXIÓN GLOBAL
         const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
         const WHATSAPP_NUMBER = "584242961164"; 
-        const ADMIN_PASSWORD = "1234"; // Esta es la clave del panel de la dueña
+        const ADMIN_PASSWORD = "30589875"; 
         let globalData = {};
 
         async function init() {
@@ -141,49 +104,49 @@
                 globalData = await response.json();
                 document.getElementById('loading').classList.add('hidden');
                 switchTab('sanes');
-                populateSanSelector();
+                populateSelectors();
                 renderOfertas();
             } catch (error) {
-                console.error(error);
-                document.getElementById('loading').innerHTML = `<p class="text-red-500 font-bold text-sm">Error de sincronización.</p>`;
+                console.error("Error en sincronización externa:", error);
+                document.getElementById('loading').innerHTML = `<p class="text-red-500 font-bold text-xs tracking-wider uppercase">Fallo de comunicación con la base de datos.</p>`;
             }
         }
 
         function loginAdmin() {
-            const pass = prompt("Introduce la clave de administradora:");
+            const pass = prompt("Introduzca credencial de seguridad de la Administradora:");
             if (pass === ADMIN_PASSWORD) {
                 switchTab('admin');
             } else if (pass !== null) {
-                alert("Clave incorrecta");
+                alert("Acceso denegado. Credencial incorrecta.");
             }
         }
 
         function switchTab(tab) {
-            const tabs = ['sanes', 'ofertas', 'admin'];
-            tabs.forEach(t => {
-                const element = document.getElementById(`section-${t}`);
-                if(element) element.classList.add('hidden');
+            ['sanes', 'ofertas', 'admin'].forEach(t => {
+                const sec = document.getElementById(`section-${t}`);
+                if(sec) sec.classList.add('hidden');
                 const btn = document.getElementById(`tab-${t}`);
                 if(btn) btn.classList.remove('tab-active', 'text-gray-400');
             });
 
             document.getElementById(`section-${tab}`).classList.remove('hidden');
             if(tab !== 'admin') document.getElementById(`tab-${tab}`).classList.add('tab-active');
+            if(tab === 'admin') renderAdminPuestos();
+            if(tab === 'sanes') renderSanDetails();
         }
 
-        function populateSanSelector() {
-            const selector = document.getElementById('san-selector');
-            if (!globalData.sanes || globalData.sanes.length === 0) {
-                selector.innerHTML = `<option>No hay Sanes registrados</option>`;
-                return;
-            }
-            selector.innerHTML = globalData.sanes.map((san, idx) => `<option value="${san.id_san}">${san.nombre_san}</option>`).join('');
+        function populateSelectors() {
+            if(!globalData.sanes || globalData.sanes.length === 0) return;
+            const options = globalData.sanes.map(s => `<option value="${s.id_san}">${s.nombre_san}</option>`).join('');
+            document.getElementById('san-selector').innerHTML = options;
+            document.getElementById('admin-san-selector').innerHTML = options;
             renderSanDetails();
         }
 
+        // MOTOR RECONSTRUCTOR DE LOGICA DE NEGOCIO EN TIEMPO REAL (CLIENTES)
         function renderSanDetails() {
-            const selectedId = document.getElementById('san-selector').value;
-            const san = globalData.sanes.find(s => s.id_san === selectedId);
+            const id = document.getElementById('san-selector').value;
+            const san = globalData.sanes.find(s => s.id_san === id);
             if (!san) return;
 
             document.getElementById('san-info-card').classList.remove('hidden');
@@ -191,118 +154,168 @@
             document.getElementById('detail-san-name').innerText = san.nombre_san;
             document.getElementById('detail-san-cuota').innerText = `$${parseFloat(san.cuota).toFixed(2)}`;
             document.getElementById('detail-san-frecuencia').innerText = san.frecuencia;
-            document.getElementById('detail-san-puestos').innerText = san.total_puestos;
-            document.getElementById('detail-san-estado').innerText = san.estado;
 
-            const puestos = globalData.pagos.filter(p => p.id_san === selectedId);
-            const container = document.getElementById('table-body-puestos');
-
-            if(puestos.length === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Sin puestos asignados todavía.</p>`;
-                return;
-            }
+            const puestos = globalData.pagos.filter(p => p.id_san === id);
+            const container = document.getElementById('client-puestos-container');
+            
+            const hoy = new Date();
+            hoy.setHours(0,0,0,0);
 
             container.innerHTML = puestos.map(p => {
-                let statusClass = "bg-gray-800 text-gray-400 border-gray-700";
-                if (p.estado_pago.includes("🟢")) statusClass = "bg-green-500/10 text-green-400 border-green-500/20";
-                if (p.estado_pago.includes("🟡")) statusClass = "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
+                let estadoCalculado = p.estado_pago;
+                let statusClass = "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"; 
+
+                // Evaluador condicional dinámico
+                if (!p.estado_pago.includes("🟢") && p.fecha_pago) {
+                    const fechaLimite = new Date(p.fecha_pago.split("T")[0] + "T00:00:00");
+                    if (hoy >= fechaLimite) {
+                        estadoCalculado = "🚨 ¡Vencido! Pendiente";
+                        statusClass = "bg-red-500/10 text-red-400 border-red-500/20";
+                    } else {
+                        estadoCalculado = "⏳ En Espera / Próximo";
+                        statusClass = "bg-blue-500/10 text-blue-400 border-blue-500/20";
+                    }
+                } else if (p.estado_pago.includes("🟢")) {
+                    statusClass = "bg-green-500/10 text-green-400 border-green-500/20";
+                }
+
                 return `
                     <div class="flex items-center justify-between p-3 rounded-xl bg-[#111827] border border-gray-800">
                         <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center font-black text-yellow-500 text-sm">${p.numero_puesto}</div>
+                            <div class="w-7 h-7 rounded-full bg-gray-800 flex items-center justify-center font-black text-yellow-500 text-xs">${p.numero_puesto}</div>
                             <div>
-                                <h5 class="text-sm font-bold ${p.cliente_assigned && p.cliente_assigned.toLowerCase().includes('disponible') ? 'text-gray-500' : 'text-white'}">${p.cliente_asignado || p.cliente_assigned}</h5>
-                                <p class="text-[10px] text-gray-400">Límite: ${p.fecha_pago.split("T")[0]}</p>
+                                <h5 class="text-xs font-bold ${p.cliente_asignado.toLowerCase().includes('disponible') ? 'text-gray-500 italic' : 'text-white'}">${p.cliente_asignado}</h5>
+                                <p class="text-[9px] text-gray-400 tracking-wide">Cobro: ${p.fecha_pago ? p.fecha_pago.split("T")[0] : 'Por definir'}</p>
                             </div>
                         </div>
-                        <span class="text-[11px] font-bold px-2 py-1 rounded border ${statusClass}">${p.estado_pago}</span>
+                        <span class="text-[9px] font-black px-2 py-1 rounded border uppercase tracking-wider ${statusClass}">${estadoCalculado}</span>
                     </div>`;
             }).join('');
         }
 
+        // CONTROL DINÁMICO EXCLUSIVO PARA LA DUEÑA (EDICIÓN CELDA POR CELDA)
+        function renderAdminPuestos() {
+            const id = document.getElementById('admin-san-selector').value;
+            const puestos = globalData.pagos.filter(p => p.id_san === id);
+            const container = document.getElementById('admin-puestos-container');
+            
+            if(puestos.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Sin registros correlativos.</p>`;
+                return;
+            }
+
+            container.innerHTML = puestos.map(p => {
+                const dateVal = p.fecha_pago ? p.fecha_pago.split("T")[0] : "";
+                return `
+                    <div class="bg-[#111827] p-3.5 rounded-xl border border-gray-800 space-y-3 shadow-md">
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                            <span class="text-xs font-black text-yellow-500 tracking-wide">PUESTO NRO. ${p.numero_puesto}</span>
+                            <select onchange="updateCell('${id}', ${p.numero_puesto}, 'estado_pago', this.value)" class="bg-[#1f2937] text-[10px] p-1.5 rounded border border-gray-700 text-white font-black uppercase">
+                                <option value="🟡 Sin pagar" ${p.estado_pago.includes('🟡') || p.estado_pago.includes('Pendiente') ? 'selected' : ''}>🟡 Ciclo Automático</option>
+                                <option value="🟢 Pagado" ${p.estado_pago === '🟢 Pagado' ? 'selected' : ''}>🟢 Cobrado / Pagado</option>
+                                <option value="🟢 Pagado - Entregado" ${p.estado_pago.includes('Entregado') ? 'selected' : ''}>🏆 Entregado</option>
+                            </select>
+                        </div>
+                        <div class="space-y-2">
+                            <div>
+                                <label class="text-[9px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Responsable Asignado:</label>
+                                <input type="text" value="${p.cliente_asignado}" onblur="updateCell('${id}', ${p.numero_puesto}, 'cliente_asignado', this.value)" class="w-full bg-[#0b0f19] p-2 rounded text-xs border border-gray-700 text-white focus:border-yellow-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Fecha de Cobro Obligatoria:</label>
+                                <input type="date" value="${dateVal}" onchange="updateCell('${id}', ${p.numero_puesto}, 'fecha_pago', this.value)" class="w-full bg-[#0b0f19] p-2 rounded text-xs border border-gray-700 text-white focus:border-yellow-500 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function updateCell(idSan, numPuesto, field, value) {
+            let payload = { action: "updatePago", id_san: idSan, numero_puesto: numPuesto };
+            payload[field] = value;
+
+            try {
+                await fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const cache = globalData.pagos.find(p => p.id_san === idSan && parseInt(p.numero_puesto) === numPuesto);
+                if(cache) cache[field] = value;
+            } catch (e) {
+                console.error("Fallo reactivo en celda:", e);
+            }
+        }
+
+        function openModalAddSan() {
+            const id = prompt("Código Único identificador del San (Ej: SAN-MOTO):");
+            if(!id) return;
+            const name = prompt("Nombre descriptivo para los clientes:");
+            const cuota = prompt("Monto de la cuota en dólares ($):");
+            const freq = prompt("Periodicidad del cobro (Ej: Semanal / Quincenal):");
+            const total = prompt("Número total de vacantes/puestos:");
+
+            if(id && name && cuota && freq && total) {
+                executePost({ action: "addSan", id_san: id.toUpperCase().trim(), nombre_san: name, cuota: cuota, frecuencia: freq, total_puestos: total });
+            }
+        }
+
+        function openModalAddOferta() {
+            const producto = prompt("Nombre del Artículo en promoción:");
+            if(!producto) return;
+            const precio = prompt("Precio final especial ($):");
+            const desc = prompt("Descripción puntual:");
+            const disp = prompt("Estado de inventario (Ej: Disponible / Agotado):");
+            const img = prompt("Enlace URL de imagen del producto (Opcional):");
+
+            if(producto && precio && disp) {
+                executePost({ action: "addOferta", id: "OFE-" + Date.now().toString().slice(-4), producto: producto, precio_oferta: precio, descripcion: desc, disponibilidad: disp, imgUrl: img });
+            }
+        }
+
+        async function executePost(payload) {
+            document.getElementById('loading').classList.remove('hidden');
+            try {
+                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
+                setTimeout(() => init(), 1800); 
+            } catch(e) {
+                alert("Error al inyectar comando post.");
+                document.getElementById('loading').classList.add('hidden');
+            }
+        }
+
         function renderOfertas() {
-            const container = document.getElementById('ofertas-container');
+            const container = document.getElementById('section-ofertas');
             if (!globalData.ofertas || globalData.ofertas.length === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-12">No hay ofertas publicadas.</p>`;
+                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-12">No existen promociones vigentes.</p>`;
                 return;
             }
             container.innerHTML = globalData.ofertas.map(o => {
                 const img = o.imgUrl ? o.imgUrl : 'https://images.unsplash.com/photo-1601524909162-be87252be298?auto=format&fit=crop&w=300&q=80';
                 return `
-                    <div class="bg-[#111827] rounded-2xl border border-gray-800 overflow-hidden flex flex-col justify-between">
+                    <div class="bg-[#111827] rounded-2xl border border-gray-800 overflow-hidden flex flex-col justify-between shadow-md">
                         <div class="p-4 flex space-x-4">
-                            <img src="${img}" class="w-20 h-20 object-cover rounded-xl bg-gray-800">
+                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl bg-gray-800 flex-shrink-0">
                             <div class="flex-1 min-w-0">
-                                <span class="text-[9px] font-black text-yellow-500 uppercase">${o.disponibilidad}</span>
-                                <h4 class="text-sm font-extrabold text-white truncate">${o.producto}</h4>
-                                <p class="text-xs text-gray-400 line-clamp-2 mt-1">${o.descripcion}</p>
+                                <span class="text-[8px] font-black text-yellow-500 uppercase tracking-widest block mb-0.5">${o.disponibilidad}</span>
+                                <h4 class="text-xs font-black text-white truncate uppercase">${o.producto}</h4>
+                                <p class="text-[11px] text-gray-400 line-clamp-2 mt-0.5 leading-relaxed">${o.descripcion}</p>
                             </div>
                         </div>
-                        <div class="bg-[#1f2937]/50 px-4 py-3 border-t border-gray-800 flex items-center justify-between">
-                            <span class="text-lg font-black text-white">$${parseFloat(o.precio_oferta).toFixed(2)}</span>
-                            <button onclick="orderViaWhatsApp('${o.id || 'OFE'}', '${o.producto}', '${o.precio_oferta}')" class="bg-emerald-600 text-white font-bold text-xs py-2 px-3 rounded-lg flex items-center">
-                                <i class="fa-brands fa-whatsapp text-sm mr-1.5"></i>Pedir Oferta
+                        <div class="bg-[#1f2937]/40 px-4 py-2.5 border-t border-gray-800 flex items-center justify-between">
+                            <span class="text-base font-black text-white">$${parseFloat(o.precio_oferta).toFixed(2)}</span>
+                            <button onclick="orderViaWhatsApp('${o.producto}', '${o.precio_oferta}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[10px] py-1.5 px-3 rounded-md flex items-center uppercase tracking-wider transition-all">
+                                <i class="fa-brands fa-whatsapp text-xs mr-1"></i>Pedir
                             </button>
                         </div>
                     </div>`;
             }).join('');
         }
 
-        function orderViaWhatsApp(id, name, price) {
-            const message = encodeURIComponent(`¡Hola! Me interesa la oferta:\n\n📦 *Producto:* ${name}\n💰 *Precio:* $${parseFloat(price).toFixed(2)}`);
+        function orderViaWhatsApp(name, price) {
+            const message = encodeURIComponent(`¡Hola! Quisiera apartar la oferta especial:\n\n📦 *Producto:* ${name}\n💰 *Precio:* $${parseFloat(price).toFixed(2)}`);
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
-        }
-
-        async function submitAdminForm(event, action) {
-            event.preventDefault();
-            const btn = event.target.querySelector('button[type="submit"]');
-            const originalText = btn.innerText;
-            btn.innerText = "GUARDANDO...";
-            btn.disabled = true;
-
-            let payload = { action: action };
-
-            if (action === 'addOferta') {
-                payload.id = "OFE-" + Date.now().toString().slice(-4);
-                payload.producto = document.getElementById('of-producto').value;
-                payload.precio_oferta = document.getElementById('of-precio').value;
-                payload.descripcion = document.getElementById('of-desc').value;
-                payload.disponibilidad = document.getElementById('of-disp').value;
-                payload.imgUrl = document.getElementById('of-img').value;
-            } else if (action === 'addSan') {
-                payload.id_san = document.getElementById('san-id').value.toUpperCase().trim();
-                payload.nombre_san = document.getElementById('san-name').value;
-                payload.cuota = document.getElementById('san-cuota').value;
-                payload.frecuencia = document.getElementById('san-freq').value;
-                payload.total_puestos = document.getElementById('san-total').value;
-                payload.estado = "Activo";
-            } else if (action === 'addPago') {
-                payload.id_san = document.getElementById('pag-id').value.toUpperCase().trim();
-                payload.numero_puesto = document.getElementById('pag-puesto').value;
-                payload.fecha_pago = document.getElementById('pag-fecha').value;
-                payload.cliente_asignado = document.getElementById('pag-cliente').value;
-                payload.monto_cuota = document.getElementById('pag-monto').value;
-                payload.estado_pago = document.getElementById('pag-estado').value;
-            }
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: "POST",
-                    mode: "no-cors", // Requerido para Apps Script sin servidores intermedios
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-                
-                alert("¡Datos guardados con éxito en la base de datos!");
-                event.target.reset();
-                init(); // Recargar datos
-            } catch (error) {
-                console.error(error);
-                alert("Error al guardar los datos.");
-            } finally {
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
         }
 
         init();
