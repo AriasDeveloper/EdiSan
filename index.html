@@ -3,24 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Corporativo Sanes & Ofertas Velvet</title>
+    <title>Sanes Inversiones Edimar - La Patrona</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #0c0817; color: #f3f4f6; }
-        .purple-glow { box-shadow: 0 0 25px rgba(139, 92, 246, 0.15); }
+        .purple-glow { box-shadow: 0 0 25px rgba(217, 70, 239, 0.2); }
         .tab-active { border-bottom: 3px solid #d946ef; color: #d946ef; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.4) sepia(1) saturate(3) hue-rotate(270deg); cursor: pointer; }
     </style>
 </head>
 <body class="font-sans antialiased pb-24">
 
-    <!-- Header Corporativo -->
-    <header class="bg-[#170f2c] border-b border-purple-900/40 py-5 px-4 text-center sticky top-0 z-40 shadow-lg">
-        <h1 class="text-xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-400 uppercase">
-            Sanes & Ofertas Velvet
+    <!-- Header Corporativo Rediseñado: Edimar (La Patrona) -->
+    <header class="bg-gradient-to-b from-[#1f113a] to-[#120826] border-b border-pink-500/20 py-6 px-4 text-center sticky top-0 z-40 shadow-2xl">
+        <div class="inline-flex items-center justify-center bg-pink-500/10 border border-pink-500/30 px-3 py-1 rounded-full mb-2">
+            <i class="fa-solid fa-crown text-amber-400 text-[10px] mr-1.5 animate-pulse"></i>
+            <span class="text-[9px] uppercase tracking-widest font-black text-pink-400">Inversiones Edimar</span>
+        </div>
+        <h1 class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 uppercase">
+            SANES LA PATRONA
         </h1>
-        <p class="text-[10px] text-purple-300/70 mt-0.5 tracking-wider font-medium">Logística de Cuotas y Entregas de Productos</p>
+        <p class="text-[10px] text-purple-300/60 mt-1 tracking-widest font-bold uppercase">Plataforma de Control de Cuotas y Adjudicaciones</p>
     </header>
 
     <!-- Pestañas Superiores -->
@@ -39,7 +43,7 @@
         <!-- Pantalla de carga -->
         <div id="loading" class="text-center py-20">
             <div class="animate-spin inline-block w-8 h-8 border-[3px] border-purple-500 border-t-transparent rounded-full"></div>
-            <p class="text-[10px] text-purple-400 font-bold mt-4 tracking-widest uppercase">Sincronizando Sistema Velvet...</p>
+            <p class="text-[10px] text-purple-400 font-bold mt-4 tracking-widest uppercase">Sincronizando con La Patrona...</p>
         </div>
 
         <!-- ================= VISTA CLIENTE: CRONOGRAMA DE RONDAS ================= -->
@@ -49,12 +53,12 @@
                 <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 focus:outline-none focus:border-pink-500 font-bold text-sm cursor-pointer"></select>
             </div>
 
-            <!-- Card de Info General (Solución definitiva al NaN buscando la clave exacta) -->
+            <!-- Card de Info General -->
             <div id="san-info-card" class="bg-gradient-to-br from-[#1c1236] to-[#120b24] p-5 rounded-2xl border border-purple-900/40 purple-glow hidden">
                 <h3 id="detail-san-name" class="text-base font-extrabold text-white tracking-wide">---</h3>
                 <div class="grid grid-cols-2 gap-3 mt-4 text-center">
                     <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
-                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Cuota por Persona</span>
+                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Cuota Requerida</span>
                         <span id="detail-san-cuota" class="text-lg font-black text-amber-400">$0.00</span>
                     </div>
                     <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
@@ -76,7 +80,7 @@
         <!-- ================= VISTA DUEÑA: CONSOLA DE DOBLE CAPA INTERACTIVA ================= -->
         <section id="section-admin" class="hidden space-y-6">
             <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
-                <h2 class="text-xs font-black text-pink-400 uppercase tracking-widest"><i class="fa-solid fa-crown mr-2"></i>Consola Control Dueña</h2>
+                <h2 class="text-xs font-black text-pink-400 uppercase tracking-widest"><i class="fa-solid fa-crown mr-2"></i>Consola Dueña (La Patrona)</h2>
                 <button onclick="switchTab('sanes')" class="text-[9px] font-black bg-purple-950/60 border border-purple-800/40 px-3 py-1.5 rounded-lg text-purple-300 uppercase tracking-wider">Salir</button>
             </div>
 
@@ -88,10 +92,10 @@
                     <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase tracking-wide hover:border-purple-500 transition-all">🛍️ Cargar Oferta</button>
                 </div>
 
-                <!-- Formulario San -->
+                <!-- Formulario San (CORREGIDO: id unificado con la acción del backend) -->
                 <div id="block-add-san" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
                     <input type="text" id="new-san-id" placeholder="ID Único (Ej: SAN-MOTOS)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold placeholder-purple-400/40 focus:outline-none">
-                    <input type="text" id="new-san-name" placeholder="Nombre (Ej: San Motos Bera 2026)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
+                    <input type="text" id="new-san-name" placeholder="Nombre (Ej: San Motos Bera)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
                     <div class="grid grid-cols-3 gap-1.5">
                         <input type="number" id="new-san-cuota" placeholder="Cuota $" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
                         <select id="new-san-freq" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
@@ -126,20 +130,19 @@
                 <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-xs focus:outline-none"></select>
             </div>
 
-            <!-- Control Maestro de Desplazamiento de Calendario en Cadena -->
+            <!-- Control Maestro Calendario -->
             <div id="admin-cascada-card" class="bg-gradient-to-r from-[#21113a] to-[#120a24] p-4 rounded-xl border border-purple-800/50 space-y-2.5 hidden shadow-md">
                 <div class="flex justify-between items-center">
                     <span class="text-[10px] font-black text-purple-300 uppercase tracking-widest"><i class="fa-solid fa-calendar-days mr-1"></i> Mover Cronograma Completo</span>
                     <span id="admin-cascada-freq" class="text-[9px] font-bold px-2 py-0.5 rounded bg-purple-900/40 text-purple-400 border border-purple-800/50 uppercase">---</span>
                 </div>
-                <p class="text-[10px] text-purple-400/80 leading-relaxed">Si cambias la fecha de inicio, **todas las rondas recalculan su fecha de vencimiento automáticamente** en cadena de forma matemática.</p>
                 <div class="flex gap-2">
                     <input type="date" id="admin-master-date" class="flex-1 bg-[#0c0817] border border-purple-800 p-2 rounded text-xs text-white focus:outline-none">
                     <button onclick="triggerCascadeFechas()" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded text-[10px] font-black uppercase tracking-wider transition-all">Propagar Fechas</button>
                 </div>
             </div>
 
-            <!-- Bloques de Rondas (Desglose Clínico de Quién Pagó) -->
+            <!-- Bloques de Rondas -->
             <div class="space-y-4" id="admin-puestos-container"></div>
         </section>
     </main>
@@ -195,7 +198,6 @@
 
         function populateSelectors() {
             if(!globalData.sanes || globalData.sanes.length === 0) return;
-            // Se mapean los nombres buscando de forma segura las propiedades de la hoja
             const options = globalData.sanes.map(s => {
                 const idSan = s.id_san || s.ID_San || s.id;
                 const nombreSan = s.nombre_san || s.Nombre || s.nombre;
@@ -206,13 +208,11 @@
             renderSanDetails();
         }
 
-        // MOTOR RENDER DE LOGICA DE NEGOCIO PÚBLICA (VISTA CLIENTES)
         function renderSanDetails() {
             const id = document.getElementById('san-selector').value;
             const san = globalData.sanes.find(s => (s.id_san || s.ID_San || s.id) === id);
             if (!san) return;
 
-            // SOLUCIÓN AL NaN: Mapeo exacto de los campos de la tabla sin importar minúsculas
             const cuotaValor = san.cuota || san.cuota_base || san.monto_cuota || san.Monto || 0;
             const freqValor = san.frecuencia || san.Frecuencia || "Semanal";
             const nameValor = san.nombre_san || san.Nombre || "San Activo";
@@ -225,7 +225,6 @@
 
             const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.ID_San) === id);
             
-            // Agrupamos por número de Ronda para mostrar el estado general de esa fecha de entrega
             const rondasMapeadas = {};
             todosLosPagos.forEach(p => {
                 const r = p.ronda || p.Ronda || p.numero_puesto; 
@@ -233,7 +232,7 @@
                     rondasMapeadas[r] = {
                         ronda: r,
                         fecha: p.fecha_pago || p.Fecha || p.fecha,
-                        beneficiario: p.beneficiario_premio || p.Beneficiario || "Cupo " + r,
+                        beneficiario: p.beneficiario_premio || p.Beneficiario || "Cliente " + r,
                         estadoEntrega: p.estado_entrega || p.Estado_Entrega || "📦 Retención",
                         totalClientes: 0,
                         clientesPagados: 0
@@ -255,12 +254,12 @@
                 let badgeClass = "bg-purple-500/10 text-purple-300 border-purple-800/40";
                 
                 if(r.estadoEntrega.toLowerCase().includes("entregado")) {
-                    statusText = "🏆 ¡Articulo Entregado!";
+                    statusText = "🏆 ¡Artículo Entregado!";
                     badgeClass = "bg-pink-500/20 text-pink-400 border-pink-500/30 font-black";
                 } else if (r.fecha) {
                     const limit = new Date(r.fecha.split("T")[0] + "T00:00:00");
                     if (hoy >= limit && r.clientesPagados < r.totalClientes) {
-                        statusText = "🚨 Ronda con Retrasos";
+                        statusText = "🚨 Con Retrasos";
                         badgeClass = "bg-red-500/20 text-red-400 border-red-500/30 font-bold";
                     }
                 }
@@ -269,17 +268,16 @@
                     <div class="p-4 rounded-xl bg-[#170f2c] border border-purple-900/30 shadow-md space-y-2">
                         <div class="flex justify-between items-start">
                             <div>
-                                <span class="text-[9px] font-black text-purple-400 uppercase tracking-widest block">RONDA DE ENTREGA NRO. ${r.ronda}</span>
+                                <span class="text-[9px] font-black text-purple-400 uppercase tracking-widest block">Ronda de Entrega Nro. ${r.ronda}</span>
                                 <h5 class="text-xs font-black text-white mt-0.5">📦 Premio asignado a: <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-pink-400">${r.beneficiario}</span></h5>
                             </div>
                             <span class="text-[8px] font-black px-2 py-1 rounded border uppercase tracking-wider ${badgeClass}">${statusText}</span>
                         </div>
-                        <p class="text-[9px] text-purple-400/60 font-medium tracking-wide">Fecha límite de liquidación completa: ${r.fecha ? r.fecha.split("T")[0] : 'Por definir'}</p>
+                        <p class="text-[9px] text-purple-400/60 font-medium tracking-wide">Fecha límite de liquidación: ${r.fecha ? r.fecha.split("T")[0] : 'Por definir'}</p>
                     </div>`;
             }).join('');
         }
 
-        // CAPA DE ADMINISTRACIÓN: CONTROL CLÍNICO DE ASISTENCIA Y ENTREGA POR BOTONES
         function renderAdminPuestos() {
             const id = document.getElementById('admin-san-selector').value;
             const san = globalData.sanes.find(s => (s.id_san || s.ID_San || s.id) === id);
@@ -297,7 +295,6 @@
                 return;
             }
 
-            // Agrupamos la matriz por Ronda para pintar los bloques maestros de gestión
             const rondasAdm = {};
             todosLosPagos.forEach(p => {
                 const r = p.ronda || p.Ronda || p.numero_puesto;
@@ -305,7 +302,7 @@
                     rondasAdm[r] = {
                         ronda: r,
                         fecha: p.fecha_pago || p.Fecha || p.fecha,
-                        beneficiario: p.beneficiario_premio || p.Beneficiario || "Cupo " + r,
+                        beneficiario: p.beneficiario_premio || p.Beneficiario || "Cliente " + r,
                         estadoEntrega: p.estado_entrega || p.Estado_Entrega || "📦 Retención",
                         clientes: []
                     };
@@ -319,7 +316,6 @@
             container.innerHTML = Object.values(rondasAdm).map(r => {
                 const isEntregado = r.estadoEntrega.toLowerCase().includes("entregado");
                 
-                // Construimos la lista de asistencia rápida para chequear quién pagó en esta ronda
                 const listaAsistenciaHtml = r.clientes.map(c => {
                     const pagado = c.statusPago.includes("🟢") || c.statusPago.toLowerCase().includes("pagado");
                     return `
@@ -338,7 +334,7 @@
                             <span class="text-[9px] text-purple-300/80 font-medium font-mono">${r.fecha ? r.fecha.split("T")[0] : ''}</span>
                         </div>
 
-                        <!-- Sub-Bloque: Control del Ganador del Producto -->
+                        <!-- Formulario de Control del Ganador del Producto -->
                         <div class="bg-[#120b24]/80 p-3 rounded-lg border border-purple-950 space-y-2">
                             <div class="flex justify-between items-center">
                                 <span class="text-[9px] font-black text-purple-400 uppercase tracking-wider">🏆 Se lleva el producto:</span>
@@ -352,7 +348,7 @@
                             </div>
                         </div>
 
-                        <!-- Sub-Bloque: Lista de Asistencia (¿Quién pagó su cuota de esta ronda?) -->
+                        <!-- Lista de Asistencia Dinámica -->
                         <div class="space-y-1.5">
                             <span class="text-[9px] font-black text-purple-400/80 uppercase tracking-widest block px-0.5 mb-1">Pasar Asistencia de Cuotas:</span>
                             ${listaAsistenciaHtml}
@@ -361,11 +357,9 @@
             }).join('');
         }
 
-        // INTERRUPTORES DE UN SOLO TOQUE CON RESPUESTA RECOLECTORA INMEDIATA
         async function toggleCuotaAsistencia(idSan, ronda, cliente, statusActual, btn) {
             const nuevoEstado = (statusActual.includes("🟢") || statusActual.toLowerCase().includes("pagado")) ? "🔴 Pendiente" : "🟢 Pagado";
             
-            // Animación reactiva instantánea en la pantalla antes del fetch
             if(nuevoEstado === "🟢 Pagado") {
                 btn.className = "text-[9px] font-black uppercase px-2.5 py-1 rounded border bg-emerald-500 border-emerald-600 text-black shadow-md transition-all";
                 btn.innerText = "🟢 Pagó";
@@ -380,12 +374,12 @@
                     mode: "no-cors",
                     body: JSON.stringify({ action: "updateCuota", id_san: idSan, ronda: ronda, cliente_paga: cliente, estado_pago: nuevoEstado })
                 });
-                // Actualizamos localmente el caché sin refrescar toda la UI
                 const cached = globalData.pagos.find(p => (p.id_san || p.ID_San) === idSan && parseInt(p.ronda || p.Ronda || p.numero_puesto) === ronda && (p.cliente_asignado || p.Cliente_Que_Paga || p.cliente) === cliente);
                 if(cached) cached.estado_pago = nuevoEstado;
             } catch(e) { console.error(e); }
         }
 
+        // CORRECCIÓN: Actualiza localmente la memoria y sincroniza la lista de pagos en vivo
         async function updateBeneficiario(idSan, ronda, nuevoNombre) {
             try {
                 await fetch(API_URL, {
@@ -393,11 +387,21 @@
                     mode: "no-cors",
                     body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, beneficiario: nuevoNombre })
                 });
+                
+                // Actualiza en tiempo real los valores en memoria para evitar desfases visuales
                 globalData.pagos.forEach(p => {
-                    if((p.id_san || p.ID_San) === idSan && parseInt(p.ronda || p.Ronda || p.numero_puesto) === ronda) {
-                        p.beneficiario_premio = nuevoNombre;
+                    if((p.id_san || p.ID_San) === idSan) {
+                        if (parseInt(p.ronda || p.Ronda || p.numero_puesto) === ronda) {
+                            p.beneficiario_premio = nuevoNombre;
+                        }
+                        if ((p.cliente_asignado || p.Cliente_Que_Paga || p.cliente) === "Cliente " + ronda) {
+                            p.cliente_asignado = nuevoNombre;
+                            p.Cliente_Que_Paga = nuevoNombre;
+                            p.cliente = nuevoNombre;
+                        }
                     }
                 });
+                renderAdminPuestos();
             } catch(e) { console.error(e); }
         }
 
