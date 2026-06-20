@@ -7,111 +7,115 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #0c0817; color: #f3f4f6; }
-        .purple-glow { box-shadow: 0 0 25px rgba(217, 70, 239, 0.2); }
-        .tab-active { border-bottom: 3px solid #d946ef; color: #d946ef; }
+        body { background-color: #0c0817; color: #f3f4f6; overflow-x: hidden; }
+        .purple-glow { box-shadow: 0 0 30px rgba(217, 70, 239, 0.15); }
+        .tab-active { border-bottom: 3px solid #d946ef; color: #d946ef; transform: scale(1.02); }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.4) sepia(1) saturate(3) hue-rotate(270deg); cursor: pointer; }
+        
+        /* Animaciones Personalizadas */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        /* Retrasos escalonados para las listas */
+        .delay-1 { animation-delay: 0.05s; }
+        .delay-2 { animation-delay: 0.1s; }
+        .delay-3 { animation-delay: 0.15s; }
     </style>
 </head>
 <body class="font-sans antialiased pb-24">
 
-    <!-- Header Corporativo Rediseñado: Edimar (La Patrona) -->
-    <header class="bg-gradient-to-b from-[#1f113a] to-[#120826] border-b border-pink-500/20 py-6 px-4 text-center sticky top-0 z-40 shadow-2xl">
-        <div class="inline-flex items-center justify-center bg-pink-500/10 border border-pink-500/30 px-3 py-1 rounded-full mb-2">
-            <i class="fa-solid fa-crown text-amber-400 text-[10px] mr-1.5 animate-pulse"></i>
+    <header class="bg-gradient-to-b from-[#1f113a] to-[#120826] border-b border-pink-500/20 py-6 px-4 text-center sticky top-0 z-40 shadow-2xl transition-all">
+        <div class="inline-flex items-center justify-center bg-pink-500/10 border border-pink-500/30 px-3 py-1 rounded-full mb-2 animate-bounce">
+            <i class="fa-solid fa-crown text-amber-400 text-[10px] mr-1.5"></i>
             <span class="text-[9px] uppercase tracking-widest font-black text-pink-400">Inversiones Edimar</span>
         </div>
         <h1 class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 uppercase">
             SANES LA PATRONA
         </h1>
-        <p class="text-[10px] text-purple-300/60 mt-1 tracking-widest font-bold uppercase">Plataforma de Control de Cuotas y Adjudicaciones</p>
+        <p class="text-[10px] text-purple-300/60 mt-1 tracking-widest font-bold uppercase">Servicio de Sanes y Adjudicaciones</p>
     </header>
 
-    <!-- Pestañas Superiores -->
     <div class="flex bg-[#120b24] border-b border-purple-900/30 text-center text-xs font-black uppercase tracking-widest">
-        <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-active transition-all">
+        <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-active transition-all duration-300 active:scale-95">
             <i class="fa-solid fa-vault mr-2 text-purple-400"></i>Cronograma Sanes
         </button>
-        <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 text-purple-400/50 transition-all">
+        <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 text-purple-400/50 transition-all duration-300 active:scale-95">
             <i class="fa-solid fa-tags mr-2 text-pink-400"></i>Catálogo Club
         </button>
     </div>
 
-    <!-- Contenedor Principal -->
     <main class="max-w-md mx-auto px-4 mt-6">
         
-        <!-- Pantalla de carga -->
-        <div id="loading" class="text-center py-20">
-            <div class="animate-spin inline-block w-8 h-8 border-[3px] border-purple-500 border-t-transparent rounded-full"></div>
-            <p class="text-[10px] text-purple-400 font-bold mt-4 tracking-widest uppercase">Sincronizando con La Patrona...</p>
+        <div id="loading" class="text-center py-20 transition-all duration-500">
+            <div class="relative inline-block">
+                <div class="animate-spin inline-block w-10 h-10 border-[3px] border-purple-500 border-t-transparent rounded-full"></div>
+                <i class="fa-solid fa-crown text-pink-500 absolute top-3 left-3 text-xs animate-pulse"></i>
+            </div>
+            <p class="text-[10px] text-purple-400 font-black mt-4 tracking-widest uppercase animate-pulse">Sincronizando con La Patrona...</p>
         </div>
 
-        <!-- ================= VISTA CLIENTE: CRONOGRAMA DE RONDAS ================= -->
         <section id="section-sanes" class="hidden space-y-5">
-            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 shadow-xl">
+            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 shadow-xl animate-fade-in">
                 <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione un Grupo Activo:</label>
-                <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 focus:outline-none focus:border-pink-500 font-bold text-sm cursor-pointer"></select>
+                <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 focus:outline-none focus:border-pink-500 font-bold text-sm cursor-pointer transition-all"></select>
             </div>
 
-            <!-- Card de Info General -->
-            <div id="san-info-card" class="bg-gradient-to-br from-[#1c1236] to-[#120b24] p-5 rounded-2xl border border-purple-900/40 purple-glow hidden">
+            <div id="san-info-card" class="bg-gradient-to-br from-[#1c1236] to-[#120b24] p-5 rounded-2xl border border-purple-900/40 purple-glow hidden animate-fade-in delay-1">
                 <h3 id="detail-san-name" class="text-base font-extrabold text-white tracking-wide">---</h3>
                 <div class="grid grid-cols-2 gap-3 mt-4 text-center">
-                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
+                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950 transform transition hover:scale-105 duration-300">
                         <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Cuota Requerida</span>
                         <span id="detail-san-cuota" class="text-lg font-black text-amber-400">$0.00</span>
                     </div>
-                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
+                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950 transform transition hover:scale-105 duration-300">
                         <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Frecuencia</span>
                         <span id="detail-san-frecuencia" class="text-xs font-bold text-gray-200 mt-1 block">---</span>
                     </div>
                 </div>
             </div>
 
-            <div id="san-table-container" class="hidden space-y-2.5">
+            <div id="san-table-container" class="hidden space-y-2.5 animate-fade-in delay-2">
                 <h4 class="text-[10px] font-bold text-purple-400/80 uppercase tracking-widest px-1">Rondas de Adjudicación de Productos</h4>
                 <div class="space-y-3.5" id="client-puestos-container"></div>
             </div>
         </section>
 
-        <!-- ================= VISTA CLIENTE: OFERTAS ================= -->
         <section id="section-ofertas" class="hidden grid grid-cols-1 gap-4"></section>
 
-        <!-- ================= VISTA DUEÑA: CONSOLA DE DOBLE CAPA INTERACTIVA ================= -->
-        <section id="section-admin" class="hidden space-y-6">
+        <section id="section-admin" class="hidden space-y-6 animate-fade-in">
             <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
-                <h2 class="text-xs font-black text-pink-400 uppercase tracking-widest"><i class="fa-solid fa-crown mr-2"></i>Consola Dueña (La Patrona)</h2>
-                <button onclick="switchTab('sanes')" class="text-[9px] font-black bg-purple-950/60 border border-purple-800/40 px-3 py-1.5 rounded-lg text-purple-300 uppercase tracking-wider">Salir</button>
+                <h2 class="text-xs font-black text-pink-400 uppercase tracking-widest"><i class="fa-solid fa-crown mr-2"></i>Consola de La Patrona</h2>
+                <button onclick="switchTab('sanes')" class="text-[9px] font-black bg-purple-950/60 border border-purple-800/40 px-3 py-1.5 rounded-lg text-purple-300 uppercase tracking-wider hover:bg-purple-900 transition-all">Salir</button>
             </div>
 
-            <!-- Bloque de Creaciones -->
             <div class="bg-gradient-to-r from-[#1d123a] to-[#251849] p-4 rounded-xl border border-purple-800/40 shadow-md space-y-3">
                 <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest block"><i class="fa-solid fa-folder-plus mr-1"></i> Panel de Inicialización</span>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="toggleForm('block-add-san')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase tracking-wide hover:border-purple-500 transition-all">📦 Registrar Nuevo San</button>
-                    <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase tracking-wide hover:border-purple-500 transition-all">🛍️ Cargar Oferta</button>
+                    <button onclick="toggleForm('block-add-san')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase tracking-wide hover:border-purple-500 transition-all active:scale-95">📦 Registrar Nuevo San</button>
+                    <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase tracking-wide hover:border-purple-500 transition-all active:scale-95">🛍️ Cargar Oferta</button>
                 </div>
 
-                <!-- Formulario San (CORREGIDO: id unificado con la acción del backend) -->
-                <div id="block-add-san" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
-                    <input type="text" id="new-san-id" placeholder="ID Único (Ej: SAN-MOTOS)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold placeholder-purple-400/40 focus:outline-none">
-                    <input type="text" id="new-san-name" placeholder="Nombre (Ej: San Motos Bera)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
+                <div id="block-add-san" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2 transition-all">
+                    <input type="text" id="new-san-id" placeholder="ID Único (Ej: SAN-MOTOS)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold placeholder-purple-400/40 focus:outline-none focus:border-pink-500">
+                    <input type="text" id="new-san-name" placeholder="Nombre (Ej: San Motos Bera)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none focus:border-pink-500">
                     <div class="grid grid-cols-3 gap-1.5">
-                        <input type="number" id="new-san-cuota" placeholder="Cuota $" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
+                        <input type="number" id="new-san-cuota" placeholder="Cuota $" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none focus:border-pink-500">
                         <select id="new-san-freq" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                             <option value="Semanal">Semanal</option>
                             <option value="Quincenal">Quincenal</option>
                         </select>
-                        <input type="number" id="new-san-total" placeholder="Puestos" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
+                        <input type="number" id="new-san-total" placeholder="Puestos" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none focus:border-pink-500">
                     </div>
                     <div>
                         <label class="text-[9px] font-black text-purple-400 uppercase tracking-wider block mb-1">Fecha de la Primera Entrega:</label>
                         <input type="date" id="new-san-date" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                     </div>
-                    <button onclick="submitAddSan()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-2 rounded font-black text-[10px] uppercase tracking-widest text-white shadow-lg">Generar San e Hilos de Pago</button>
+                    <button onclick="submitAddSan()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-2 rounded font-black text-[10px] uppercase tracking-widest text-white shadow-lg transition-transform active:scale-98">Generar San e Hilos de Pago</button>
                 </div>
 
-                <!-- Formulario Oferta -->
                 <div id="block-add-oferta" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
                     <input type="text" id="new-of-prod" placeholder="Nombre del Artículo" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                     <div class="grid grid-cols-2 gap-1.5">
@@ -120,17 +124,15 @@
                     </div>
                     <input type="text" id="new-of-desc" placeholder="Descripción corta" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                     <input type="text" id="new-of-img" placeholder="URL de Imagen (Opcional)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
-                    <button onclick="submitAddOferta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 rounded font-black text-[10px] uppercase tracking-widest text-black shadow-lg">Publicar en vitrina</button>
+                    <button onclick="submitAddOferta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 rounded font-black text-[10px] uppercase tracking-widest text-black shadow-lg transition-transform active:scale-98">Publicar en Vitrina</button>
                 </div>
             </div>
 
-            <!-- Selector de Control -->
             <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30">
                 <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione Tanda Comercial a Auditar:</label>
                 <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-xs focus:outline-none"></select>
             </div>
 
-            <!-- Control Maestro Calendario -->
             <div id="admin-cascada-card" class="bg-gradient-to-r from-[#21113a] to-[#120a24] p-4 rounded-xl border border-purple-800/50 space-y-2.5 hidden shadow-md">
                 <div class="flex justify-between items-center">
                     <span class="text-[10px] font-black text-purple-300 uppercase tracking-widest"><i class="fa-solid fa-calendar-days mr-1"></i> Mover Cronograma Completo</span>
@@ -138,17 +140,15 @@
                 </div>
                 <div class="flex gap-2">
                     <input type="date" id="admin-master-date" class="flex-1 bg-[#0c0817] border border-purple-800 p-2 rounded text-xs text-white focus:outline-none">
-                    <button onclick="triggerCascadeFechas()" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded text-[10px] font-black uppercase tracking-wider transition-all">Propagar Fechas</button>
+                    <button onclick="triggerCascadeFechas()" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded text-[10px] font-black uppercase tracking-wider transition-all active:scale-95">Propagar Fechas</button>
                 </div>
             </div>
 
-            <!-- Bloques de Rondas -->
             <div class="space-y-4" id="admin-puestos-container"></div>
         </section>
     </main>
 
-    <!-- Botón Flotante Consola -->
-    <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#211342] hover:bg-purple-900 text-pink-400 p-4 rounded-full shadow-2xl border border-purple-700/60 z-50 transition-all purple-glow">
+    <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#211342] hover:bg-purple-900 text-pink-400 p-4 rounded-full shadow-2xl border border-purple-700/60 z-50 transition-all duration-300 transform hover:rotate-12 hover:scale-110 purple-glow">
         <i class="fa-solid fa-crown text-base"></i>
     </button>
 
@@ -160,6 +160,7 @@
 
         async function init() {
             try {
+                document.getElementById('loading').style.opacity = '1';
                 document.getElementById('loading').classList.remove('hidden');
                 const response = await fetch(API_URL);
                 globalData = await response.json();
@@ -182,7 +183,8 @@
         }
 
         function toggleForm(id) {
-            document.getElementById(id).classList.toggle('hidden');
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
         }
 
         function switchTab(tab) {
@@ -199,8 +201,9 @@
         function populateSelectors() {
             if(!globalData.sanes || globalData.sanes.length === 0) return;
             const options = globalData.sanes.map(s => {
-                const idSan = s.id_san || s.ID_San || s.id;
-                const nombreSan = s.nombre_san || s.Nombre || s.nombre;
+                // Mapeo flexible de llaves para evitar fallos de mayúsculas
+                const idSan = s.id_san || s.id || '';
+                const nombreSan = s.nombre_san || s.nombre || 'San Activo';
                 return `<option value="${idSan}">${nombreSan}</option>`;
             }).join('');
             document.getElementById('san-selector').innerHTML = options;
@@ -210,12 +213,13 @@
 
         function renderSanDetails() {
             const id = document.getElementById('san-selector').value;
-            const san = globalData.sanes.find(s => (s.id_san || s.ID_San || s.id) === id);
+            const san = globalData.sanes.find(s => (s.id_san || s.id || '') === id);
             if (!san) return;
 
-            const cuotaValor = san.cuota || san.cuota_base || san.monto_cuota || san.Monto || 0;
-            const freqValor = san.frecuencia || san.Frecuencia || "Semanal";
-            const nameValor = san.nombre_san || san.Nombre || "San Activo";
+            // DETECCIÓN BLINDADA DE CUOTA: Lee 'cuota' en minúsculas por la normalización del backend
+            const cuotaValor = san.cuota || san.monto || 0;
+            const freqValor = san.frecuencia || "Semanal";
+            const nameValor = san.nombre_san || "San Activo";
 
             document.getElementById('san-info-card').classList.remove('hidden');
             document.getElementById('san-table-container').classList.remove('hidden');
@@ -223,24 +227,24 @@
             document.getElementById('detail-san-cuota').innerText = `$${parseFloat(cuotaValor).toFixed(2)}`;
             document.getElementById('detail-san-frecuencia').innerText = freqValor;
 
-            const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.ID_San) === id);
+            const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.id) === id);
             
             const rondasMapeadas = {};
             todosLosPagos.forEach(p => {
-                const r = p.ronda || p.Ronda || p.numero_puesto; 
+                const r = p.ronda || p.numero_puesto || 1; 
                 if(!rondasMapeadas[r]) {
                     rondasMapeadas[r] = {
                         ronda: r,
-                        fecha: p.fecha_pago || p.Fecha || p.fecha,
-                        beneficiario: p.beneficiario_premio || p.Beneficiario || "Cliente " + r,
-                        estadoEntrega: p.estado_entrega || p.Estado_Entrega || "📦 Retención",
+                        fecha: p.fecha_pago || p.fecha,
+                        beneficiario: p.beneficiario_premio || p.beneficiario || "Cupo " + r,
+                        estadoEntrega: p.estado_entrega || "📦 Retención",
                         totalClientes: 0,
                         clientesPagados: 0
                     };
                 }
                 rondasMapeadas[r].totalClientes++;
-                const st = (p.estado_pago || p.Estado || "").toLowerCase();
-                if(st.includes("🟢") || st.includes("pagado") || st.includes("cobrado")) {
+                const st = (p.estado_pago || "").toLowerCase();
+                if(st.includes("🟢") || st.includes("pagado")) {
                     rondasMapeadas[r].clientesPagados++;
                 }
             });
@@ -249,23 +253,24 @@
             const hoy = new Date();
             hoy.setHours(0,0,0,0);
 
-            container.innerHTML = Object.values(rondasMapeadas).map(r => {
+            container.innerHTML = Object.values(rondasMapeadas).map((r, index) => {
                 let statusText = `📊 Recaudación: ${r.clientesPagados}/${r.totalClientes}`;
                 let badgeClass = "bg-purple-500/10 text-purple-300 border-purple-800/40";
                 
                 if(r.estadoEntrega.toLowerCase().includes("entregado")) {
                     statusText = "🏆 ¡Artículo Entregado!";
-                    badgeClass = "bg-pink-500/20 text-pink-400 border-pink-500/30 font-black";
+                    badgeClass = "bg-pink-500/20 text-pink-400 border-pink-500/30 font-black animate-pulse";
                 } else if (r.fecha) {
                     const limit = new Date(r.fecha.split("T")[0] + "T00:00:00");
                     if (hoy >= limit && r.clientesPagados < r.totalClientes) {
                         statusText = "🚨 Con Retrasos";
-                        badgeClass = "bg-red-500/20 text-red-400 border-red-500/30 font-bold";
+                        badgeClass = "bg-red-500/20 text-red-400 border-red-500/30 font-bold animate-pulse";
                     }
                 }
 
+                // Agregamos animación escalonada usando el índice de la ronda
                 return `
-                    <div class="p-4 rounded-xl bg-[#170f2c] border border-purple-900/30 shadow-md space-y-2">
+                    <div class="p-4 rounded-xl bg-[#170f2c] border border-purple-900/30 shadow-md space-y-2 animate-fade-in" style="animation-delay: ${index * 0.04}s">
                         <div class="flex justify-between items-start">
                             <div>
                                 <span class="text-[9px] font-black text-purple-400 uppercase tracking-widest block">Ronda de Entrega Nro. ${r.ronda}</span>
@@ -280,8 +285,8 @@
 
         function renderAdminPuestos() {
             const id = document.getElementById('admin-san-selector').value;
-            const san = globalData.sanes.find(s => (s.id_san || s.ID_San || s.id) === id);
-            const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.ID_San) === id);
+            const san = globalData.sanes.find(s => (s.id_san || s.id || '') === id);
+            const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.id) === id);
             const container = document.getElementById('admin-puestos-container');
             
             if(!san) return;
@@ -297,58 +302,56 @@
 
             const rondasAdm = {};
             todosLosPagos.forEach(p => {
-                const r = p.ronda || p.Ronda || p.numero_puesto;
+                const r = p.ronda || 1;
                 if(!rondasAdm[r]) {
                     rondasAdm[r] = {
                         ronda: r,
-                        fecha: p.fecha_pago || p.Fecha || p.fecha,
-                        beneficiario: p.beneficiario_premio || p.Beneficiario || "Cliente " + r,
-                        estadoEntrega: p.estado_entrega || p.Estado_Entrega || "📦 Retención",
+                        fecha: p.fecha_pago || p.fecha,
+                        beneficiario: p.beneficiario_premio || "Cliente " + r,
+                        estadoEntrega: p.estado_entrega || "📦 Retención",
                         clientes: []
                     };
                 }
                 rondasAdm[r].clientes.push({
-                    nombre: p.cliente_asignado || p.Cliente_Que_Paga || p.cliente,
-                    statusPago: p.estado_pago || p.Estado || "🔴 Pendiente"
+                    nombre: p.cliente_asignado || p.cliente || '',
+                    statusPago: p.estado_pago || "🔴 Pendiente"
                 });
             });
 
-            container.innerHTML = Object.values(rondasAdm).map(r => {
+            container.innerHTML = Object.values(rondasAdm).map((r, index) => {
                 const isEntregado = r.estadoEntrega.toLowerCase().includes("entregado");
                 
                 const listaAsistenciaHtml = r.clientes.map(c => {
                     const pagado = c.statusPago.includes("🟢") || c.statusPago.toLowerCase().includes("pagado");
                     return `
-                        <div class="flex justify-between items-center bg-[#0c0817] p-2 rounded border border-purple-950/60">
+                        <div class="flex justify-between items-center bg-[#0c0817] p-2 rounded border border-purple-950/60 transform transition duration-200 hover:border-purple-700">
                             <span class="text-xs font-bold text-white">${c.nombre}</span>
-                            <button onclick="toggleCuotaAsistencia('${id}', ${r.ronda}, '${c.nombre}', '${c.statusPago}', this)" class="text-[9px] font-black uppercase px-2.5 py-1 rounded border transition-all ${pagado ? 'bg-emerald-500 border-emerald-600 text-black shadow-md':'bg-red-500/10 border-red-500/30 text-red-400'}">
+                            <button onclick="toggleCuotaAsistencia('${id}', ${r.ronda}, '${c.nombre}', '${c.statusPago}', this)" class="text-[9px] font-black uppercase px-2.5 py-1 rounded border transition-all duration-300 transform active:scale-90 ${pagado ? 'bg-emerald-500 border-emerald-600 text-black shadow-md':'bg-red-500/10 border-red-500/30 text-red-400'}">
                                 ${pagado ? '🟢 Pagó' : '🔴 Pendiente'}
                             </button>
                         </div>`;
                 }).join('');
 
                 return `
-                    <div class="bg-gradient-to-b from-[#191031] to-[#110a22] p-4 rounded-xl border ${isEntregado ? 'border-pink-500/30 shadow-pink-950/10':'border-purple-900/40'} shadow-lg space-y-3">
+                    <div class="bg-gradient-to-b from-[#191031] to-[#110a22] p-4 rounded-xl border ${isEntregado ? 'border-pink-500/30 shadow-pink-950/10':'border-purple-900/40'} shadow-lg space-y-3 animate-fade-in" style="animation-delay: ${index * 0.03}s">
                         <div class="flex justify-between items-center border-b border-purple-900/30 pb-2">
                             <span class="text-xs font-black text-amber-400 tracking-wider">RONDA ADMINISTRATIVA ${r.ronda}</span>
                             <span class="text-[9px] text-purple-300/80 font-medium font-mono">${r.fecha ? r.fecha.split("T")[0] : ''}</span>
                         </div>
 
-                        <!-- Formulario de Control del Ganador del Producto -->
                         <div class="bg-[#120b24]/80 p-3 rounded-lg border border-purple-950 space-y-2">
                             <div class="flex justify-between items-center">
                                 <span class="text-[9px] font-black text-purple-400 uppercase tracking-wider">🏆 Se lleva el producto:</span>
-                                <input type="text" value="${r.beneficiario}" onblur="updateBeneficiario('${id}', ${r.ronda}, this.value)" class="bg-[#0c0817] px-2 py-1 text-right font-black text-xs text-white rounded border border-purple-900/40 w-1/2 focus:text-pink-400 focus:outline-none">
+                                <input type="text" value="${r.beneficiario}" onblur="updateBeneficiario('${id}', ${r.ronda}, this.value)" class="bg-[#0c0817] px-2 py-1 text-right font-black text-xs text-white rounded border border-purple-900/40 w-1/2 focus:text-pink-400 focus:outline-none transition-colors">
                             </div>
                             <div class="flex justify-between items-center pt-1">
                                 <span class="text-[9px] font-black text-purple-400 uppercase tracking-wider">Estado del Artículo:</span>
-                                <button onclick="toggleEstadoEntrega('${id}', ${r.ronda}, '${r.estadoEntrega}', this)" class="text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest transition-all ${isEntregado ? 'bg-pink-600 border-pink-700 text-white shadow-lg':'bg-purple-950/40 border-purple-800 text-purple-400'}">
+                                <button onclick="toggleEstadoEntrega('${id}', ${r.ronda}, '${r.estadoEntrega}', this)" class="text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest transition-all duration-300 transform active:scale-95 ${isEntregado ? 'bg-pink-600 border-pink-700 text-white shadow-lg':'bg-purple-950/40 border-purple-800 text-purple-400'}">
                                     ${isEntregado ? '🏆 Entregado' : '📦 En Almacén'}
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Lista de Asistencia Dinámica -->
                         <div class="space-y-1.5">
                             <span class="text-[9px] font-black text-purple-400/80 uppercase tracking-widest block px-0.5 mb-1">Pasar Asistencia de Cuotas:</span>
                             ${listaAsistenciaHtml}
@@ -361,10 +364,10 @@
             const nuevoEstado = (statusActual.includes("🟢") || statusActual.toLowerCase().includes("pagado")) ? "🔴 Pendiente" : "🟢 Pagado";
             
             if(nuevoEstado === "🟢 Pagado") {
-                btn.className = "text-[9px] font-black uppercase px-2.5 py-1 rounded border bg-emerald-500 border-emerald-600 text-black shadow-md transition-all";
+                btn.className = "text-[9px] font-black uppercase px-2.5 py-1 rounded border bg-emerald-500 border-emerald-600 text-black shadow-md transition-all duration-300";
                 btn.innerText = "🟢 Pagó";
             } else {
-                btn.className = "text-[9px] font-black uppercase px-2.5 py-1 rounded border bg-red-500/10 border-red-500/30 text-red-400 transition-all";
+                btn.className = "text-[9px] font-black uppercase px-2.5 py-1 rounded border bg-red-500/10 border-red-500/30 text-red-400 transition-all duration-300";
                 btn.innerText = "🔴 Pendiente";
             }
 
@@ -374,12 +377,11 @@
                     mode: "no-cors",
                     body: JSON.stringify({ action: "updateCuota", id_san: idSan, ronda: ronda, cliente_paga: cliente, estado_pago: nuevoEstado })
                 });
-                const cached = globalData.pagos.find(p => (p.id_san || p.ID_San) === idSan && parseInt(p.ronda || p.Ronda || p.numero_puesto) === ronda && (p.cliente_asignado || p.Cliente_Que_Paga || p.cliente) === cliente);
+                const cached = globalData.pagos.find(p => (p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda && (p.cliente_asignado || p.cliente || '') === cliente);
                 if(cached) cached.estado_pago = nuevoEstado;
             } catch(e) { console.error(e); }
         }
 
-        // CORRECCIÓN: Actualiza localmente la memoria y sincroniza la lista de pagos en vivo
         async function updateBeneficiario(idSan, ronda, nuevoNombre) {
             try {
                 await fetch(API_URL, {
@@ -388,15 +390,13 @@
                     body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, beneficiario: nuevoNombre })
                 });
                 
-                // Actualiza en tiempo real los valores en memoria para evitar desfases visuales
                 globalData.pagos.forEach(p => {
-                    if((p.id_san || p.ID_San) === idSan) {
-                        if (parseInt(p.ronda || p.Ronda || p.numero_puesto) === ronda) {
+                    if((p.id_san || p.id) === idSan) {
+                        if (parseInt(p.ronda || 1) === ronda) {
                             p.beneficiario_premio = nuevoNombre;
                         }
-                        if ((p.cliente_asignado || p.Cliente_Que_Paga || p.cliente) === "Cliente " + ronda) {
+                        if ((p.cliente_asignado || p.cliente || '') === "Cliente " + ronda) {
                             p.cliente_asignado = nuevoNombre;
-                            p.Cliente_Que_Paga = nuevoNombre;
                             p.cliente = nuevoNombre;
                         }
                     }
@@ -409,10 +409,10 @@
             const nuevoEstado = estadoActual.toLowerCase().includes("entregado") ? "📦 Retención" : "🏆 Entregado";
             
             if(nuevoEstado === "🏆 Entregado") {
-                btn.className = "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-pink-600 border-pink-700 text-white shadow-lg transition-all";
+                btn.className = "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-pink-600 border-pink-700 text-white shadow-lg transition-all duration-300";
                 btn.innerText = "🏆 Entregado";
             } else {
-                btn.className = "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-purple-950/40 border-purple-800 text-purple-400 transition-all";
+                btn.className = "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-purple-950/40 border-purple-800 text-purple-400 transition-all duration-300";
                 btn.innerText = "📦 En Almacén";
             }
 
@@ -423,7 +423,7 @@
                     body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, estado_entrega: nuevoEstado })
                 });
                 globalData.pagos.forEach(p => {
-                    if((p.id_san || p.ID_San) === idSan && parseInt(p.ronda || p.Ronda || p.numero_puesto) === ronda) {
+                    if((p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda) {
                         p.estado_entrega = nuevoEstado;
                     }
                 });
@@ -489,21 +489,21 @@
                 container.innerHTML = `<p class="text-xs text-purple-400/40 text-center py-12 font-bold uppercase tracking-widest">Sin promociones vigentes.</p>`;
                 return;
             }
-            container.innerHTML = globalData.ofertas.map(o => {
-                const img = o.imgUrl ? o.imgUrl : 'https://images.unsplash.com/photo-1601524909162-be87252be298?auto=format&fit=crop&w=300&q=80';
+            container.innerHTML = globalData.ofertas.map((o, idx) => {
+                const img = o.imgurl ? o.imgurl : 'https://images.unsplash.com/photo-1601524909162-be87252be298?auto=format&fit=crop&w=300&q=80';
                 return `
-                    <div class="bg-[#170f2c] rounded-2xl border border-purple-900/30 overflow-hidden flex flex-col justify-between shadow-lg">
+                    <div class="bg-[#170f2c] rounded-2xl border border-purple-900/30 overflow-hidden flex flex-col justify-between shadow-lg animate-fade-in" style="animation-delay: ${idx * 0.05}s">
                         <div class="p-4 flex space-x-4">
-                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl bg-purple-950 flex-shrink-0 border border-purple-900/40">
+                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl bg-purple-950 flex-shrink-0 border border-purple-900/40 transition-transform duration-300 hover:scale-110">
                             <div class="flex-1 min-w-0">
-                                <span class="text-[8px] font-black text-amber-400 uppercase tracking-widest block mb-0.5">${o.disponibilidad}</span>
-                                <h4 class="text-xs font-black text-white truncate uppercase tracking-wider">${o.producto}</h4>
+                                <span class="text-[8px] font-black text-amber-400 uppercase tracking-widest block mb-0.5">${o.disponibilidad || 'Disponible'}</span>
+                                <h4 class="text-xs font-black text-white truncate uppercase tracking-wider">${o.producto || 'Artículo'}</h4>
                                 <p class="text-[11px] text-purple-300/70 line-clamp-2 mt-0.5 leading-relaxed font-medium">${o.descripcion || ''}</p>
                             </div>
                         </div>
                         <div class="bg-[#120b24]/60 px-4 py-3 border-t border-purple-900/20 flex items-center justify-between">
-                            <span class="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">$${parseFloat(o.precio_oferta).toFixed(2)}</span>
-                            <button onclick="orderViaWhatsApp('${o.producto}', '${o.precio_oferta}')" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-black text-[10px] py-2 px-3.5 rounded-lg flex items-center uppercase tracking-widest shadow-md">
+                            <span class="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">$${parseFloat(o.precio_oferta || 0).toFixed(2)}</span>
+                            <button onclick="orderViaWhatsApp('${o.producto}', '${o.precio_oferta}')" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-black text-[10px] py-2 px-3.5 rounded-lg flex items-center uppercase tracking-widest shadow-md transform transition hover:translate-y-[-2px] active:scale-95 duration-200">
                                 <i class="fa-brands fa-whatsapp text-xs mr-1.5"></i>Pedir
                             </button>
                         </div>
