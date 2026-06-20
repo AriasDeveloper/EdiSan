@@ -8,44 +8,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #0c0817; color: #f3f4f6; overflow-x: hidden; }
-        
-        /* --- Sistema de Luces y Efectos de Brillo --- */
         .purple-glow { box-shadow: 0 0 35px rgba(168, 85, 247, 0.2); }
         .pink-glow-soft { box-shadow: 0 0 25px rgba(236, 72, 153, 0.15); }
         .amber-glow-soft { box-shadow: 0 0 25px rgba(245, 158, 11, 0.15); }
-
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.4) sepia(1) saturate(3) hue-rotate(270deg); cursor: pointer; }
         
-        /* --- Biblioteca de Animaciones Avanzadas --- */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
             to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
-        
         @keyframes pulseGlow {
             0%, 100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 10px rgba(236, 72, 153, 0.2); }
             50% { transform: scale(1.03); opacity: 1; box-shadow: 0 0 25px rgba(236, 72, 153, 0.4); }
         }
-
         @keyframes shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
         }
-
-        /* --- Clases de Animación Utilidades --- */
         .animate-fade-in { animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
         .animate-crown-pulse { animation: pulseGlow 2s infinite ease-in-out; }
-        
         .shimmer-loading {
             background: linear-gradient(90deg, #170f2c 25%, #28194d 50%, #170f2c 75%);
             background-size: 200% 100%;
             animation: shimmer 1.6s infinite linear;
         }
-
-        /* Micro-interacciones de Botones e Inputs */
         .btn-interactive { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .btn-interactive:active { transform: scale(0.94); }
-        
         .tab-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
@@ -100,18 +88,17 @@
                     <select id="client-name-selector" class="flex-1 bg-[#0c0817] text-white p-2 rounded text-xs font-bold border border-purple-800/60 focus:outline-none focus:border-pink-500"></select>
                     <button onclick="checkClientCreditHistory()" class="bg-pink-600 hover:bg-pink-700 text-white font-black text-[10px] px-4 py-2 rounded uppercase tracking-wider btn-interactive shadow-md shadow-pink-900/20">Ver Mi Record</button>
                 </div>
-                
                 <div id="client-history-result" class="hidden bg-[#0c0817] p-3 rounded-lg border border-purple-950 text-xs space-y-2 animate-fade-in"></div>
             </div>
 
             <div id="san-info-card" class="bg-gradient-to-br from-[#1c1236] to-[#120b24] p-5 rounded-2xl border border-purple-900/40 purple-glow hidden animate-fade-in">
                 <h3 id="detail-san-name" class="text-base font-extrabold text-white tracking-wide">---</h3>
                 <div class="grid grid-cols-2 gap-3 mt-4 text-center">
-                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950 transform hover:scale-[1.02] transition-transform duration-300">
+                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
                         <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Cuota Requerida</span>
                         <span id="detail-san-cuota" class="text-lg font-black text-amber-400">$0.00</span>
                     </div>
-                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950 transform hover:scale-[1.02] transition-transform duration-300">
+                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
                         <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Frecuencia</span>
                         <span id="detail-san-frecuencia" class="text-xs font-bold text-gray-200 mt-1 block">---</span>
                     </div>
@@ -152,6 +139,7 @@
                         <select id="new-san-freq" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                             <option value="Semanal">Semanal</option>
                             <option value="Quincenal">Quincenal</option>
+                            <option value="Mensual">Mensual</option>
                         </select>
                         <input type="number" id="new-san-total" placeholder="Puestos" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none focus:border-pink-500">
                     </div>
@@ -170,7 +158,7 @@
                     </div>
                     <input type="text" id="new-of-desc" placeholder="Descripción" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                     <input type="text" id="new-of-img" placeholder="URL Imagen" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
-                    <button onclick="submitAddOferta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 rounded font-black text-[10px] uppercase text-black font-black shadow-lg btn-interactive">Publicar Oferta</button>
+                    <button onclick="submitAddOferta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 rounded font-black text-[10px] uppercase text-black shadow-lg btn-interactive">Publicar Oferta</button>
                 </div>
             </div>
 
@@ -178,7 +166,11 @@
                 <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest">Seleccione Tanda a Gestionar:</label>
                 <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-xs focus:outline-none"></select>
                 
-                <button onclick="deleteCurrentSan()" class="w-full bg-red-950/20 border border-red-700/40 hover:bg-red-900/40 text-red-400 font-black text-[10px] py-2.5 px-4 rounded-lg uppercase tracking-wider transition-all flex items-center justify-center gap-2 btn-interactive">
+                <button onclick="saveAllAdminChangesToServer()" class="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-black font-black text-xs py-3 px-4 rounded-xl uppercase tracking-widest shadow-xl shadow-emerald-950/20 flex items-center justify-center gap-2 btn-interactive">
+                    <i class="fa-solid fa-floppy-disk text-base"></i> Guardar Cambios en la Nube
+                </button>
+
+                <button onclick="deleteCurrentSan()" class="w-full bg-red-950/20 border border-red-700/40 hover:bg-red-900/40 text-red-400 font-black text-[10px] py-2 px-4 rounded-lg uppercase tracking-wider transition-all flex items-center justify-center gap-2 btn-interactive">
                     <i class="fa-solid fa-trash-can text-base"></i> Eliminar Tanda Completa
                 </button>
             </div>
@@ -207,6 +199,9 @@
         const WHATSAPP_NUMBER = "584242961164"; 
         const ADMIN_PASSWORD = "1234"; 
         let globalData = {};
+        
+        // BUFFER LOCAL: Guarda los cambios temporales del administrador aquí antes de subir a la nube
+        let stagingChanges = { nombres: {}, cuotas: {}, beneficiarios: {}, entregas: {} };
 
         async function init() {
             try {
@@ -214,6 +209,7 @@
                 const response = await fetch(API_URL);
                 globalData = await response.json();
                 document.getElementById('loading').classList.add('hidden');
+                resetStagingBuffer();
                 switchTab('sanes');
                 populateSelectors();
                 renderOfertas();
@@ -221,6 +217,10 @@
                 console.error(error);
                 document.getElementById('loading').innerHTML = `<p class="text-red-500 font-bold text-xs uppercase animate-bounce">⚠️ Error de Enlace.</p>`;
             }
+        }
+
+        function resetStagingBuffer() {
+            stagingChanges = { nombres: {}, cuotas: {}, beneficiarios: {}, entregas: {} };
         }
 
         function loginAdmin() {
@@ -233,11 +233,7 @@
 
         function toggleForm(id) {
             const el = document.getElementById(id);
-            if (el.classList.contains('hidden')) {
-                el.classList.remove('hidden');
-            } else {
-                el.classList.add('hidden');
-            }
+            el.classList.toggle('hidden');
         }
 
         function switchTab(tab) {
@@ -298,10 +294,8 @@
             document.getElementById('detail-san-frecuencia').innerText = freqValor;
 
             const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.id) === id);
-            
             const nombresUnicos = [...new Set(todosLosPagos.map(p => p.cliente_asignado || p.cliente).filter(Boolean))];
             document.getElementById('client-name-selector').innerHTML = nombresUnicos.map(n => `<option value="${n}">${n}</option>`).join('');
-            document.getElementById('client-history-result').classList.add('hidden');
 
             const rMap = {};
             todosLosPagos.forEach(p => {
@@ -314,10 +308,16 @@
                         estadoEntrega: p.estado_entrega || "📦 Retención",
                         totalClientes: 0,
                         clientesPagados: 0,
-                        primerClienteLista: p.cliente_asignado || p.cliente || ""
+                        primerClienteRonda: ""
                     };
                 }
                 rMap[r].totalClientes++;
+                
+                // PUNTO 2 SOLUCIÓN: Captura el primer cliente real pero UNICAMENTE dentro de su propia ronda asignada
+                if (!rMap[r].primerClienteRonda) {
+                    rMap[r].primerClienteRonda = p.cliente_asignado || p.cliente || "";
+                }
+                
                 const st = (p.estado_pago || "").toLowerCase();
                 if(st.includes("🟢") || st.includes("pagado")) rMap[r].clientesPagados++;
             });
@@ -341,10 +341,9 @@
                     }
                 }
 
-                // NUEVA LÓGICA AUTO-SINCRO: Si viene vacío o dice "Cupo/Cliente", usa el nombre de la lista de asistencia
                 let nombreMostrado = r.beneficiario.trim();
                 if (!nombreMostrado || nombreMostrado.toLowerCase().includes("cupo") || nombreMostrado.toLowerCase().includes("cliente")) {
-                    nombreMostrado = r.primerClienteLista || "Por Asignar";
+                    nombreMostrado = r.primerClienteRonda || "Por Asignar";
                 }
 
                 return `
@@ -387,8 +386,12 @@
                         beneficiario: p.beneficiario_premio || "",
                         estadoEntrega: p.estado_entrega || "📦 Retención",
                         clientesTracker: {},
-                        primerClienteLista: p.cliente_asignado || p.cliente || ""
+                        primerClienteRonda: ""
                     };
+                }
+                
+                if(!rMap[r].primerClienteRonda) {
+                    rMap[r].primerClienteRonda = p.cliente_asignado || p.cliente || "";
                 }
                 
                 const cName = p.cliente_asignado || p.cliente || '';
@@ -398,21 +401,28 @@
             });
 
             container.innerHTML = Object.values(rMap).sort((a,b) => a.ronda - b.ronda).map((r, idx) => {
-                const isEntregado = r.estadoEntrega.toLowerCase().includes("entregado");
+                // Leer del buffer temporal si ya fue modificado por el usuario antes de guardar
+                const bKey = `${id}_${r.ronda}`;
+                const currentBeneficiario = stagingChanges.beneficiarios[bKey] !== undefined ? stagingChanges.beneficiarios[bKey] : r.beneficiario;
+                const currentEntrega = stagingChanges.entregas[bKey] !== undefined ? stagingChanges.entregas[bKey] : r.estadoEntrega;
                 
-                // NUEVA LÓGICA AUTO-SINCRO EN CONSOLA ADMINISTRATIVA
-                let nombrePremio = r.beneficiario.trim();
+                const isEntregado = currentEntrega.toLowerCase().includes("entregado");
+                
+                let nombrePremio = currentBeneficiario.trim();
                 if (!nombrePremio || nombrePremio.toLowerCase().includes("cupo") || nombrePremio.toLowerCase().includes("cliente")) {
-                    nombrePremio = r.primerClienteLista || "";
+                    nombrePremio = r.primerClienteRonda || "";
                 }
 
                 const listaAsistenciaHtml = Object.keys(r.clientesTracker).map(nombreCliente => {
-                    const statusPago = r.clientesTracker[nombreCliente];
+                    // Controlar estado de pago desde memoria caché o buffer intermedio
+                    const uniquePagoKey = `${id}_${r.ronda}_${nombreCliente}`;
+                    const statusPago = stagingChanges.cuotas[uniquePagoKey] !== undefined ? stagingChanges.cuotas[uniquePagoKey] : r.clientesTracker[nombreCliente];
                     const pagado = statusPago.includes("🟢") || statusPago.toLowerCase().includes("pagado");
+                    
                     return `
                         <div class="flex justify-between items-center bg-[#0c0817] p-2 rounded border border-purple-950/60 gap-3 hover:border-purple-800 transition-colors">
-                            <input type="text" value="${nombreCliente}" onblur=\"editClienteNombreDirecto('${id}', '${nombreCliente}', this.value)\" class="bg-transparent text-xs font-bold text-white border-b border-purple-900/30 focus:border-pink-500 focus:outline-none flex-1 py-0.5 transition-colors">
-                            <button onclick=\"toggleCuotaAsistencia('${id}', ${r.ronda}, '${nombreCliente}', '${statusPago}', this)\" class="text-[9px] font-black uppercase px-2.5 py-1.5 rounded border btn-interactive ${pagado ? 'bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-black font-black shadow-md shadow-emerald-950/30':'bg-red-500/10 border-red-500/30 text-red-400'}">
+                            <input type="text" value="${nombreCliente}" oninput=\"stageNombreCliente('${id}', '${nombreCliente}', this.value)\" class="bg-transparent text-xs font-bold text-white border-b border-purple-900/30 focus:border-pink-500 focus:outline-none flex-1 py-0.5 transition-colors">
+                            <button onclick=\"stageCuotaAsistencia('${id}', ${r.ronda}, '${nombreCliente}', '${statusPago}', this)\" class="text-[9px] font-black uppercase px-2.5 py-1.5 rounded border btn-interactive ${pagado ? 'bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-black font-black shadow-md shadow-emerald-950/30':'bg-red-500/10 border-red-500/30 text-red-400'}">
                                 ${pagado ? '🟢 Pagó' : '🔴 Pendiente'}
                             </button>
                         </div>`;
@@ -428,101 +438,88 @@
                         <div class="bg-[#120b24]/80 p-3 rounded-lg border border-purple-950 space-y-2">
                             <div class="flex justify-between items-center">
                                 <span class="text-[9px] font-black text-purple-400 uppercase">🏆 Se lleva el producto:</span>
-                                <input type="text" value="${nombrePremio}" onblur=\"updateBeneficiario('${id}', ${r.ronda}, this.value)\" class="bg-[#0c0817] px-2 py-1 text-right font-black text-xs text-white rounded border border-purple-900/40 w-1/2 focus:text-pink-400 focus:outline-none focus:border-pink-500 transition-all">
+                                <input type="text" value="${nombrePremio}" oninput=\"stageBeneficiario('${id}', ${r.ronda}, this.value)\" class="bg-[#0c0817] px-2 py-1 text-right font-black text-xs text-white rounded border border-purple-900/40 w-1/2 focus:text-pink-400 focus:outline-none focus:border-pink-500 transition-all">
                             </div>
                             <div class="flex justify-between items-center pt-1">
                                 <span class="text-[9px] font-black text-purple-400 uppercase">Estado del Artículo:</span>
-                                <button onclick=\"toggleEstadoEntrega('${id}', ${r.ronda}, '${r.estadoEntrega}', this)\" class="text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest btn-interactive ${isEntregado ? 'bg-gradient-to-r from-pink-500 to-purple-600 border-pink-500 text-white shadow-lg shadow-pink-950/50 font-black':'bg-purple-950/40 border-purple-800 text-purple-400'}">
+                                <button onclick=\"stageEstadoEntrega('${id}', ${r.ronda}, '${currentEntrega}', this)\" class="text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest btn-interactive ${isEntregado ? 'bg-gradient-to-r from-pink-500 to-purple-600 border-pink-500 text-white shadow-lg shadow-pink-950/50 font-black':'bg-purple-950/40 border-purple-800 text-purple-400'}">
                                     ${isEntregado ? '🏆 Entregado' : '📦 En Almacén'}
                                 </button>
                             </div>
                         </div>
 
                         <div class="space-y-1.5">
-                            <span class="text-[9px] font-black text-purple-400/80 uppercase tracking-widest block px-0.5">Asistencia de Cuotas (Modifica aquí individualmente):</span>
+                            <span class="text-[9px] font-black text-purple-400/80 uppercase tracking-widest block px-0.5">Asistencia de Cuotas:</span>
                             ${listaAsistenciaHtml}
                         </div>
                     </div>`;
             }).join('');
         }
 
-        async function editClienteNombreDirecto(idSan, nombreViejo, nombreNuevo) {
-            if(!nombreNuevo || nombreViejo === nombreNuevo) return;
-            try {
-                await fetch(API_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({ action: "updateClienteNombre", id_san: idSan, nombre_viaje: nombreViejo, nombre_nuevo: nombreNuevo })
-                });
-                globalData.pagos.forEach(p => {
-                    if((p.id_san || p.id) === idSan) {
-                        if((p.cliente_asignado || p.cliente || '') === nombreViejo) {
-                            p.cliente_asignado = nombreNuevo; p.cliente = nombreNuevo;
-                        }
-                        if(p.beneficiario_premio === nombreViejo) p.beneficiario_premio = nombreNuevo;
-                    }
-                });
-                renderAdminPuestos();
-            } catch(e) { console.error(e); }
+        // --- FUNCIONES DEL BUFFER TEMPORAL (PUNTO 3) ---
+        function stageNombreCliente(idSan, nombreViejo, nombreNuevo) {
+            if(!nombreNuevo) return;
+            stagingChanges.nombres[`${idSan}_${nombreViejo}`] = nombreNuevo;
         }
 
-        async function toggleCuotaAsistencia(idSan, ronda, cliente, statusActual, btn) {
+        function stageCuotaAsistencia(idSan, ronda, cliente, statusActual, btn) {
+            const uniqueKey = `${idSan}_${ronda}_${cliente}`;
             const nuevoEstado = (statusActual.includes("🟢") || statusActual.toLowerCase().includes("pagado")) ? "🔴 Pendiente" : "🟢 Pagado";
+            
+            stagingChanges.cuotas[uniqueKey] = nuevoEstado;
             
             btn.className = nuevoEstado === "🟢 Pagado" ? 
                 "text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-black font-black shadow-md btn-interactive" : 
                 "text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-red-500/10 border-red-500/30 text-red-400 btn-interactive";
             btn.innerText = nuevoEstado === "🟢 Pagado" ? "🟢 Pagó" : "🔴 Pendiente";
-
-            try {
-                await fetch(API_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({ action: "updateCuota", id_san: idSan, ronda: ronda, cliente_paga: cliente, estado_pago: nuevoEstado })
-                });
-                const cached = globalData.pagos.find(p => (p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda && (p.cliente_asignado || p.cliente || '') === cliente);
-                if(cached) cached.estado_pago = nuevoEstado;
-            } catch(e) { console.error(e); }
         }
 
-        async function updateBeneficiario(idSan, ronda, nuevoNombre) {
-            try {
-                await fetch(API_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, beneficiario: nuevoNombre })
-                });
-                globalData.pagos.forEach(p => {
-                    if((p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda) {
-                        p.beneficiario_premio = nuevoNombre;
-                    }
-                });
-                renderAdminPuestos();
-            } catch(e) { console.error(e); }
+        function stageBeneficiario(idSan, ronda, nuevoNombre) {
+            stagingChanges.beneficiarios[`${idSan}_${ronda}`] = nuevoNombre;
         }
 
-        async function toggleEstadoEntrega(idSan, ronda, estadoActual, btn) {
+        function stageEstadoEntrega(idSan, ronda, estadoActual, btn) {
+            const bKey = `${idSan}_${ronda}`;
             const nuevoEstado = estadoActual.toLowerCase().includes("entregado") ? "📦 Retención" : "🏆 Entregado";
+            
+            stagingChanges.entregas[bKey] = nuevoEstado;
             
             btn.className = nuevoEstado === "🏆 Entregado" ? 
                 "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-gradient-to-r from-pink-500 to-purple-600 border-pink-500 text-white shadow-lg font-black btn-interactive" : 
                 "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-purple-950/40 border-purple-800 text-purple-400 btn-interactive";
             btn.innerText = nuevoEstado === "🏆 Entregado" ? "🏆 Entregado" : "📦 En Almacén";
+            
+            btn.setAttribute("onclick", `stageEstadoEntrega('${idSan}', ${ronda}, '${nuevoEstado}', this)`);
+        }
+
+        // PROCESADOR MÁSTER: EMPAQUETA TODO Y REALIZA UNA SOLA PUBLICACIÓN
+        async function saveAllAdminChangesToServer() {
+            document.getElementById('loading').classList.remove('hidden');
+            
+            const payload = {
+                action: "batchAdminUpdate",
+                nombres: stagingChanges.nombres,
+                cuotas: stagingChanges.cuotas,
+                beneficiarios: stagingChanges.beneficiarios,
+                entregas: stagingChanges.entregas
+            };
 
             try {
                 await fetch(API_URL, {
                     method: "POST",
                     mode: "no-cors",
-                    body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, estado_entrega: nuevoEstado })
+                    body: JSON.stringify(payload)
                 });
-                globalData.pagos.forEach(p => {
-                    if((p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda) {
-                        p.estado_entrega = nuevoEstado;
-                    }
-                });
-            } catch(e) { console.error(e); }
+                alert("🚀 ¡Datos sincronizados con éxito!");
+                setTimeout(() => init(), 1200);
+            } catch(e) {
+                console.error(e);
+                alert("❌ Error de red al intentar guardar.");
+                document.getElementById('loading').classList.add('hidden');
+            }
         }
 
+        // --- CÓDIGO RESTANTE DE OPERACIONES GENERALES ---
         async function deleteCurrentSan() {
             const id = document.getElementById('admin-san-selector').value;
             if(!id) return;
