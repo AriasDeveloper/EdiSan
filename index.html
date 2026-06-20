@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Sanes y Ofertas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0b0f19; color: #f3f4f6; }
+        .gold-glow { box-shadow: 0 0 15px rgba(234, 179, 8, 0.15); }
+        .tab-active { border-bottom: 3px solid #eab308; color: #eab308; }
+    </style>
+</head>
+<body class="font-sans antialiased pb-10">
+
+    <!-- Header -->
+    <header class="bg-[#111827] border-b border-gray-800 py-6 px-4 text-center sticky top-0 z-50 shadow-md">
+        <h1 id="store-title" class="text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-500">
+            ✨ PORTAL DE SANES & OFERTAS ✨
+        </h1>
+        <p class="text-xs text-gray-400 mt-1">Consulta tus estados de cuenta y promociones 24/7</p>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="flex bg-[#111827] border-b border-gray-800 text-center text-sm font-bold tracking-wide">
+        <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-active transition-all duration-300">
+            <i class="fa-solid font-bold fa-piggy-bank mr-2"></i>Sanes / Tandas
+        </button>
+        <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 text-gray-400 transition-all duration-300">
+            <i class="fa-solid fa-fire mr-2 text-amber-500"></i>Ofertas Semanales
+        </button>
+    </div>
+
+    <!-- Main Container -->
+    <main class="max-w-md mx-auto px-4 mt-6">
+        
+        <!-- Loading Spinner -->
+        <div id="loading" class="text-center py-20">
+            <div class="animate-spin inline-block w-10 h-10 border-[4px] border-current border-t-transparent text-yellow-500 rounded-full" role="status"></div>
+            <p class="text-sm text-gray-400 mt-3 tracking-widest">Sincronizando base de datos...</p>
+        </div>
+
+        <!-- ================= SECTION: SANES ================= -->
+        <section id="section-sanes" class="hidden space-y-6">
+            <div class="bg-[#111827] p-4 rounded-xl border border-gray-800">
+                <label class="block text-xs font-bold text-yellow-500 uppercase tracking-wider mb-2">Selecciona un San activo:</label>
+                <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#1f2937] text-white p-3 rounded-lg border border-gray-700 focus:outline-none focus:border-yellow-500 font-medium">
+                    <!-- Dynamic Options -->
+                </select>
+            </div>
+
+            <!-- San General Info Card -->
+            <div id="san-info-card" class="bg-gradient-to-br from-[#111827] to-[#1f2937] p-5 rounded-2xl border border-gray-800 gold-glow hidden">
+                <h3 id="detail-san-name" class="text-lg font-extrabold text-white">---</h3>
+                <div class="grid grid-cols-2 gap-4 mt-4 text-center">
+                    <div class="bg-[#0b0f19] p-3 rounded-xl border border-gray-800">
+                        <span class="block text-[10px] text-gray-400 font-bold uppercase">Cuota</span>
+                        <span id="detail-san-cuota" class="text-xl font-black text-yellow-400">$0.00</span>
+                    </div>
+                    <div class="bg-[#0b0f19] p-3 rounded-xl border border-gray-800">
+                        <span class="block text-[10px] text-gray-400 font-bold uppercase">Frecuencia</span>
+                        <span id="detail-san-frecuencia" class="text-sm font-bold text-gray-200 mt-1 block">---</span>
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-between items-center text-xs text-gray-400 px-1">
+                    <span>Puestos totales: <strong id="detail-san-puestos" class="text-white">0</strong></span>
+                    <span id="detail-san-estado" class="px-2 py-1 rounded bg-yellow-500/10 text-yellow-400 font-bold">---</span>
+                </div>
+            </div>
+
+            <!-- Table Timeline Puestos -->
+            <div id="san-table-container" class="hidden">
+                <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">Cronograma de puestos y pagos</h4>
+                <div class="space-y-3" id="table-body-puestos">
+                    <!-- Dynamic Rows -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION: OFERTAS ================= -->
+        <section id="section-ofertas" class="hidden space-y-4">
+            <div id="ofertas-container" class="grid grid-cols-1 gap-4">
+                <!-- Dynamic Product Cards -->
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
+        const WHATSAPP_NUMBER = "584242961164"; // Configura el número destino aquí
+        let globalData = {};
+
+        async function init() {
+            try {
+                const response = await fetch(API_URL);
+                globalData = await response.json();
+                
+                document.getElementById('loading').classList.add('hidden');
+                switchTab('sanes');
+                
+                populateSanSelector();
+                renderOfertas();
+            } catch (error) {
+                console.error("Error cargando la API:", error);
+                document.getElementById('loading').innerHTML = `<p class="text-red-500 font-bold text-sm">Error al conectar con la base de datos. Verifica la publicación del script.</p>`;
+            }
+        }
+
+        function switchTab(tab) {
+            const tabSanes = document.getElementById('tab-sanes');
+            const tabOfertas = document.getElementById('tab-ofertas');
+            const secSanes = document.getElementById('section-sanes');
+            const secOfertas = document.getElementById('section-ofertas');
+
+            if (tab === 'sanes') {
+                tabSanes.classList.add('tab-active');
+                tabOfertas.classList.remove('tab-active');
+                tabOfertas.classList.add('text-gray-400');
+                secSanes.classList.remove('hidden');
+                secOfertas.classList.add('hidden');
+            } else {
+                tabOfertas.classList.add('tab-active');
+                tabSanes.classList.remove('tab-active');
+                tabSanes.classList.add('text-gray-400');
+                secOfertas.classList.remove('hidden');
+                secSanes.classList.add('hidden');
+            }
+        }
+
+        function populateSanSelector() {
+            const selector = document.getElementById('san-selector');
+            if (!globalData.sanes || globalData.sanes.length === 0) {
+                selector.innerHTML = `<option>No hay Sanes activos registrados</option>`;
+                return;
+            }
+            
+            selector.innerHTML = globalData.sanes.map((san, idx) => 
+                `<option value="${san.id_san}" ${idx === 0 ? 'selected' : ''}>${san.nombre_san}</option>`
+            ).join('');
+            
+            renderSanDetails();
+        }
+
+        function renderSanDetails() {
+            const selectedId = document.getElementById('san-selector').value;
+            const san = globalData.sanes.find(s => s.id_san === selectedId);
+            
+            if (!san) return;
+
+            document.getElementById('san-info-card').classList.remove('hidden');
+            document.getElementById('san-table-container').classList.remove('hidden');
+
+            document.getElementById('detail-san-name').innerText = san.nombre_san;
+            document.getElementById('detail-san-cuota').innerText = `$${parseFloat(san.cuota).toFixed(2)}`;
+            document.getElementById('detail-san-frecuencia').innerText = san.frecuencia;
+            document.getElementById('detail-san-puestos').innerText = san.total_puestos;
+            document.getElementById('detail-san-estado').innerText = san.estado;
+
+            // Filtrar y ordenar los puestos de pagos de este San específico
+            const puestos = globalData.pagos.filter(p => p.id_san === selectedId);
+            const container = document.getElementById('table-body-puestos');
+
+            if(puestos.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">No se han cargado cronogramas de puestos todavía.</p>`;
+                return;
+            }
+
+            container.innerHTML = puestos.map(p => {
+                let statusClass = "bg-gray-800 text-gray-400 border-gray-700";
+                if (p.estado_pago.includes("🟢")) statusClass = "bg-green-500/10 text-green-400 border-green-500/20";
+                if (p.estado_pago.includes("🟡")) statusClass = "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
+
+                // Formatear Fecha básica
+                let fechaFormateada = p.fecha_pago;
+                if(fechaFormateada.includes("T")) fechaFormateada = fechaFormateada.split("T")[0];
+
+                return `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#111827] border border-gray-800 hover:border-gray-700 transition-all">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center font-black text-yellow-500 text-sm border border-yellow-500/20">
+                                ${p.numero_puesto}
+                            </div>
+                            <div>
+                                <h5 class="text-sm font-bold ${p.cliente_asignado.toLowerCase().includes('disponible') ? 'text-gray-500 italic' : 'text-white'}">
+                                    ${p.cliente_asignado}
+                                </h5>
+                                <p class="text-[10px] text-gray-400 mt-0.5">
+                                    <i class="fa-regular fa-calendar mr-1"></i> Límite: ${fechaFormateada}
+                                </p>
+                            </div>
+                        </div>
+                        <span class="text-[11px] font-bold px-2 py-1 rounded border ${statusClass}">
+                            ${p.estado_pago.replace('🟢','').replace('🟡','').trim()}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderOfertas() {
+            const container = document.getElementById('ofertas-container');
+            if (!globalData.ofertas || globalData.ofertas.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-[#111827] rounded-2xl border border-gray-800">
+                        <i class="fa-solid fa-box-open text-3xl text-gray-600 mb-2"></i>
+                        <p class="text-xs text-gray-500">No hay ofertas de contado publicadas esta semana.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = globalData.ofertas.map(o => {
+                const img = o.imgUrl ? o.imgUrl : 'https://images.unsplash.com/photo-1601524909162-be87252be298?auto=format&fit=crop&w=300&q=80';
+                return `
+                    <div class="bg-[#111827] rounded-2xl border border-gray-800 overflow-hidden flex flex-col justify-between">
+                        <div class="p-4 flex space-x-4">
+                            <img src="${img}" alt="${o.producto}" class="w-20 h-20 object-cover rounded-xl border border-gray-700 bg-gray-800 flex-shrink-0">
+                            <div class="flex-1 min-w-0">
+                                <span class="text-[9px] font-black tracking-widest text-yellow-500 uppercase">${o.disponibilidad}</span>
+                                <h4 class="text-sm font-extrabold text-white truncate mt-0.5">${o.producto}</h4>
+                                <p class="text-xs text-gray-400 line-clamp-2 mt-1 font-medium">${o.descripcion}</p>
+                            </div>
+                        </div>
+                        <div class="bg-[#1f2937]/50 px-4 py-3 border-t border-gray-800 flex items-center justify-between">
+                            <span class="text-lg font-black text-white">$${parseFloat(o.precio_oferta).toFixed(2)}</span>
+                            <button onclick="orderViaWhatsApp('${o.id}', '${o.producto}', '${o.precio_oferta}')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2 px-3 rounded-lg flex items-center shadow-lg transition-all">
+                                <i class="fa-brands fa-whatsapp text-sm mr-1.5"></i>Pedir Oferta
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function orderViaWhatsApp(id, name, price) {
+            const message = encodeURIComponent(`¡Hola! Me interesa la oferta promocional de contado:\n\n📦 *Producto:* ${name}\n🆔 *Código:* ${id}\n💰 *Precio de Oferta:* $${parseFloat(price).toFixed(2)}\n\n¿Tienen disponibilidad para pasar retirando?`);
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
+        }
+
+        // Run application
+        init();
+    </script>
+</body>
+</html>
