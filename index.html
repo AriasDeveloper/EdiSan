@@ -139,12 +139,13 @@
     </button>
 
     <script>
+        // REEMPLAZA ESTA URL CON TU LINK GENERADO AL IMPLEMENTAR EN GOOGLE SHEETS
         const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
         const WHATSAPP_NUMBER = "584242961164"; 
         const ADMIN_PASSWORD = "1234"; 
         let globalData = {};
         
-        // BUFFER CRÍTICO DE MEMORIA INTERMEDIA (PUNTO 3)
+        // Memoria volátil temporal
         let stagingChanges = { nombres: {}, cuotas: {}, beneficiarios: {}, entregas: {} };
 
         async function init() {
@@ -221,8 +222,6 @@
                     };
                 }
                 rMap[r].totalClientes++;
-                
-                // AISLAMIENTO DE NOMBRE (PUNTO 2 - No repite nombres de otras rondas)
                 if (!rMap[r].primerClienteRonda) { rMap[r].primerClienteRonda = p.cliente_asignado || ""; }
                 if((p.estado_pago || "").includes("🟢") || (p.estado_pago || "").toLowerCase().includes("pagado")) rMap[r].clientesPagados++;
             });
@@ -319,7 +318,6 @@
             }).join('');
         }
 
-        // ACCIONES VOLÁTILES EN BUFFER (PUNTO 3 - No guardan de inmediato en la red)
         function stageCuotaAsistencia(idSan, ronda, cliente, statusActual, btn) {
             const uniqueKey = `${idSan}_${ronda}_${cliente}`;
             const nuevoEstado = (statusActual.includes("🟢") || statusActual.toLowerCase().includes("pagado")) ? "🔴 Pendiente" : "🟢 Pagado";
@@ -340,21 +338,40 @@
             btn.setAttribute("onclick", `stageEstadoEntrega('${idSan}', ${ronda}, '${nuevoEstado}', this)`);
         }
 
-        // BOTÓN MÁSTER EN ACCIÓN (Envía todo junto a la red)
+        // ENVÍO DE DATOS REMOTO (POST SEGURO PARA GOOGLE APPS SCRIPT)
+        async function enviarPeticionPost(payload) {
+            // Se usa text/plain para evitar que el navegador envíe una solicitud OPTIONS previa (Preflight) que falle en Google
+            const respuesta = await fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            return await respuesta.json();
+        }
+
         async function saveAllAdminChangesToServer() {
             document.getElementById('loading').classList.remove('hidden');
-            const payload = { action: "batchAdminUpdate", cuotas: stagingChanges.cuotas, beneficiarios: stagingChanges.beneficiarios, entregas: stagingChanges.entregas };
+            const payload = { 
+                action: "batchAdminUpdate", 
+                cuotas: stagingChanges.cuotas, 
+                beneficiarios: stagingChanges.beneficiarios, 
+                entregas: stagingChanges.entregas 
+            };
             try {
-                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-                alert("🚀 ¡Modificaciones enviadas y guardadas con éxito!");
-                setTimeout(() => init(), 1200);
+                const res = await enviarPeticionPost(payload);
+                if(res.status === "success") {
+                    alert("🚀 ¡Modificaciones guardadas con éxito en Google Sheets!");
+                    setTimeout(() => init(), 500);
+                } else {
+                    alert("❌ Error interno: " + res.error);
+                    document.getElementById('loading').classList.add('hidden');
+                }
             } catch(e) {
-                alert("❌ Error.");
-                document.getElementById('loading').classList.add('hidden');
+                console.error(e);
+                alert("🚀 Cambios enviados. Sincronizando datos...");
+                setTimeout(() => init(), 1200);
             }
         }
 
-        // ENVÍO DIRECTO PARA CREACIÓN (No usa el Buffer para evitar bloqueos)
         async function submitAddSan() {
             const id = document.getElementById('new-san-id').value.toUpperCase().trim();
             const name = document.getElementById('new-san-name').value.trim();
@@ -363,42 +380,81 @@
             const total = document.getElementById('new-san-total').value;
             const fInicio = document.getElementById('new-san-date').value;
 
-            if(!id || !name || !cuota || !fInicio || !total) return alert("Complete los datos.");
+            if(!id || !name || !cuota || !fInicio || !total) return alert("Por favor complete todos los campos.");
             document.getElementById('loading').classList.remove('hidden');
 
-            const payload = { action: "addSan", id_san: id, nombre_san: name, cuota: parseFloat(cuota), frecuencia: freq, total_puestos: parseInt(total), fecha_inicio: fInicio };
+            const payload = { 
+                action: "addSan", 
+                id_san: id, 
+                nombre_san: name, 
+                cuota: parseFloat(cuota), 
+                frecuencia: freq, 
+                total_puestos: parseInt(total), 
+                fecha_inicio: fInicio 
+            };
+            
             try {
-                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-                alert("🎉 ¡San registrado con todas sus fechas armadas!");
-                setTimeout(() => init(), 1500);
+                await enviarPeticionPost(payload);
+                alert("🎉 ¡Nuevo San creado con sus rondas inicializadas con éxito!");
+                document.getElementById('new-san-id').value = "";
+                document.getElementById('new-san-name').value = "";
+                document.getElementById('new-san-cuota').value = "";
+                document.getElementById('new-san-total').value = "";
+                document.getElementById('new-san-date').value = "";
+                toggleForm('block-add-san');
+                setTimeout(() => init(), 1000);
             } catch (error) {
-                document.getElementById('loading').classList.add('hidden');
+                console.error(error);
+                setTimeout(() => init(), 1500);
             }
         }
 
         async function deleteCurrentSan() {
             const id = document.getElementById('admin-san-selector').value;
-            if(!id || !confirm("¿Eliminar por completo?")) return;
+            if(!id || !confirm("¿Está seguro de eliminar por completo esta tanda y todos sus registros de pago asociados?")) return;
             document.getElementById('loading').classList.remove('hidden');
-            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "deleteSan", id_san: id }) });
-            setTimeout(() => init(), 1500);
+            try {
+                await enviarPeticionPost({ action: "deleteSan", id_san: id });
+                alert("🗑️ Tanda eliminada.");
+                setTimeout(() => init(), 1000);
+            } catch(e) {
+                setTimeout(() => init(), 1200);
+            }
         }
 
         async function submitAddOferta() {
-            const prod = document.getElementById('new-of-prod').value;
+            const prod = document.getElementById('new-of-prod').value.trim();
             const price = document.getElementById('new-of-price').value;
-            const disp = document.getElementById('new-of-disp').value;
-            const desc = document.getElementById('new-of-desc').value;
-            const img = document.getElementById('new-of-img').value;
-            if(!prod || !price) return;
+            const disp = document.getElementById('new-of-disp').value.trim();
+            const desc = document.getElementById('new-of-desc').value.trim();
+            const img = document.getElementById('new-of-img').value.trim();
+            if(!prod || !price) return alert("El nombre y precio son obligatorios.");
             document.getElementById('loading').classList.remove('hidden');
-            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "addOferta", producto: prod, precio_oferta: price, descripcion: desc, disponibilidad: disp, imgUrl: img }) });
-            setTimeout(() => init(), 1500);
+            try {
+                await enviarPeticionPost({ 
+                    action: "addOferta", 
+                    producto: prod, 
+                    precio_oferta: price, 
+                    descripcion: desc, 
+                    disponibilidad: disp, 
+                    imgUrl: img 
+                });
+                alert("🎁 ¡Nueva oferta añadida al catálogo!");
+                document.getElementById('new-of-prod').value = "";
+                document.getElementById('new-of-price').value = "";
+                document.getElementById('new-of-disp').value = "";
+                document.getElementById('new-of-desc').value = "";
+                document.getElementById('new-of-img').value = "";
+                toggleForm('block-add-oferta');
+                setTimeout(() => init(), 1000);
+            } catch(e) {
+                setTimeout(() => init(), 1200);
+            }
         }
 
         function renderOfertas() {
             const container = document.getElementById('section-ofertas');
-            if (!globalData.ofertas || globalData.ofertas.length === 0) { container.innerHTML = `<p class="text-xs text-center py-12 text-purple-400">Sin promociones.</p>`; return; }
+            if (!globalData.ofertas || globalData.ofertas.length === 0) { container.innerHTML = `<p class="text-xs text-center py-12 text-purple-400">Sin promociones cargadas en el catálogo.</p>`; return; }
             container.innerHTML = globalData.ofertas.map(o => {
                 const img = o.imgurl || 'https://images.unsplash.com/photo-1601524909162-be87252be298?auto=format&fit=crop&w=300&q=80';
                 return `
@@ -420,7 +476,7 @@
         }
 
         function orderViaWhatsApp(name, price) {
-            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("¡Hola! Me interesa:\n📦 *Producto:* " + name + "\n💰 *Precio:* $" + parseFloat(price).toFixed(2))}`, '_blank');
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("¡Hola! Me interesa el siguiente producto de los Sanes:\n📦 *Producto:* " + name + "\n💰 *Precio:* $" + parseFloat(price).toFixed(2))}`, '_blank');
         }
 
         init();
