@@ -1,27 +1,27 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanes Inversiones Edimar</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <base target="_top">
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec"; // <--- Pega aquí tu URL
-        
-        // Función para actualizar estado de pago al instante
-        async function updateEstado(id, ronda, cliente, estado) {
-            const nuevo = estado.includes("Pagado") ? "🔴 Pendiente" : "🟢 Pagado";
-            await fetch(API_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: "updatePago", id_san: id, ronda: ronda, cliente: cliente, nuevoEstado: nuevo })
-            });
-            window.location.reload();
+        // PEGA AQUÍ TU URL DE EJECUCIÓN (La que termina en /exec)
+        const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec"; 
+
+        async function cargarDatos() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                // Muestra algo en pantalla para saber que cargó
+                document.getElementById("status").innerText = "¡Datos cargados correctamente!";
+                console.log(data); // Mira los datos en la consola (F12)
+            } catch (e) {
+                document.getElementById("status").innerText = "Error: " + e.message;
+            }
         }
-        
-        // ... (Aquí iría todo el resto de tu diseño CSS y funciones JS de tu versión original)
-        // Solo asegúrate de llamar a updateEstado() en tus botones de pago.
     </script>
 </head>
-<body class="bg-gray-900 text-white">
-    </body>
+<body onload="cargarDatos()">
+    <h1>Estado de la conexión:</h1>
+    <p id="status">Cargando...</p>
+</body>
 </html>
