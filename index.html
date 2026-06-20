@@ -1,27 +1,205 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <base target="_top">
-    <script>
-        // PEGA AQUÍ TU URL DE EJECUCIÓN (La que termina en /exec)
-        const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec"; 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanes Inversiones Edimar - La Patrona</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #0c0817; color: #f3f4f6; overflow-x: hidden; }
+        .purple-glow { box-shadow: 0 0 35px rgba(168, 85, 247, 0.2); }
+        .pink-glow-soft { box-shadow: 0 0 25px rgba(236, 72, 153, 0.15); }
+        .amber-glow-soft { box-shadow: 0 0 25px rgba(245, 158, 11, 0.15); }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.4) sepia(1) saturate(3) hue-rotate(270deg); cursor: pointer; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); filter: blur(4px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+        @keyframes pulseGlow { 0%, 100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 10px rgba(236, 72, 153, 0.2); } 50% { transform: scale(1.03); opacity: 1; box-shadow: 0 0 25px rgba(236, 72, 153, 0.4); } }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .animate-fade-in { animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        .animate-crown-pulse { animation: pulseGlow 2s infinite ease-in-out; }
+        .shimmer-loading { background: linear-gradient(90deg, #170f2c 25%, #28194d 50%, #170f2c 75%); background-size: 200% 100%; animation: shimmer 1.6s infinite linear; }
+        .btn-interactive { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-interactive:active { transform: scale(0.94); }
+        .tab-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="font-sans antialiased pb-24 selection:bg-pink-500 selection:text-white">
 
-        async function cargarDatos() {
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
+    <header class="bg-gradient-to-b from-[#1f113a] to-[#120826] border-b border-pink-500/20 py-6 px-4 text-center sticky top-0 z-40 shadow-2xl backdrop-blur-md bg-opacity-95">
+        <div class="inline-flex items-center justify-center bg-pink-500/10 border border-pink-500/30 px-4 py-1.5 rounded-full mb-2 animate-crown-pulse">
+            <i class="fa-solid fa-crown text-amber-400 text-3xl mr-2"></i>
+            <span class="text-[10px] uppercase tracking-widest font-black text-pink-400">Inversiones Edimar</span>
+        </div>
+        <h1 class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 uppercase drop-shadow-md">SANES LA PATRONA</h1>
+    </header>
+
+    <div class="flex bg-[#120b24] border-b border-purple-900/30 text-center text-xs font-black uppercase tracking-widest sticky top-[97px] z-30 shadow-md">
+        <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-transition border-b-2 border-transparent text-purple-400/50 flex flex-col items-center justify-center gap-1 hover:text-purple-300 btn-interactive">
+            <i class="fa-solid fa-vault text-2xl mb-0.5"></i><span>Cronograma</span>
+        </button>
+        <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 tab-transition border-b-2 border-transparent text-purple-400/50 flex flex-col items-center justify-center gap-1 hover:text-pink-400 btn-interactive">
+            <i class="fa-solid fa-tags text-2xl mb-0.5"></i><span>Catálogo Club</span>
+        </button>
+    </div>
+
+    <main class="max-w-md mx-auto px-4 mt-6">
+        <div id="loading" class="text-center py-20 space-y-4">
+            <div class="relative inline-block">
+                <div class="animate-spin inline-block w-14 h-14 border-[3px] border-purple-500 border-t-transparent rounded-full shadow-lg"></div>
+                <i class="fa-solid fa-crown text-pink-500 absolute top-4 left-4 text-xl animate-bounce"></i>
+            </div>
+            <p class="text-[10px] text-purple-400 font-black tracking-widest uppercase animate-pulse">Sincronizando Servidor...</p>
+        </div>
+
+        <section id="section-sanes" class="hidden space-y-5">
+            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 shadow-xl animate-fade-in purple-glow">
+                <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione un Grupo Activo:</label>
+                <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-sm focus:outline-none"></select>
+            </div>
+
+            <div id="san-info-card" class="bg-gradient-to-br from-[#1c1236] to-[#120b24] p-5 rounded-2xl border border-purple-900/40 purple-glow hidden animate-fade-in">
+                <h3 id="detail-san-name" class="text-base font-extrabold text-white">---</h3>
+                <div class="grid grid-cols-2 gap-3 mt-4 text-center">
+                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
+                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Cuota Requerida</span>
+                        <span id="detail-san-cuota" class="text-lg font-black text-amber-400">$0.00</span>
+                    </div>
+                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
+                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Frecuencia</span>
+                        <span id="detail-san-frecuencia" class="text-xs font-bold text-gray-200 mt-1 block">---</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="san-table-container" class="hidden space-y-2.5">
+                <div class="space-y-3.5" id="client-puestos-container"></div>
+            </div>
+        </section>
+
+        <section id="section-ofertas" class="hidden grid grid-cols-1 gap-4"></section>
+
+        <section id="section-admin" class="hidden space-y-6 animate-fade-in">
+            <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
+                <h2 class="text-xs font-black text-pink-400 uppercase tracking-widest">Consola Administradora</h2>
+                <button onclick="switchTab('sanes')" class="text-[9px] font-black bg-purple-950/60 px-3 py-1.5 rounded-lg text-purple-300 uppercase">Salir</button>
+            </div>
+
+            <div class="bg-gradient-to-r from-[#1d123a] to-[#251849] p-4 rounded-xl border border-purple-800/40 shadow-md space-y-3 purple-glow">
+                <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest block">Gestión de Datos</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="toggleForm('block-add-san')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase btn-interactive">Reg. Nuevo San</button>
+                    <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase btn-interactive">Cargar Oferta</button>
+                </div>
+
+                <div id="block-add-san" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2 animate-fade-in">
+                    <input type="text" id="new-san-id" placeholder="ID Único (Ej: SAN-BERA)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold focus:outline-none">
+                    <input type="text" id="new-san-name" placeholder="Nombre (Ej: Tanda de Motos)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <input type="number" id="new-san-cuota" placeholder="Cuota $" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                        <select id="new-san-freq" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                            <option value="Semanal">Semanal</option>
+                            <option value="Quincenal">Quincenal</option>
+                            <option value="Mensual">Mensual</option>
+                        </select>
+                        <input type="number" id="new-san-total" placeholder="Puestos" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    </div>
+                    <input type="date" id="new-san-date" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <button onclick="submitAddSan()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-2 rounded font-black text-[10px] uppercase text-white btn-interactive">Crear Todo el San</button>
+                </div>
+
+                <div id="block-add-oferta" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
+                    <input type="text" id="new-of-prod" placeholder="Nombre del Artículo" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <div class="grid grid-cols-2 gap-1.5">
+                        <input type="number" id="new-of-price" placeholder="Precio $" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                        <input type="text" id="new-of-disp" placeholder="Disponibilidad" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    </div>
+                    <input type="text" id="new-of-desc" placeholder="Descripción" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <input type="text" id="new-of-img" placeholder="URL Imagen" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <button onclick="submitAddOferta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 rounded font-black text-[10px] uppercase text-black btn-interactive">Publicar Oferta</button>
+                </div>
+            </div>
+
+            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 space-y-3 amber-glow-soft">
+                <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest">Seleccione Tanda a Gestionar:</label>
+                <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-xs focus:outline-none"></select>
                 
-                // Muestra algo en pantalla para saber que cargó
-                document.getElementById("status").innerText = "¡Datos cargados correctamente!";
-                console.log(data); // Mira los datos en la consola (F12)
-            } catch (e) {
-                document.getElementById("status").innerText = "Error: " + e.message;
+                <button onclick="saveAllAdminChangesToServer()" class="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-black font-black text-xs py-3 px-4 rounded-xl uppercase tracking-widest shadow-xl flex items-center justify-center gap-2 btn-interactive">
+                    <i class="fa-solid fa-floppy-disk text-base"></i> Guardar Cambios en la Nube
+                </button>
+
+                <button onclick="deleteCurrentSan()" class="w-full bg-red-950/20 border border-red-700/40 text-red-400 font-black text-[10px] py-2 px-4 rounded-lg uppercase tracking-wider flex items-center justify-center gap-2 btn-interactive">Eliminar Tanda Completa</button>
+            </div>
+
+            <div class="space-y-4" id="admin-puestos-container"></div>
+        </section>
+    </main>
+
+    <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#211342] text-pink-400 p-5 rounded-full border border-purple-700/60 z-50 purple-glow btn-interactive">
+        <i class="fa-solid fa-crown text-3xl"></i>
+    </button>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
+        const ADMIN_PASSWORD = "1234"; 
+        let globalData = {};
+        let stagingChanges = { nombres: {}, cuotas: {}, beneficiarios: {}, entregas: {} };
+
+        async function init() {
+            try {
+                document.getElementById('loading').classList.remove('hidden');
+                const response = await fetch(API_URL);
+                globalData = await response.json();
+                document.getElementById('loading').classList.add('hidden');
+                populateSelectors();
+                renderOfertas();
+                switchTab('sanes');
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `<p class="text-red-500 font-bold text-xs uppercase animate-bounce">⚠️ Error de conexión.</p>`;
             }
         }
+
+        window.onload = init;
+
+        function loginAdmin() { if (prompt("Contraseña:") === ADMIN_PASSWORD) switchTab('admin'); }
+        function toggleForm(id) { document.getElementById(id).classList.toggle('hidden'); }
+        
+        function switchTab(tab) {
+            ['sanes', 'ofertas', 'admin'].forEach(t => {
+                if(document.getElementById(`section-${t}`)) document.getElementById(`section-${t}`).classList.add('hidden');
+            });
+            document.getElementById(`section-${tab}`).classList.remove('hidden');
+            if(tab === 'admin') renderAdminPuestos();
+        }
+
+        function populateSelectors() {
+            if(!globalData.sanes) return;
+            const options = globalData.sanes.map(s => `<option value="${s.id_san}">${s.nombre_san}</option>`).join('');
+            document.getElementById('san-selector').innerHTML = options;
+            document.getElementById('admin-san-selector').innerHTML = options;
+            renderSanDetails();
+        }
+
+        function renderSanDetails() {
+            const id = document.getElementById('san-selector').value;
+            const san = globalData.sanes.find(s => s.id_san === id);
+            if(!san) return;
+            document.getElementById('san-info-card').classList.remove('hidden');
+            document.getElementById('san-table-container').classList.remove('hidden');
+            document.getElementById('detail-san-name').innerText = san.nombre_san;
+            document.getElementById('detail-san-cuota').innerText = `$${parseFloat(san.cuota).toFixed(2)}`;
+            document.getElementById('detail-san-frecuencia').innerText = san.frecuencia;
+        }
+
+        function renderAdminPuestos() { /* Tu función original de renderizado admin */ }
+        function saveAllAdminChangesToServer() { /* Tu función de guardado */ }
+        function submitAddSan() { /* Tu función para agregar san */ }
+        function submitAddOferta() { /* Tu función para agregar oferta */ }
+        function deleteCurrentSan() { /* Tu función para borrar */ }
+        function renderOfertas() { /* Tu función para mostrar ofertas */ }
+        async function enviarPeticionPost(payload) {
+            const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(payload) });
+            return await res.json();
+        }
     </script>
-</head>
-<body onload="cargarDatos()">
-    <h1>Estado de la conexión:</h1>
-    <p id="status">Cargando...</p>
 </body>
 </html>
