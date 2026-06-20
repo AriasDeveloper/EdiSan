@@ -8,64 +8,97 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #0c0817; color: #f3f4f6; overflow-x: hidden; }
-        .purple-glow { box-shadow: 0 0 30px rgba(217, 70, 239, 0.15); }
-        .tab-active { border-bottom: 3px solid #d946ef; color: #d946ef; transform: scale(1.02); }
+        
+        /* --- Sistema de Luces y Efectos de Brillo --- */
+        .purple-glow { box-shadow: 0 0 35px rgba(168, 85, 247, 0.2); }
+        .pink-glow-soft { box-shadow: 0 0 25px rgba(236, 72, 153, 0.15); }
+        .amber-glow-soft { box-shadow: 0 0 25px rgba(245, 158, 11, 0.15); }
+
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.4) sepia(1) saturate(3) hue-rotate(270deg); cursor: pointer; }
         
+        /* --- Biblioteca de Animaciones Avanzadas --- */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
-        .animate-fade-in { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 10px rgba(236, 72, 153, 0.2); }
+            50% { transform: scale(1.03); opacity: 1; box-shadow: 0 0 25px rgba(236, 72, 153, 0.4); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* --- Clases de Animación Utilidades --- */
+        .animate-fade-in { animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        .animate-crown-pulse { animation: pulseGlow 2s infinite ease-in-out; }
+        
+        .shimmer-loading {
+            background: linear-gradient(90deg, #170f2c 25%, #28194d 50%, #170f2c 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.6s infinite linear;
+        }
+
+        /* Micro-interacciones de Botones e Inputs */
+        .btn-interactive { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-interactive:active { transform: scale(0.94); }
+        
+        .tab-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
-<body class="font-sans antialiased pb-24">
+<body class="font-sans antialiased pb-24 selection:bg-pink-500 selection:text-white">
 
-    <header class="bg-gradient-to-b from-[#1f113a] to-[#120826] border-b border-pink-500/20 py-6 px-4 text-center sticky top-0 z-40 shadow-2xl">
-        <div class="inline-flex items-center justify-center bg-pink-500/10 border border-pink-500/30 px-3 py-1 rounded-full mb-2">
-            <i class="fa-solid fa-crown text-amber-400 text-3xl mr-2 animate-pulse"></i>
+    <header class="bg-gradient-to-b from-[#1f113a] to-[#120826] border-b border-pink-500/20 py-6 px-4 text-center sticky top-0 z-40 shadow-2xl backdrop-blur-md bg-opacity-95">
+        <div class="inline-flex items-center justify-center bg-pink-500/10 border border-pink-500/30 px-4 py-1.5 rounded-full mb-2 animate-crown-pulse">
+            <i class="fa-solid fa-crown text-amber-400 text-3xl mr-2"></i>
             <span class="text-[10px] uppercase tracking-widest font-black text-pink-400">Inversiones Edimar</span>
         </div>
-        <h1 class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 uppercase">
+        <h1 class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 uppercase drop-shadow-md">
             SANES LA PATRONA
         </h1>
     </header>
 
-    <div class="flex bg-[#120b24] border-b border-purple-900/30 text-center text-xs font-black uppercase tracking-widest">
-        <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-active transition-all flex flex-col items-center justify-center gap-1">
-            <i class="fa-solid fa-vault text-3xl text-purple-400"></i>
+    <div class="flex bg-[#120b24] border-b border-purple-900/30 text-center text-xs font-black uppercase tracking-widest sticky top-[97px] z-30 shadow-md">
+        <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-transition border-b-2 border-transparent text-purple-400/50 flex flex-col items-center justify-center gap-1 hover:text-purple-300 btn-interactive">
+            <i class="fa-solid fa-vault text-2xl mb-0.5"></i>
             <span>Cronograma</span>
         </button>
-        <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 text-purple-400/50 transition-all flex flex-col items-center justify-center gap-1">
-            <i class="fa-solid fa-tags text-3xl text-pink-400"></i>
+        <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 tab-transition border-b-2 border-transparent text-purple-400/50 flex flex-col items-center justify-center gap-1 hover:text-pink-400 btn-interactive">
+            <i class="fa-solid fa-tags text-2xl mb-0.5"></i>
             <span>Catálogo Club</span>
         </button>
     </div>
 
     <main class="max-w-md mx-auto px-4 mt-6">
         
-        <div id="loading" class="text-center py-20">
+        <div id="loading" class="text-center py-20 space-y-4">
             <div class="relative inline-block">
-                <div class="animate-spin inline-block w-12 h-12 border-[3px] border-purple-500 border-t-transparent rounded-full"></div>
-                <i class="fa-solid fa-crown text-pink-500 absolute top-3.5 left-3.5 text-xl animate-pulse"></i>
+                <div class="animate-spin inline-block w-14 h-14 border-[3px] border-purple-500 border-t-transparent rounded-full shadow-lg"></div>
+                <i class="fa-solid fa-crown text-pink-500 absolute top-4 left-4 text-xl animate-bounce"></i>
             </div>
-            <p class="text-[10px] text-purple-400 font-black mt-4 tracking-widest uppercase">Leyendo Servidor...</p>
+            <div class="w-32 h-2.5 mx-auto rounded-full overflow-hidden bg-purple-950/40 relative">
+                <div class="shimmer-loading w-full h-full"></div>
+            </div>
+            <p class="text-[10px] text-purple-400 font-black tracking-widest uppercase animate-pulse">Sincronizando Servidor...</p>
         </div>
 
         <section id="section-sanes" class="hidden space-y-5">
-            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 shadow-xl animate-fade-in">
+            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 shadow-xl animate-fade-in purple-glow">
                 <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione un Grupo Activo:</label>
-                <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-sm"></select>
+                <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-sm focus:border-pink-500 focus:outline-none transition-all duration-300"></select>
             </div>
 
-            <div id="client-lookup-card" class="bg-gradient-to-r from-[#1e113c] to-[#140b29] p-4 rounded-xl border border-pink-500/20 shadow-md space-y-3 hidden animate-fade-in">
+            <div id="client-lookup-card" class="bg-gradient-to-r from-[#1e113c] to-[#140b29] p-4 rounded-xl border border-pink-500/20 shadow-md space-y-3 hidden animate-fade-in pink-glow-soft">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-address-card text-pink-400 text-2xl"></i>
                     <span class="text-[10px] font-black text-pink-400 uppercase tracking-widest">Mi Estado de Cuenta Particular</span>
                 </div>
                 <div class="flex gap-2">
-                    <select id="client-name-selector" class="flex-1 bg-[#0c0817] text-white p-2 rounded text-xs font-bold border border-purple-800/60"></select>
-                    <button onclick="checkClientCreditHistory()" class="bg-pink-600 hover:bg-pink-700 text-white font-black text-[10px] px-4 py-2 rounded uppercase tracking-wider">Ver Mi Record</button>
+                    <select id="client-name-selector" class="flex-1 bg-[#0c0817] text-white p-2 rounded text-xs font-bold border border-purple-800/60 focus:outline-none focus:border-pink-500"></select>
+                    <button onclick="checkClientCreditHistory()" class="bg-pink-600 hover:bg-pink-700 text-white font-black text-[10px] px-4 py-2 rounded uppercase tracking-wider btn-interactive shadow-md shadow-pink-900/20">Ver Mi Record</button>
                 </div>
                 
                 <div id="client-history-result" class="hidden bg-[#0c0817] p-3 rounded-lg border border-purple-950 text-xs space-y-2 animate-fade-in"></div>
@@ -74,18 +107,18 @@
             <div id="san-info-card" class="bg-gradient-to-br from-[#1c1236] to-[#120b24] p-5 rounded-2xl border border-purple-900/40 purple-glow hidden animate-fade-in">
                 <h3 id="detail-san-name" class="text-base font-extrabold text-white tracking-wide">---</h3>
                 <div class="grid grid-cols-2 gap-3 mt-4 text-center">
-                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
+                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950 transform hover:scale-[1.02] transition-transform duration-300">
                         <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Cuota Requerida</span>
                         <span id="detail-san-cuota" class="text-lg font-black text-amber-400">$0.00</span>
                     </div>
-                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
+                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950 transform hover:scale-[1.02] transition-transform duration-300">
                         <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Frecuencia</span>
                         <span id="detail-san-frecuencia" class="text-xs font-bold text-gray-200 mt-1 block">---</span>
                     </div>
                 </div>
             </div>
 
-            <div id="san-table-container" class="hidden space-y-2.5 animate-fade-in">
+            <div id="san-table-container" class="hidden space-y-2.5">
                 <div class="space-y-3.5" id="client-puestos-container"></div>
             </div>
         </section>
@@ -95,69 +128,69 @@
         <section id="section-admin" class="hidden space-y-6 animate-fade-in">
             <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
                 <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-crown text-pink-400 text-3xl"></i>
+                    <i class="fa-solid fa-crown text-pink-400 text-3xl animate-bounce"></i>
                     <h2 class="text-xs font-black text-pink-400 uppercase tracking-widest">Consola Administradora</h2>
                 </div>
-                <button onclick="switchTab('sanes')" class="text-[9px] font-black bg-purple-950/60 border border-purple-800/40 px-3 py-1.5 rounded-lg text-purple-300 uppercase">Salir</button>
+                <button onclick="switchTab('sanes')" class="text-[9px] font-black bg-purple-950/60 border border-purple-800/40 px-3 py-1.5 rounded-lg text-purple-300 uppercase btn-interactive">Salir</button>
             </div>
 
-            <div class="bg-gradient-to-r from-[#1d123a] to-[#251849] p-4 rounded-xl border border-purple-800/40 shadow-md space-y-3">
+            <div class="bg-gradient-to-r from-[#1d123a] to-[#251849] p-4 rounded-xl border border-purple-800/40 shadow-md space-y-3 purple-glow">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-folder-plus text-amber-400 text-2xl"></i>
                     <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest">Gestión de Datos</span>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="toggleForm('block-add-san')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase hover:border-purple-500">Reg. Nuevo San</button>
-                    <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase hover:border-purple-500">Cargar Oferta</button>
+                    <button onclick="toggleForm('block-add-san')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase hover:border-purple-500 transition-all btn-interactive">Reg. Nuevo San</button>
+                    <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase hover:border-purple-500 transition-all btn-interactive">Cargar Oferta</button>
                 </div>
 
-                <div id="block-add-san" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
-                    <input type="text" id="new-san-id" placeholder="ID Único (Ej: SAN-BERA)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold focus:border-pink-500">
-                    <input type="text" id="new-san-name" placeholder="Nombre (Ej: Tanda de Motos)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:border-pink-500">
+                <div id="block-add-san" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2 animate-fade-in">
+                    <input type="text" id="new-san-id" placeholder="ID Único (Ej: SAN-BERA)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold focus:border-pink-500 focus:outline-none transition-colors">
+                    <input type="text" id="new-san-name" placeholder="Nombre (Ej: Tanda de Motos)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:border-pink-500 focus:outline-none transition-colors">
                     <div class="grid grid-cols-3 gap-1.5">
-                        <input type="number" id="new-san-cuota" placeholder="Cuota $" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white">
-                        <select id="new-san-freq" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white">
+                        <input type="number" id="new-san-cuota" placeholder="Cuota $" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none focus:border-pink-500">
+                        <select id="new-san-freq" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                             <option value="Semanal">Semanal</option>
                             <option value="Quincenal">Quincenal</option>
                         </select>
-                        <input type="number" id="new-san-total" placeholder="Puestos" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white">
+                        <input type="number" id="new-san-total" placeholder="Puestos" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none focus:border-pink-500">
                     </div>
                     <div>
                         <label class="text-[9px] font-black text-purple-400 uppercase block mb-1">Fecha de inicio:</label>
-                        <input type="date" id="new-san-date" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white">
+                        <input type="date" id="new-san-date" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                     </div>
-                    <button onclick="submitAddSan()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-2 rounded font-black text-[10px] uppercase text-white">Crear Todo el San</button>
+                    <button onclick="submitAddSan()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-2 rounded font-black text-[10px] uppercase text-white shadow-lg btn-interactive">Crear Todo el San</button>
                 </div>
 
-                <div id="block-add-oferta" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
-                    <input type="text" id="new-of-prod" placeholder="Nombre del Artículo" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white">
+                <div id="block-add-oferta" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2 animate-fade-in">
+                    <input type="text" id="new-of-prod" placeholder="Nombre del Artículo" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                     <div class="grid grid-cols-2 gap-1.5">
-                        <input type="number" id="new-of-price" placeholder="Precio $" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white">
-                        <input type="text" id="new-of-disp" placeholder="Disponibilidad" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white">
+                        <input type="number" id="new-of-price" placeholder="Precio $" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                        <input type="text" id="new-of-disp" placeholder="Disponibilidad" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                     </div>
-                    <input type="text" id="new-of-desc" placeholder="Descripción" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white">
-                    <input type="text" id="new-of-img" placeholder="URL Imagen" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white">
-                    <button onclick="submitAddOferta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 rounded font-black text-[10px] uppercase text-black">Publicar Oferta</button>
+                    <input type="text" id="new-of-desc" placeholder="Descripción" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <input type="text" id="new-of-img" placeholder="URL Imagen" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <button onclick="submitAddOferta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 rounded font-black text-[10px] uppercase text-black font-black shadow-lg btn-interactive">Publicar Oferta</button>
                 </div>
             </div>
 
-            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 space-y-3">
+            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 space-y-3 amber-glow-soft">
                 <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest">Seleccione Tanda a Gestionar:</label>
                 <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-xs focus:outline-none"></select>
                 
-                <button onclick="deleteCurrentSan()" class="w-full bg-red-950/40 border border-red-700/50 hover:bg-red-900 text-red-400 font-black text-[10px] py-2 px-4 rounded-lg uppercase tracking-wider transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-trash-can text-lg"></i> Eliminar Tanda Completa (Borrar Todo)
+                <button onclick="deleteCurrentSan()" class="w-full bg-red-950/20 border border-red-700/40 hover:bg-red-900/40 text-red-400 font-black text-[10px] py-2.5 px-4 rounded-lg uppercase tracking-wider transition-all flex items-center justify-center gap-2 btn-interactive">
+                    <i class="fa-solid fa-trash-can text-base"></i> Eliminar Tanda Completa
                 </button>
             </div>
 
-            <div id="admin-cascada-card" class="bg-gradient-to-r from-[#21113a] to-[#120a24] p-4 rounded-xl border border-purple-800/50 space-y-2.5 hidden">
+            <div id="admin-cascada-card" class="bg-gradient-to-r from-[#21113a] to-[#120a24] p-4 rounded-xl border border-purple-800/50 space-y-2.5 hidden animate-fade-in">
                 <div class="flex justify-between items-center">
                     <span class="text-[10px] font-black text-purple-300 uppercase">Mover Cronograma</span>
                     <span id="admin-cascada-freq" class="text-[9px] font-bold px-2 py-0.5 rounded bg-purple-900/40 text-purple-400 border border-purple-800/50 uppercase">---</span>
                 </div>
                 <div class="flex gap-2">
-                    <input type="date" id="admin-master-date" class="flex-1 bg-[#0c0817] border border-purple-800 p-2 rounded text-xs text-white">
-                    <button onclick="triggerCascadeFechas()" class="bg-purple-600 text-white px-3 py-2 rounded text-[10px] font-black uppercase">Propagar</button>
+                    <input type="date" id="admin-master-date" class="flex-1 bg-[#0c0817] border border-purple-800 p-2 rounded text-xs text-white focus:outline-none">
+                    <button onclick="triggerCascadeFechas()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-[10px] font-black uppercase shadow-md btn-interactive">Propagar</button>
                 </div>
             </div>
 
@@ -165,7 +198,7 @@
         </section>
     </main>
 
-    <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#211342] hover:bg-purple-900 text-pink-400 p-5 rounded-full shadow-2xl border border-purple-700/60 z-50 transition-all duration-300 purple-glow">
+    <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#211342] hover:bg-purple-900 text-pink-400 p-5 rounded-full shadow-2xl border border-purple-700/60 z-50 transition-all duration-300 purple-glow btn-interactive hover:rotate-12">
         <i class="fa-solid fa-crown text-3xl"></i>
     </button>
 
@@ -186,7 +219,7 @@
                 renderOfertas();
             } catch (error) {
                 console.error(error);
-                document.getElementById('loading').innerHTML = `<p class="text-red-500 font-bold text-xs uppercase">Error de Enlace.</p>`;
+                document.getElementById('loading').innerHTML = `<p class="text-red-500 font-bold text-xs uppercase animate-bounce">⚠️ Error de Enlace.</p>`;
             }
         }
 
@@ -199,16 +232,32 @@
         }
 
         function toggleForm(id) {
-            document.getElementById(id).classList.toggle('hidden');
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
         }
 
         function switchTab(tab) {
             ['sanes', 'ofertas', 'admin'].forEach(t => {
                 if(document.getElementById(`section-${t}`)) document.getElementById(`section-${t}`).classList.add('hidden');
-                if(document.getElementById(`tab-${t}`)) document.getElementById(`tab-${t}`).classList.remove('tab-active', 'text-purple-400/50');
+                if(document.getElementById(`tab-${t}`)) {
+                    document.getElementById(`tab-${t}`).className = "w-1/2 py-4 tab-transition border-b-2 border-transparent text-purple-400/50 flex flex-col items-center justify-center gap-1 hover:text-purple-300 btn-interactive";
+                }
             });
+            
             document.getElementById(`section-${tab}`).classList.remove('hidden');
-            if(tab !== 'admin') document.getElementById(`tab-${tab}`).classList.add('tab-active');
+            
+            if(tab !== 'admin') {
+                const activeTab = document.getElementById(`tab-${tab}`);
+                if (tab === 'sanes') {
+                    activeTab.className = "w-1/2 py-4 tab-transition border-b-2 border-purple-500 text-purple-400 font-black flex flex-col items-center justify-center gap-1 scale-[1.02] btn-interactive";
+                } else if (tab === 'ofertas') {
+                    activeTab.className = "w-1/2 py-4 tab-transition border-b-2 border-pink-500 text-pink-400 font-black flex flex-col items-center justify-center gap-1 scale-[1.02] btn-interactive";
+                }
+            }
             if(tab === 'admin') renderAdminPuestos();
             if(tab === 'sanes') renderSanDetails();
         }
@@ -250,7 +299,6 @@
 
             const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.id) === id);
             
-            // Llenar selector de nombres únicos sin duplicados
             const nombresUnicos = [...new Set(todosLosPagos.map(p => p.cliente_asignado || p.cliente).filter(Boolean))];
             document.getElementById('client-name-selector').innerHTML = nombresUnicos.map(n => `<option value="${n}">${n}</option>`).join('');
             document.getElementById('client-history-result').classList.add('hidden');
@@ -262,10 +310,11 @@
                     rMap[r] = {
                         ronda: r,
                         fecha: p.fecha_pago || p.fecha,
-                        beneficiario: p.beneficiario_premio || p.beneficiario || "Cupo " + r,
+                        beneficiario: p.beneficiario_premio || p.beneficiario || "",
                         estadoEntrega: p.estado_entrega || "📦 Retención",
                         totalClientes: 0,
-                        clientesPagados: 0
+                        clientesPagados: 0,
+                        primerClienteLista: p.cliente_asignado || p.cliente || ""
                     };
                 }
                 rMap[r].totalClientes++;
@@ -283,7 +332,7 @@
                 
                 if(r.estadoEntrega.toLowerCase().includes("entregado")) {
                     statusText = "🏆 Entregado";
-                    badgeClass = "bg-pink-500/20 text-pink-400 border-pink-500/30 font-black";
+                    badgeClass = "bg-pink-500/20 text-pink-400 border-pink-500/30 font-black animate-pulse";
                 } else if (r.fecha) {
                     const limit = new Date(r.fecha.split("T")[0] + "T00:00:00");
                     if (hoy >= limit && r.clientesPagados < r.totalClientes) {
@@ -292,12 +341,18 @@
                     }
                 }
 
+                // NUEVA LÓGICA AUTO-SINCRO: Si viene vacío o dice "Cupo/Cliente", usa el nombre de la lista de asistencia
+                let nombreMostrado = r.beneficiario.trim();
+                if (!nombreMostrado || nombreMostrado.toLowerCase().includes("cupo") || nombreMostrado.toLowerCase().includes("cliente")) {
+                    nombreMostrado = r.primerClienteLista || "Por Asignar";
+                }
+
                 return `
-                    <div class="p-4 rounded-xl bg-[#170f2c] border border-purple-900/30 shadow-md space-y-2 animate-fade-in" style="animation-delay: ${idx * 0.03}s">
+                    <div class="p-4 rounded-xl bg-[#170f2c] border border-purple-900/30 shadow-md space-y-2 animate-fade-in hover:border-purple-600/50 transition-all duration-300 transform hover:translate-x-1" style="animation-delay: ${idx * 0.04}s">
                         <div class="flex justify-between items-start">
                             <div>
                                 <span class="text-[9px] font-black text-purple-400 uppercase block">Ronda Nro. ${r.ronda}</span>
-                                <h5 class="text-xs font-black text-white mt-0.5">🏆 Premio para: <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-pink-400">${r.beneficiario}</span></h5>
+                                <h5 class="text-xs font-black text-white mt-0.5">🏆 Premio para: <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-pink-400">${nombreMostrado}</span></h5>
                             </div>
                             <span class="text-[8px] font-black px-2 py-1 rounded border uppercase ${badgeClass}">${statusText}</span>
                         </div>
@@ -306,53 +361,6 @@
             }).join('');
         }
 
-        function checkClientCreditHistory() {
-            const idSan = document.getElementById('san-selector').value;
-            const clienteSelected = document.getElementById('client-name-selector').value;
-            if(!clienteSelected) return;
-
-            const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.id) === idSan && (p.cliente_asignado || p.cliente) === clienteSelected);
-            const totalCuotas = todosLosPagos.length;
-            const pagadas = todosLosPagos.filter(p => p.estado_pago.includes("🟢") || p.estado_pago.toLowerCase().includes("pagado")).length;
-            const pendientes = totalCuotas - pagadas;
-            
-            let historialRondasHtml = todosLosPagos.sort((a,b) => parseInt(a.ronda)-parseInt(b.ronda)).map(p => {
-                const est = p.estado_pago.includes("🟢") || p.estado_pago.toLowerCase().includes("pagado") ? 
-                    '<span class="text-emerald-400 font-bold">🟢 PAGADO</span>' : '<span class="text-red-400 font-bold">🔴 PENDIENTE</span>';
-                return `<div class="flex justify-between items-center bg-[#170f2c] p-2 rounded border border-purple-900/30 text-[11px]">
-                            <span>Ronda #${p.ronda} (${p.fecha_pago || p.fecha || 'S/F'})</span>
-                            <span>${est}</span>
-                        </div>`;
-            }).join('');
-
-            const resultBox = document.getElementById('client-history-result');
-            resultBox.classList.remove('hidden');
-            resultBox.innerHTML = `
-                <div class="border-b border-purple-900 pb-2 mb-2">
-                    <p class="text-white font-black uppercase text-center text-xs tracking-wide">Resumen: ${clienteSelected}</p>
-                    <div class="grid grid-cols-3 gap-1 text-center text-[10px] mt-2">
-                        <div class="bg-purple-950/40 p-1 rounded">
-                            <span class="text-gray-400 block text-[8px] uppercase">Asignadas</span>
-                            <span class="font-bold text-white">${totalCuotas}</span>
-                        </div>
-                        <div class="bg-emerald-950/40 p-1 rounded">
-                            <span class="text-emerald-400 block text-[8px] uppercase">Saldadas</span>
-                            <span class="font-bold text-emerald-400">${pagadas}</span>
-                        </div>
-                        <div class="bg-red-950/40 p-1 rounded">
-                            <span class="text-red-400 block text-[8px] uppercase">Restantes</span>
-                            <span class="font-bold text-red-400">${pendientes}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-1 max-h-40 overflow-y-auto pr-1">
-                    <p class="text-[9px] text-purple-400 uppercase font-bold tracking-wider mb-1">Detalle de mis ciclos de pago:</p>
-                    ${historialRondasHtml}
-                </div>
-            `;
-        }
-
-        // ================= FILTRADO ULTRA-ESTRICTO PARA EVITAR DUPLICACIONES EXTRAÑAS =================
         function renderAdminPuestos() {
             const id = document.getElementById('admin-san-selector').value;
             if(!id) {
@@ -376,9 +384,10 @@
                     rMap[r] = {
                         ronda: r,
                         fecha: p.fecha_pago || p.fecha,
-                        beneficiario: p.beneficiario_premio || "Cliente " + r,
+                        beneficiario: p.beneficiario_premio || "",
                         estadoEntrega: p.estado_entrega || "📦 Retención",
-                        clientesTracker: {} // Asegura unicidad por nombre dentro de esta ronda
+                        clientesTracker: {},
+                        primerClienteLista: p.cliente_asignado || p.cliente || ""
                     };
                 }
                 
@@ -391,34 +400,39 @@
             container.innerHTML = Object.values(rMap).sort((a,b) => a.ronda - b.ronda).map((r, idx) => {
                 const isEntregado = r.estadoEntrega.toLowerCase().includes("entregado");
                 
-                // Mapear el tracker asegurando que no se repitan nombres falsamente en la tarjeta
+                // NUEVA LÓGICA AUTO-SINCRO EN CONSOLA ADMINISTRATIVA
+                let nombrePremio = r.beneficiario.trim();
+                if (!nombrePremio || nombrePremio.toLowerCase().includes("cupo") || nombrePremio.toLowerCase().includes("cliente")) {
+                    nombrePremio = r.primerClienteLista || "";
+                }
+
                 const listaAsistenciaHtml = Object.keys(r.clientesTracker).map(nombreCliente => {
                     const statusPago = r.clientesTracker[nombreCliente];
                     const pagado = statusPago.includes("🟢") || statusPago.toLowerCase().includes("pagado");
                     return `
-                        <div class="flex justify-between items-center bg-[#0c0817] p-2 rounded border border-purple-950/60 gap-3">
-                            <input type="text" value="${nombreCliente}" onblur="editClienteNombreDirecto('${id}', '${nombreCliente}', this.value)" class="bg-transparent text-xs font-bold text-white border-b border-purple-900/30 focus:border-pink-500 focus:outline-none flex-1 py-0.5 transition-colors">
-                            <button onclick="toggleCuotaAsistencia('${id}', ${r.ronda}, '${nombreCliente}', '${statusPago}', this)" class="text-[9px] font-black uppercase px-2.5 py-1 rounded border transition-all ${pagado ? 'bg-emerald-500 border-emerald-600 text-black shadow-md':'bg-red-500/10 border-red-500/30 text-red-400'}">
+                        <div class="flex justify-between items-center bg-[#0c0817] p-2 rounded border border-purple-950/60 gap-3 hover:border-purple-800 transition-colors">
+                            <input type="text" value="${nombreCliente}" onblur=\"editClienteNombreDirecto('${id}', '${nombreCliente}', this.value)\" class="bg-transparent text-xs font-bold text-white border-b border-purple-900/30 focus:border-pink-500 focus:outline-none flex-1 py-0.5 transition-colors">
+                            <button onclick=\"toggleCuotaAsistencia('${id}', ${r.ronda}, '${nombreCliente}', '${statusPago}', this)\" class="text-[9px] font-black uppercase px-2.5 py-1.5 rounded border btn-interactive ${pagado ? 'bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-black font-black shadow-md shadow-emerald-950/30':'bg-red-500/10 border-red-500/30 text-red-400'}">
                                 ${pagado ? '🟢 Pagó' : '🔴 Pendiente'}
                             </button>
                         </div>`;
                 }).join('');
 
                 return `
-                    <div class="bg-gradient-to-b from-[#191031] to-[#110a22] p-4 rounded-xl border ${isEntregado ? 'border-pink-500/30':'border-purple-900/40'} shadow-lg space-y-3 animate-fade-in" style="animation-delay: ${idx * 0.02}s">
+                    <div class="bg-gradient-to-b from-[#191031] to-[#110a22] p-4 rounded-xl border ${isEntregado ? 'border-pink-500/40 pink-glow-soft':'border-purple-900/40'} shadow-lg space-y-3 animate-fade-in" style="animation-delay: ${idx * 0.03}s">
                         <div class="flex justify-between items-center border-b border-purple-900/30 pb-2">
                             <span class="text-xs font-black text-amber-400 tracking-wider">RONDA ADMINISTRATIVA ${r.ronda}</span>
-                            <span class="text-[9px] text-purple-300/80 font-mono">${r.fecha ? r.fecha.split("T")[0] : ''}</span>
+                            <span class="text-[9px] text-purple-300/80 font-mono bg-purple-950/60 px-2 py-0.5 rounded border border-purple-900/30">${r.fecha ? r.fecha.split("T")[0] : ''}</span>
                         </div>
 
                         <div class="bg-[#120b24]/80 p-3 rounded-lg border border-purple-950 space-y-2">
                             <div class="flex justify-between items-center">
                                 <span class="text-[9px] font-black text-purple-400 uppercase">🏆 Se lleva el producto:</span>
-                                <input type="text" value="${r.beneficiario}" onblur="updateBeneficiario('${id}', ${r.ronda}, this.value)" class="bg-[#0c0817] px-2 py-1 text-right font-black text-xs text-white rounded border border-purple-900/40 w-1/2 focus:text-pink-400 focus:outline-none">
+                                <input type="text" value="${nombrePremio}" onblur=\"updateBeneficiario('${id}', ${r.ronda}, this.value)\" class="bg-[#0c0817] px-2 py-1 text-right font-black text-xs text-white rounded border border-purple-900/40 w-1/2 focus:text-pink-400 focus:outline-none focus:border-pink-500 transition-all">
                             </div>
                             <div class="flex justify-between items-center pt-1">
                                 <span class="text-[9px] font-black text-purple-400 uppercase">Estado del Artículo:</span>
-                                <button onclick="toggleEstadoEntrega('${id}', ${r.ronda}, '${r.estadoEntrega}', this)" class="text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest ${isEntregado ? 'bg-pink-600 border-pink-700 text-white shadow-lg':'bg-purple-950/40 border-purple-800 text-purple-400'}">
+                                <button onclick=\"toggleEstadoEntrega('${id}', ${r.ronda}, '${r.estadoEntrega}', this)\" class="text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest btn-interactive ${isEntregado ? 'bg-gradient-to-r from-pink-500 to-purple-600 border-pink-500 text-white shadow-lg shadow-pink-950/50 font-black':'bg-purple-950/40 border-purple-800 text-purple-400'}">
                                     ${isEntregado ? '🏆 Entregado' : '📦 En Almacén'}
                                 </button>
                             </div>
@@ -438,7 +452,7 @@
                 await fetch(API_URL, {
                     method: "POST",
                     mode: "no-cors",
-                    body: JSON.stringify({ action: "updateClienteNombre", id_san: idSan, nombre_viejo: nombreViejo, nombre_nuevo: nombreNuevo })
+                    body: JSON.stringify({ action: "updateClienteNombre", id_san: idSan, nombre_viaje: nombreViejo, nombre_nuevo: nombreNuevo })
                 });
                 globalData.pagos.forEach(p => {
                     if((p.id_san || p.id) === idSan) {
@@ -454,9 +468,10 @@
 
         async function toggleCuotaAsistencia(idSan, ronda, cliente, statusActual, btn) {
             const nuevoEstado = (statusActual.includes("🟢") || statusActual.toLowerCase().includes("pagado")) ? "🔴 Pendiente" : "🟢 Pagado";
+            
             btn.className = nuevoEstado === "🟢 Pagado" ? 
-                "text-[9px] font-black uppercase px-2.5 py-1 rounded border bg-emerald-500 border-emerald-600 text-black shadow-md" : 
-                "text-[9px] font-black uppercase px-2.5 py-1 rounded border bg-red-500/10 border-red-500/30 text-red-400";
+                "text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-black font-black shadow-md btn-interactive" : 
+                "text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-red-500/10 border-red-500/30 text-red-400 btn-interactive";
             btn.innerText = nuevoEstado === "🟢 Pagado" ? "🟢 Pagó" : "🔴 Pendiente";
 
             try {
@@ -488,9 +503,10 @@
 
         async function toggleEstadoEntrega(idSan, ronda, estadoActual, btn) {
             const nuevoEstado = estadoActual.toLowerCase().includes("entregado") ? "📦 Retención" : "🏆 Entregado";
+            
             btn.className = nuevoEstado === "🏆 Entregado" ? 
-                "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-pink-600 border-pink-700 text-white shadow-lg" : 
-                "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-purple-950/40 border-purple-800 text-purple-400";
+                "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-gradient-to-r from-pink-500 to-purple-600 border-pink-500 text-white shadow-lg font-black btn-interactive" : 
+                "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-purple-950/40 border-purple-800 text-purple-400 btn-interactive";
             btn.innerText = nuevoEstado === "🏆 Entregado" ? "🏆 Entregado" : "📦 En Almacén";
 
             try {
@@ -510,7 +526,7 @@
         async function deleteCurrentSan() {
             const id = document.getElementById('admin-san-selector').value;
             if(!id) return;
-            if(confirm(`⚠️ ¿Eliminar el San [${id}]?`)) {
+            if(confirm(`⚠️ ¿Eliminar por completo el San [${id}]?`)) {
                 document.getElementById('loading').classList.remove('hidden');
                 await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "deleteSan", id_san: id }) });
                 setTimeout(() => init(), 1500);
@@ -554,15 +570,15 @@
         function renderOfertas() {
             const container = document.getElementById('section-ofertas');
             if (!globalData.ofertas || globalData.ofertas.length === 0) {
-                container.innerHTML = `<p class="text-xs text-purple-400/40 text-center py-12 font-bold uppercase">Sin promociones.</p>`;
+                container.innerHTML = `<p class="text-xs text-purple-400/40 text-center py-12 font-bold uppercase">Sin promociones de momento.</p>`;
                 return;
             }
             container.innerHTML = globalData.ofertas.map((o, idx) => {
                 const img = o.imgurl ? o.imgurl : 'https://images.unsplash.com/photo-1601524909162-be87252be298?auto=format&fit=crop&w=300&q=80';
                 return `
-                    <div class="bg-[#170f2c] rounded-2xl border border-purple-900/30 overflow-hidden flex flex-col justify-between shadow-lg animate-fade-in" style="animation-delay: ${idx * 0.04}s">
+                    <div class="bg-[#170f2c] rounded-2xl border border-purple-900/30 overflow-hidden flex flex-col justify-between shadow-lg animate-fade-in hover:border-pink-500/30 transition-all duration-300" style="animation-delay: ${idx * 0.05}s">
                         <div class="p-4 flex space-x-4">
-                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl bg-purple-950 border border-purple-900/40">
+                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl bg-purple-950 border border-purple-900/40 transform hover:scale-110 transition-transform duration-300">
                             <div class="flex-1 min-w-0">
                                 <span class="text-[8px] font-black text-amber-400 uppercase block mb-0.5">${o.disponibilidad || 'Disponible'}</span>
                                 <h4 class="text-xs font-black text-white truncate uppercase tracking-wider">${o.producto || 'Artículo'}</h4>
@@ -571,7 +587,7 @@
                         </div>
                         <div class="bg-[#120b24]/60 px-4 py-3 border-t border-purple-900/20 flex items-center justify-between">
                             <span class="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">$${parseFloat(o.precio_oferta || 0).toFixed(2)}</span>
-                            <button onclick="orderViaWhatsApp('${o.producto}', '${o.precio_oferta}')" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-black text-[10px] py-2 px-3.5 rounded-lg uppercase tracking-widest">Pedir</button>
+                            <button onclick=\"orderViaWhatsApp('${o.producto}', '${o.precio_oferta}')\" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-black text-[10px] py-2 px-4 rounded-lg uppercase tracking-widest shadow-md btn-interactive">Pedir</button>
                         </div>
                     </div>`;
             }).join('');
