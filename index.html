@@ -21,6 +21,7 @@
 </head>
 <body class="font-sans antialiased pb-24">
 
+    <!-- Header Premium Corporativo -->
     <header class="bg-gradient-to-b from-[#1f113a] to-[#120826] border-b border-pink-500/20 py-6 px-4 text-center sticky top-0 z-40 shadow-2xl">
         <div class="inline-flex items-center justify-center bg-pink-500/10 border border-pink-500/30 px-3 py-1 rounded-full mb-2">
             <i class="fa-solid fa-crown text-amber-400 text-3xl mr-2 animate-pulse"></i>
@@ -31,6 +32,7 @@
         </h1>
     </header>
 
+    <!-- Pestañas Superiores con Íconos el triple de grandes -->
     <div class="flex bg-[#120b24] border-b border-purple-900/30 text-center text-xs font-black uppercase tracking-widest">
         <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-active transition-all flex flex-col items-center justify-center gap-1">
             <i class="fa-solid fa-vault text-3xl text-purple-400"></i>
@@ -42,8 +44,10 @@
         </button>
     </div>
 
+    <!-- Contenedor Principal -->
     <main class="max-w-md mx-auto px-4 mt-6">
         
+        <!-- Spinner Animado Avanzado -->
         <div id="loading" class="text-center py-20">
             <div class="relative inline-block">
                 <div class="animate-spin inline-block w-12 h-12 border-[3px] border-purple-500 border-t-transparent rounded-full"></div>
@@ -52,12 +56,29 @@
             <p class="text-[10px] text-purple-400 font-black mt-4 tracking-widest uppercase">Leyendo Servidor...</p>
         </div>
 
+        <!-- ================= VISTA CLIENTE: CRONOGRAMA ================= -->
         <section id="section-sanes" class="hidden space-y-5">
             <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 shadow-xl animate-fade-in">
                 <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione un Grupo Activo:</label>
                 <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-sm"></select>
             </div>
 
+            <!-- NUEVA BANDEJA DE HISTORIAL CREDITICIO PARA CLIENTES -->
+            <div id="client-lookup-card" class="bg-gradient-to-r from-[#1e113c] to-[#140b29] p-4 rounded-xl border border-pink-500/20 shadow-md space-y-3 hidden animate-fade-in">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-address-card text-pink-400 text-2xl"></i>
+                    <span class="text-[10px] font-black text-pink-400 uppercase tracking-widest">Mi Estado de Cuenta Particular</span>
+                </div>
+                <div class="flex gap-2">
+                    <select id="client-name-selector" class="flex-1 bg-[#0c0817] text-white p-2 rounded text-xs font-bold border border-purple-800/60"></select>
+                    <button onclick="checkClientCreditHistory()" class="bg-pink-600 hover:bg-pink-700 text-white font-black text-[10px] px-4 py-2 rounded uppercase tracking-wider">Ver Mi Record</button>
+                </div>
+                
+                <!-- Contenedor Desplegable del Historial -->
+                <div id="client-history-result" class="hidden bg-[#0c0817] p-3 rounded-lg border border-purple-950 text-xs space-y-2 animate-fade-in"></div>
+            </div>
+
+            <!-- Card de Info General -->
             <div id="san-info-card" class="bg-gradient-to-br from-[#1c1236] to-[#120b24] p-5 rounded-2xl border border-purple-900/40 purple-glow hidden animate-fade-in">
                 <h3 id="detail-san-name" class="text-base font-extrabold text-white tracking-wide">---</h3>
                 <div class="grid grid-cols-2 gap-3 mt-4 text-center">
@@ -77,8 +98,10 @@
             </div>
         </section>
 
+        <!-- ================= VISTA CLIENTE: OFERTAS ================= -->
         <section id="section-ofertas" class="hidden grid grid-cols-1 gap-4"></section>
 
+        <!-- ================= VISTA DUEÑA: CONSOLA INTERACTIVA ================= -->
         <section id="section-admin" class="hidden space-y-6 animate-fade-in">
             <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
                 <div class="flex items-center gap-2">
@@ -88,6 +111,7 @@
                 <button onclick="switchTab('sanes')" class="text-[9px] font-black bg-purple-950/60 border border-purple-800/40 px-3 py-1.5 rounded-lg text-purple-300 uppercase">Salir</button>
             </div>
 
+            <!-- Panel de Operaciones -->
             <div class="bg-gradient-to-r from-[#1d123a] to-[#251849] p-4 rounded-xl border border-purple-800/40 shadow-md space-y-3">
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-folder-plus text-amber-400 text-2xl"></i>
@@ -98,6 +122,7 @@
                     <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase hover:border-purple-500">Cargar Oferta</button>
                 </div>
 
+                <!-- Formulario San -->
                 <div id="block-add-san" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
                     <input type="text" id="new-san-id" placeholder="ID Único (Ej: SAN-BERA)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold focus:border-pink-500">
                     <input type="text" id="new-san-name" placeholder="Nombre (Ej: Tanda de Motos)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:border-pink-500">
@@ -116,6 +141,7 @@
                     <button onclick="submitAddSan()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-2 rounded font-black text-[10px] uppercase text-white">Crear Todo el San</button>
                 </div>
 
+                <!-- Formulario Oferta -->
                 <div id="block-add-oferta" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
                     <input type="text" id="new-of-prod" placeholder="Nombre del Artículo" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white">
                     <div class="grid grid-cols-2 gap-1.5">
@@ -128,6 +154,7 @@
                 </div>
             </div>
 
+            <!-- Selector Comercial y Destrucción -->
             <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 space-y-3">
                 <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest">Seleccione Tanda a Gestionar:</label>
                 <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-xs focus:outline-none"></select>
@@ -137,6 +164,7 @@
                 </button>
             </div>
 
+            <!-- Mover Cronograma -->
             <div id="admin-cascada-card" class="bg-gradient-to-r from-[#21113a] to-[#120a24] p-4 rounded-xl border border-purple-800/50 space-y-2.5 hidden">
                 <div class="flex justify-between items-center">
                     <span class="text-[10px] font-black text-purple-300 uppercase">Mover Cronograma</span>
@@ -148,10 +176,12 @@
                 </div>
             </div>
 
+            <!-- Bloques Administrativos de Rondas -->
             <div class="space-y-4" id="admin-puestos-container"></div>
         </section>
     </main>
 
+    <!-- Botón Flotante Consola -->
     <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#211342] hover:bg-purple-900 text-pink-400 p-5 rounded-full shadow-2xl border border-purple-700/60 z-50 transition-all duration-300 purple-glow">
         <i class="fa-solid fa-crown text-3xl"></i>
     </button>
@@ -222,21 +252,26 @@
             const san = globalData.sanes.find(s => (s.id_san || s.id || '') === id);
             if (!san) return;
 
-            // DETECCIÓN DINÁMICA DE VALOR CUOTA: Evita el fallo si cambia el encabezado
             const keyCuota = Object.keys(san).find(k => k.includes('cuota') || k.includes('monto')) || 'cuota';
             const cuotaValor = san[keyCuota] || 0;
-            
             const freqValor = san.frecuencia || "Semanal";
             const nameValor = san.nombre_san || "San Activo";
 
             document.getElementById('san-info-card').classList.remove('hidden');
             document.getElementById('san-table-container').classList.remove('hidden');
+            document.getElementById('client-lookup-card').classList.remove('hidden'); // Mostrar bandeja de búsqueda
+            
             document.getElementById('detail-san-name').innerText = nameValor;
             document.getElementById('detail-san-cuota').innerText = `$${parseFloat(cuotaValor).toFixed(2)}`;
             document.getElementById('detail-san-frecuencia').innerText = freqValor;
 
             const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.id) === id);
             
+            // Llenar selector de clientes para la consulta personal de historial
+            const nombresUnicos = [...new Set(todosLosPagos.map(p => p.cliente_asignado || p.cliente).filter(Boolean))];
+            document.getElementById('client-name-selector').innerHTML = nombresUnicos.map(n => `<option value="${n}">${n}</option>`).join('');
+            document.getElementById('client-history-result').classList.add('hidden'); // Resetear bandeja de historial
+
             const rMap = {};
             todosLosPagos.forEach(p => {
                 const r = p.ronda || p.numero_puesto || 1; 
@@ -288,6 +323,54 @@
             }).join('');
         }
 
+        // NUEVA FUNCIÓN: Genera el Historial Crediticio e Información del Cliente seleccionado
+        function checkClientCreditHistory() {
+            const idSan = document.getElementById('san-selector').value;
+            const clienteSelected = document.getElementById('client-name-selector').value;
+            if(!clienteSelected) return;
+
+            const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.id) === idSan && (p.cliente_asignado || p.cliente) === clienteSelected);
+            const totalCuotas = todosLosPagos.length;
+            const pagadas = todosLosPagos.filter(p => p.estado_pago.includes("🟢") || p.estado_pago.toLowerCase().includes("pagado")).length;
+            const pendientes = totalCuotas - pagadas;
+            
+            let historialRondasHtml = todosLosPagos.map(p => {
+                const est = p.estado_pago.includes("🟢") || p.estado_pago.toLowerCase().includes("pagado") ? 
+                    '<span class="text-emerald-400 font-bold">🟢 PAGADO</span>' : '<span class="text-red-400 font-bold">🔴 PENDIENTE</span>';
+                return `<div class="flex justify-between items-center bg-[#170f2c] p-2 rounded border border-purple-900/30 text-[11px]">
+                            <span>Ronda #${p.ronda} (${p.fecha_pago || p.fecha || 'S/F'})</span>
+                            <span>${est}</span>
+                        </div>`;
+            }).join('');
+
+            const resultBox = document.getElementById('client-history-result');
+            resultBox.classList.remove('hidden');
+            resultBox.innerHTML = `
+                <div class="border-b border-purple-900 pb-2 mb-2">
+                    <p class="text-white font-black uppercase text-center text-xs tracking-wide">Resumen: ${clienteSelected}</p>
+                    <div class="grid grid-cols-3 gap-1 text-center text-[10px] mt-2">
+                        <div class="bg-purple-950/40 p-1 rounded">
+                            <span class="text-gray-400 block text-[8px] uppercase">Asignadas</span>
+                            <span class="font-bold text-white">${totalCuotas}</span>
+                        </div>
+                        <div class="bg-emerald-950/40 p-1 rounded">
+                            <span class="text-emerald-400 block text-[8px] uppercase">Saldadas</span>
+                            <span class="font-bold text-emerald-400">${pagadas}</span>
+                        </div>
+                        <div class="bg-red-950/40 p-1 rounded">
+                            <span class="text-red-400 block text-[8px] uppercase">Restantes</span>
+                            <span class="font-bold text-red-400">${pendientes}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-1 max-h-40 overflow-y-auto pr-1">
+                    <p class="text-[9px] text-purple-400 uppercase font-bold tracking-wider mb-1">Detalle de mis ciclos de pago:</p>
+                    ${historialRondasHtml}
+                </div>
+            `;
+        }
+
+        // CORRECCIÓN EXACTA EN EL RENDERIZADO ADMINISTRATIVO: Agrupar por bloques limpios sin mezclar ni duplicar
         function renderAdminPuestos() {
             const id = document.getElementById('admin-san-selector').value;
             if(!id) {
@@ -304,6 +387,7 @@
             document.getElementById('admin-cascada-freq').innerText = san.frecuencia || "Semanal";
             document.getElementById('admin-master-date').value = san.fecha_inicio ? san.fecha_inicio.split("T")[0] : "";
 
+            // Agrupamos de manera súper estricta por Ronda
             const rMap = {};
             todosLosPagos.forEach(p => {
                 const r = p.ronda || 1;
@@ -316,16 +400,18 @@
                         clientes: []
                     };
                 }
+                // Insertamos cada registro de pago como un cliente único para ESE ciclo
                 rMap[r].clientes.push({
                     nombre: p.cliente_asignado || p.cliente || '',
                     statusPago: p.estado_pago || "🔴 Pendiente"
                 });
             });
 
+            // Renderizamos los bloques por ciclos ordenados
             container.innerHTML = Object.values(rMap).map((r, idx) => {
                 const isEntregado = r.estadoEntrega.toLowerCase().includes("entregado");
                 
-                // Mapeo dinámico: Cada cliente ahora tiene un input para ser cambiado libremente
+                // Mapeo perfecto: Aquí iteramos limpiamente sólo los clientes de ESTA ronda específica
                 const listaAsistenciaHtml = r.clientes.map(c => {
                     const pagado = c.statusPago.includes("🟢") || c.statusPago.toLowerCase().includes("pagado");
                     return `
@@ -358,7 +444,7 @@
                         </div>
 
                         <div class="space-y-1.5">
-                            <span class="text-[9px] font-black text-purple-400/80 uppercase tracking-widest block px-0.5">Asistencia de Cuotas (Edita el nombre aquí):</span>
+                            <span class="text-[9px] font-black text-purple-400/80 uppercase tracking-widest block px-0.5">Asistencia de Cuotas (Modifica aquí individualmente):</span>
                             ${listaAsistenciaHtml}
                         </div>
                     </div>`;
@@ -368,14 +454,12 @@
         async function editClienteNombreDirecto(idSan, nombreViejo, nombreNuevo) {
             if(!nombreNuevo || nombreViejo === nombreNuevo) return;
             try {
-                // Notifica al backend del cambio de nombre relacional
                 await fetch(API_URL, {
                     method: "POST",
                     mode: "no-cors",
                     body: JSON.stringify({ action: "updateClienteNombre", id_san: idSan, nombre_viejo: nombreViejo, nombre_nuevo: nombreNuevo })
                 });
                 
-                // Sincroniza en memoria caché
                 globalData.pagos.forEach(p => {
                     if((p.id_san || p.id) === idSan) {
                         if((p.cliente_asignado || p.cliente || '') === nombreViejo) {
@@ -543,7 +627,7 @@
         }
 
         function orderViaWhatsApp(name, price) {
-            const message = encodeURIComponent(`¡Hola! Me interesa apartar el artículo en oferta:\n\n📦 *Producto:* ${name}\n💰 *Precio:* $${parseFloat(price).toFixed(2)}`);
+            const message = encodeURIComponent("¡Hola! Me interesa apartar el artículo en oferta:\n\n📦 *Producto:* " + name + "\n💰 *Precio:* $" + parseFloat(price).toFixed(2));
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
         }
 
