@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Corporativo de Sanes & Ofertas</title>
+    <title>Portal Corporativo Sanes & Ofertas Velvet</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #0c0817; color: #f3f4f6; }
-        .purple-glow { box-shadow: 0 0 25px rgba(139, 92, 246, 0.2); }
+        .purple-glow { box-shadow: 0 0 25px rgba(139, 92, 246, 0.15); }
         .tab-active { border-bottom: 3px solid #d946ef; color: #d946ef; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.4) sepia(1) saturate(3) hue-rotate(270deg); cursor: pointer; }
     </style>
 </head>
 <body class="font-sans antialiased pb-24">
 
-    <!-- Header Principal -->
+    <!-- Header Corporativo -->
     <header class="bg-[#170f2c] border-b border-purple-900/40 py-5 px-4 text-center sticky top-0 z-40 shadow-lg">
         <h1 class="text-xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-400 uppercase">
             Sanes & Ofertas Velvet
         </h1>
-        <p class="text-[10px] text-purple-300/70 mt-0.5 tracking-wider font-medium">Plataforma de Control e Inversión Automatizada</p>
+        <p class="text-[10px] text-purple-300/70 mt-0.5 tracking-wider font-medium">Logística de Cuotas y Entregas de Productos</p>
     </header>
 
-    <!-- Pestañas de Navegación -->
+    <!-- Pestañas Superiores -->
     <div class="flex bg-[#120b24] border-b border-purple-900/30 text-center text-xs font-black uppercase tracking-widest">
         <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-active transition-all">
-            <i class="fa-solid fa-vault mr-2 text-purple-400"></i>Estatus Sanes
+            <i class="fa-solid fa-vault mr-2 text-purple-400"></i>Cronograma Sanes
         </button>
         <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 text-purple-400/50 transition-all">
             <i class="fa-solid fa-tags mr-2 text-pink-400"></i>Catálogo Club
@@ -36,62 +36,62 @@
     <!-- Contenedor Principal -->
     <main class="max-w-md mx-auto px-4 mt-6">
         
-        <!-- Spinner de Carga Estilizado -->
+        <!-- Pantalla de carga -->
         <div id="loading" class="text-center py-20">
             <div class="animate-spin inline-block w-8 h-8 border-[3px] border-purple-500 border-t-transparent rounded-full"></div>
             <p class="text-[10px] text-purple-400 font-bold mt-4 tracking-widest uppercase">Sincronizando Sistema Velvet...</p>
         </div>
 
-        <!-- ================= MODO CLIENTE: VISTA DE SANES ================= -->
+        <!-- ================= VISTA CLIENTE: CRONOGRAMA DE RONDAS ================= -->
         <section id="section-sanes" class="hidden space-y-5">
             <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 shadow-xl">
-                <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione una Tanda Comercial:</label>
+                <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione un Grupo Activo:</label>
                 <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 focus:outline-none focus:border-pink-500 font-bold text-sm cursor-pointer"></select>
             </div>
 
-            <!-- Información General en Bloque Fijo -->
+            <!-- Card de Info General (Solución definitiva al NaN buscando la clave exacta) -->
             <div id="san-info-card" class="bg-gradient-to-br from-[#1c1236] to-[#120b24] p-5 rounded-2xl border border-purple-900/40 purple-glow hidden">
                 <h3 id="detail-san-name" class="text-base font-extrabold text-white tracking-wide">---</h3>
                 <div class="grid grid-cols-2 gap-3 mt-4 text-center">
                     <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
-                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Cuota Requerida</span>
+                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Cuota por Persona</span>
                         <span id="detail-san-cuota" class="text-lg font-black text-amber-400">$0.00</span>
                     </div>
                     <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950">
-                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Periodicidad</span>
+                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Frecuencia</span>
                         <span id="detail-san-frecuencia" class="text-xs font-bold text-gray-200 mt-1 block">---</span>
                     </div>
                 </div>
             </div>
 
             <div id="san-table-container" class="hidden space-y-2.5">
-                <h4 class="text-[10px] font-bold text-purple-400/80 uppercase tracking-widest px-1">Cronograma de Adjudicaciones</h4>
-                <div class="space-y-3" id="client-puestos-container"></div>
+                <h4 class="text-[10px] font-bold text-purple-400/80 uppercase tracking-widest px-1">Rondas de Adjudicación de Productos</h4>
+                <div class="space-y-3.5" id="client-puestos-container"></div>
             </div>
         </section>
 
-        <!-- ================= MODO CLIENTE: CATÁLOGO OFERTAS ================= -->
+        <!-- ================= VISTA CLIENTE: OFERTAS ================= -->
         <section id="section-ofertas" class="hidden grid grid-cols-1 gap-4"></section>
 
-        <!-- ================= CONSOLA EXCLUSIVA DE ADMINISTRACIÓN (BLOQUES) ================= -->
+        <!-- ================= VISTA DUEÑA: CONSOLA DE DOBLE CAPA INTERACTIVA ================= -->
         <section id="section-admin" class="hidden space-y-6">
             <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
-                <h2 class="text-xs font-black text-pink-400 uppercase tracking-widest"><i class="fa-solid fa-crown mr-2"></i>Consola Propietaria</h2>
+                <h2 class="text-xs font-black text-pink-400 uppercase tracking-widest"><i class="fa-solid fa-crown mr-2"></i>Consola Control Dueña</h2>
                 <button onclick="switchTab('sanes')" class="text-[9px] font-black bg-purple-950/60 border border-purple-800/40 px-3 py-1.5 rounded-lg text-purple-300 uppercase tracking-wider">Salir</button>
             </div>
 
-            <!-- BLOQUE: Gestor de Creación Rápida -->
+            <!-- Bloque de Creaciones -->
             <div class="bg-gradient-to-r from-[#1d123a] to-[#251849] p-4 rounded-xl border border-purple-800/40 shadow-md space-y-3">
-                <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest block"><i class="fa-solid fa-folder-plus mr-1"></i> Inicialización de Módulos</span>
+                <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest block"><i class="fa-solid fa-folder-plus mr-1"></i> Panel de Inicialización</span>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="toggleForm('block-add-san')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase tracking-wide hover:border-purple-500 transition-all">➕ Abrir Bloque San</button>
-                    <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase tracking-wide hover:border-purple-500 transition-all">🛍️ Abrir Bloque Oferta</button>
+                    <button onclick="toggleForm('block-add-san')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase tracking-wide hover:border-purple-500 transition-all">📦 Registrar Nuevo San</button>
+                    <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase tracking-wide hover:border-purple-500 transition-all">🛍️ Cargar Oferta</button>
                 </div>
 
-                <!-- SUB-BLOQUE FORMULARIO CREAR SAN -->
+                <!-- Formulario San -->
                 <div id="block-add-san" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
-                    <input type="text" id="new-san-id" placeholder="ID Corto (Ej: MOTO-01)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold placeholder-purple-400/40 focus:outline-none">
-                    <input type="text" id="new-san-name" placeholder="Nombre Descriptivo del San" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
+                    <input type="text" id="new-san-id" placeholder="ID Único (Ej: SAN-MOTOS)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold placeholder-purple-400/40 focus:outline-none">
+                    <input type="text" id="new-san-name" placeholder="Nombre (Ej: San Motos Bera 2026)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
                     <div class="grid grid-cols-3 gap-1.5">
                         <input type="number" id="new-san-cuota" placeholder="Cuota $" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
                         <select id="new-san-freq" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
@@ -101,50 +101,50 @@
                         <input type="number" id="new-san-total" placeholder="Puestos" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white placeholder-purple-400/40 focus:outline-none">
                     </div>
                     <div>
-                        <label class="text-[9px] font-black text-purple-400 uppercase tracking-wider block mb-1">Fecha Base de Inicio:</label>
+                        <label class="text-[9px] font-black text-purple-400 uppercase tracking-wider block mb-1">Fecha de la Primera Entrega:</label>
                         <input type="date" id="new-san-date" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                     </div>
-                    <button onclick="submitAddSan()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-2 rounded font-black text-[10px] uppercase tracking-widest text-white shadow-lg">Inicializar Todo el Bloque</button>
+                    <button onclick="submitAddSan()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-2 rounded font-black text-[10px] uppercase tracking-widest text-white shadow-lg">Generar San e Hilos de Pago</button>
                 </div>
 
-                <!-- SUB-BLOQUE FORMULARIO CREAR OFERTA -->
+                <!-- Formulario Oferta -->
                 <div id="block-add-oferta" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2">
-                    <input type="text" id="new-of-prod" placeholder="Nombre del Producto Comercial" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <input type="text" id="new-of-prod" placeholder="Nombre del Artículo" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                     <div class="grid grid-cols-2 gap-1.5">
                         <input type="number" id="new-of-price" placeholder="Precio Especial $" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                         <input type="text" id="new-of-disp" placeholder="Disponibilidad (Ej: Disponible)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
                     </div>
-                    <input type="text" id="new-of-desc" placeholder="Descripción corta de la oferta" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
-                    <input type="text" id="new-of-img" placeholder="Enlace de Imagen (Opcional)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
-                    <button onclick="submitAddOferta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 rounded font-black text-[10px] uppercase tracking-widest text-black shadow-lg">Publicar Oferta</button>
+                    <input type="text" id="new-of-desc" placeholder="Descripción corta" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <input type="text" id="new-of-img" placeholder="URL de Imagen (Opcional)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
+                    <button onclick="submitAddOferta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 rounded font-black text-[10px] uppercase tracking-widest text-black shadow-lg">Publicar en vitrina</button>
                 </div>
             </div>
 
-            <!-- BLOQUE MAESTRO: Selector de Control Activo -->
+            <!-- Selector de Control -->
             <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30">
-                <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione el San a Gestionar:</label>
+                <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione Tanda Comercial a Auditar:</label>
                 <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-xs focus:outline-none"></select>
             </div>
 
-            <!-- BLOQUE MAESTRO DE CONTROL DE FECHA EN CADENA (CASCADA) -->
+            <!-- Control Maestro de Desplazamiento de Calendario en Cadena -->
             <div id="admin-cascada-card" class="bg-gradient-to-r from-[#21113a] to-[#120a24] p-4 rounded-xl border border-purple-800/50 space-y-2.5 hidden shadow-md">
                 <div class="flex justify-between items-center">
-                    <span class="text-[10px] font-black text-purple-300 uppercase tracking-widest"><i class="fa-solid fa-link-slash mr-1"></i> Ajuste en Cadena (Cascada)</span>
+                    <span class="text-[10px] font-black text-purple-300 uppercase tracking-widest"><i class="fa-solid fa-calendar-days mr-1"></i> Mover Cronograma Completo</span>
                     <span id="admin-cascada-freq" class="text-[9px] font-bold px-2 py-0.5 rounded bg-purple-900/40 text-purple-400 border border-purple-800/50 uppercase">---</span>
                 </div>
-                <p class="text-[10px] text-purple-400 leading-relaxed">Mover la fecha de este calendario recalculará automáticamente el día de cobro de **todos los puestos inferiores** de forma matemática.</p>
+                <p class="text-[10px] text-purple-400/80 leading-relaxed">Si cambias la fecha de inicio, **todas las rondas recalculan su fecha de vencimiento automáticamente** en cadena de forma matemática.</p>
                 <div class="flex gap-2">
                     <input type="date" id="admin-master-date" class="flex-1 bg-[#0c0817] border border-purple-800 p-2 rounded text-xs text-white focus:outline-none">
-                    <button onclick="triggerCascadeFechas()" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded text-[10px] font-black uppercase tracking-wider transition-all">Recalcular</button>
+                    <button onclick="triggerCascadeFechas()" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded text-[10px] font-black uppercase tracking-wider transition-all">Propagar Fechas</button>
                 </div>
             </div>
 
-            <!-- Contenedor Dinámico: Bloques de Puestos Independientes -->
+            <!-- Bloques de Rondas (Desglose Clínico de Quién Pagó) -->
             <div class="space-y-4" id="admin-puestos-container"></div>
         </section>
     </main>
 
-    <!-- Llave Maestra Acceso Flotante -->
+    <!-- Botón Flotante Consola -->
     <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#211342] hover:bg-purple-900 text-pink-400 p-4 rounded-full shadow-2xl border border-purple-700/60 z-50 transition-all purple-glow">
         <i class="fa-solid fa-crown text-base"></i>
     </button>
@@ -171,16 +171,15 @@
         }
 
         function loginAdmin() {
-            if (prompt("Contraseña de Acceso Velvet:") === ADMIN_PASSWORD) {
+            if (prompt("Contraseña Velvet de Seguridad:") === ADMIN_PASSWORD) {
                 switchTab('admin');
             } else if (prompt !== null) {
-                alert("Clave incorrecta.");
+                alert("Credencial Incorrecta.");
             }
         }
 
         function toggleForm(id) {
-            const el = document.getElementById(id);
-            el.classList.toggle('hidden');
+            document.getElementById(id).classList.toggle('hidden');
         }
 
         function switchTab(tab) {
@@ -196,160 +195,249 @@
 
         function populateSelectors() {
             if(!globalData.sanes || globalData.sanes.length === 0) return;
-            const options = globalData.sanes.map(s => `<option value="${s.id_san}">${s.nombre_san}</option>`).join('');
+            // Se mapean los nombres buscando de forma segura las propiedades de la hoja
+            const options = globalData.sanes.map(s => {
+                const idSan = s.id_san || s.ID_San || s.id;
+                const nombreSan = s.nombre_san || s.Nombre || s.nombre;
+                return `<option value="${idSan}">${nombreSan}</option>`;
+            }).join('');
             document.getElementById('san-selector').innerHTML = options;
             document.getElementById('admin-san-selector').innerHTML = options;
             renderSanDetails();
         }
 
-        // CONTROL VISUAL EN TIEMPO REAL: REGLAS DE NEGOCIO PARA CLIENTES
+        // MOTOR RENDER DE LOGICA DE NEGOCIO PÚBLICA (VISTA CLIENTES)
         function renderSanDetails() {
             const id = document.getElementById('san-selector').value;
-            const san = globalData.sanes.find(s => s.id_san === id);
+            const san = globalData.sanes.find(s => (s.id_san || s.ID_San || s.id) === id);
             if (!san) return;
+
+            // SOLUCIÓN AL NaN: Mapeo exacto de los campos de la tabla sin importar minúsculas
+            const cuotaValor = san.cuota || san.cuota_base || san.monto_cuota || san.Monto || 0;
+            const freqValor = san.frecuencia || san.Frecuencia || "Semanal";
+            const nameValor = san.nombre_san || san.Nombre || "San Activo";
 
             document.getElementById('san-info-card').classList.remove('hidden');
             document.getElementById('san-table-container').classList.remove('hidden');
-            document.getElementById('detail-san-name').innerText = san.nombre_san;
-            document.getElementById('detail-san-cuota').innerText = `$${parseFloat(san.cuota).toFixed(2)}`;
-            document.getElementById('detail-san-frecuencia').innerText = san.frecuencia;
+            document.getElementById('detail-san-name').innerText = nameValor;
+            document.getElementById('detail-san-cuota').innerText = `$${parseFloat(cuotaValor).toFixed(2)}`;
+            document.getElementById('detail-san-frecuencia').innerText = freqValor;
 
-            const puestos = globalData.pagos.filter(p => p.id_san === id);
-            const container = document.getElementById('client-puestos-container');
+            const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.ID_San) === id);
             
+            // Agrupamos por número de Ronda para mostrar el estado general de esa fecha de entrega
+            const rondasMapeadas = {};
+            todosLosPagos.forEach(p => {
+                const r = p.ronda || p.Ronda || p.numero_puesto; 
+                if(!rondasMapeadas[r]) {
+                    rondasMapeadas[r] = {
+                        ronda: r,
+                        fecha: p.fecha_pago || p.Fecha || p.fecha,
+                        beneficiario: p.beneficiario_premio || p.Beneficiario || "Cupo " + r,
+                        estadoEntrega: p.estado_entrega || p.Estado_Entrega || "📦 Retención",
+                        totalClientes: 0,
+                        clientesPagados: 0
+                    };
+                }
+                rondasMapeadas[r].totalClientes++;
+                const st = (p.estado_pago || p.Estado || "").toLowerCase();
+                if(st.includes("🟢") || st.includes("pagado") || st.includes("cobrado")) {
+                    rondasMapeadas[r].clientesPagados++;
+                }
+            });
+
+            const container = document.getElementById('client-puestos-container');
             const hoy = new Date();
             hoy.setHours(0,0,0,0);
 
-            container.innerHTML = puestos.map(p => {
-                let estadoCalculado = p.estado_pago;
-                let statusClass = "bg-purple-500/10 text-purple-300 border-purple-800/30"; 
-
-                if (!p.estado_pago.includes("🟢") && p.fecha_pago) {
-                    const fechaLimite = new Date(p.fecha_pago.split("T")[0] + "T00:00:00");
-                    if (hoy >= fechaLimite) {
-                        estadoCalculado = "🚨 ¡Vencido! Pendiente";
-                        statusClass = "bg-red-500/20 text-red-400 border-red-500/30 font-black";
-                    } else {
-                        estadoCalculado = "⏳ En Espera / Próximo";
-                        statusClass = "bg-blue-500/15 text-blue-400 border-blue-800/40";
+            container.innerHTML = Object.values(rondasMapeadas).map(r => {
+                let statusText = `📊 Recaudación: ${r.clientesPagados}/${r.totalClientes}`;
+                let badgeClass = "bg-purple-500/10 text-purple-300 border-purple-800/40";
+                
+                if(r.estadoEntrega.toLowerCase().includes("entregado")) {
+                    statusText = "🏆 ¡Articulo Entregado!";
+                    badgeClass = "bg-pink-500/20 text-pink-400 border-pink-500/30 font-black";
+                } else if (r.fecha) {
+                    const limit = new Date(r.fecha.split("T")[0] + "T00:00:00");
+                    if (hoy >= limit && r.clientesPagados < r.totalClientes) {
+                        statusText = "🚨 Ronda con Retrasos";
+                        badgeClass = "bg-red-500/20 text-red-400 border-red-500/30 font-bold";
                     }
-                } else if (p.estado_pago.includes("🟢")) {
-                    statusClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-bold";
                 }
 
                 return `
-                    <div class="flex items-center justify-between p-3.5 rounded-xl bg-[#170f2c] border border-purple-900/30 shadow-md">
-                        <div class="flex items-center space-x-3.5">
-                            <div class="w-8 h-8 rounded-full bg-[#0c0817] flex items-center justify-center font-black text-pink-400 text-xs border border-purple-950">${p.numero_puesto}</div>
+                    <div class="p-4 rounded-xl bg-[#170f2c] border border-purple-900/30 shadow-md space-y-2">
+                        <div class="flex justify-between items-start">
                             <div>
-                                <h5 class="text-xs font-black ${p.cliente_asignado.toLowerCase().includes('disponible') ? 'text-purple-400/40 italic' : 'text-white'}">${p.cliente_asignado}</h5>
-                                <p class="text-[9px] text-purple-400/70 font-medium mt-0.5 tracking-wider">Límite: ${p.fecha_pago ? p.fecha_pago.split("T")[0] : 'No asignada'}</p>
+                                <span class="text-[9px] font-black text-purple-400 uppercase tracking-widest block">RONDA DE ENTREGA NRO. ${r.ronda}</span>
+                                <h5 class="text-xs font-black text-white mt-0.5">📦 Premio asignado a: <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-pink-400">${r.beneficiario}</span></h5>
                             </div>
+                            <span class="text-[8px] font-black px-2 py-1 rounded border uppercase tracking-wider ${badgeClass}">${statusText}</span>
                         </div>
-                        <span class="text-[9px] font-black px-2 py-1 rounded border uppercase tracking-widest ${statusClass}">${estadoCalculado}</span>
+                        <p class="text-[9px] text-purple-400/60 font-medium tracking-wide">Fecha límite de liquidación completa: ${r.fecha ? r.fecha.split("T")[0] : 'Por definir'}</p>
                     </div>`;
             }).join('');
         }
 
-        // DISEÑO AVANZADO: BLOQUES INDEPENDIENTES CON BOTONERAS DE UN SOLO TOQUE PARA LA DUEÑA
+        // CAPA DE ADMINISTRACIÓN: CONTROL CLÍNICO DE ASISTENCIA Y ENTREGA POR BOTONES
         function renderAdminPuestos() {
             const id = document.getElementById('admin-san-selector').value;
-            const san = globalData.sanes.find(s => s.id_san === id);
-            const puestos = globalData.pagos.filter(p => p.id_san === id);
+            const san = globalData.sanes.find(s => (s.id_san || s.ID_San || s.id) === id);
+            const todosLosPagos = globalData.pagos.filter(p => (p.id_san || p.ID_San) === id);
             const container = document.getElementById('admin-puestos-container');
             
             if(!san) return;
             
-            // Renderizar Bloque Maestro de Cascada Arriba
             document.getElementById('admin-cascada-card').classList.remove('hidden');
-            document.getElementById('admin-cascada-freq').innerText = san.frecuencia;
+            document.getElementById('admin-cascada-freq').innerText = san.frecuencia || "Semanal";
             document.getElementById('admin-master-date').value = san.fecha_inicio ? san.fecha_inicio.split("T")[0] : "";
 
-            if(puestos.length === 0) {
-                container.innerHTML = `<p class="text-xs text-purple-400 text-center py-4 font-bold">Cargando vinculaciones...</p>`;
+            if(todosLosPagos.length === 0) {
+                container.innerHTML = `<p class="text-xs text-purple-400 text-center py-4 font-bold">Sin hilos relacionales en memoria.</p>`;
                 return;
             }
 
-            container.innerHTML = puestos.map(p => {
-                const dateVal = p.fecha_pago ? p.fecha_pago.split("T")[0] : "";
+            // Agrupamos la matriz por Ronda para pintar los bloques maestros de gestión
+            const rondasAdm = {};
+            todosLosPagos.forEach(p => {
+                const r = p.ronda || p.Ronda || p.numero_puesto;
+                if(!rondasAdm[r]) {
+                    rondasAdm[r] = {
+                        ronda: r,
+                        fecha: p.fecha_pago || p.Fecha || p.fecha,
+                        beneficiario: p.beneficiario_premio || p.Beneficiario || "Cupo " + r,
+                        estadoEntrega: p.estado_entrega || p.Estado_Entrega || "📦 Retención",
+                        clientes: []
+                    };
+                }
+                rondasAdm[r].clientes.push({
+                    nombre: p.cliente_asignado || p.Cliente_Que_Paga || p.cliente,
+                    statusPago: p.estado_pago || p.Estado || "🔴 Pendiente"
+                });
+            });
+
+            container.innerHTML = Object.values(rondasAdm).map(r => {
+                const isEntregado = r.estadoEntrega.toLowerCase().includes("entregado");
                 
-                // Determinar iluminación activa de botoneras
-                const isAuto = p.estado_pago.includes("🟡") || p.estado_pago.includes("Pendiente");
-                const isPagado = p.estado_pago === "🟢 Pagado";
-                const isEntregado = p.estado_pago.includes("Entregado");
+                // Construimos la lista de asistencia rápida para chequear quién pagó en esta ronda
+                const listaAsistenciaHtml = r.clientes.map(c => {
+                    const pagado = c.statusPago.includes("🟢") || c.statusPago.toLowerCase().includes("pagado");
+                    return `
+                        <div class="flex justify-between items-center bg-[#0c0817] p-2 rounded border border-purple-950/60">
+                            <span class="text-xs font-bold text-white">${c.nombre}</span>
+                            <button onclick="toggleCuotaAsistencia('${id}', ${r.ronda}, '${c.nombre}', '${c.statusPago}', this)" class="text-[9px] font-black uppercase px-2.5 py-1 rounded border transition-all ${pagado ? 'bg-emerald-500 border-emerald-600 text-black shadow-md':'bg-red-500/10 border-red-500/30 text-red-400'}">
+                                ${pagado ? '🟢 Pagó' : '🔴 Pendiente'}
+                            </button>
+                        </div>`;
+                }).join('');
 
                 return `
-                    <div class="bg-gradient-to-b from-[#191031] to-[#110a22] p-4 rounded-xl border ${isPagado || isEntregado ? 'border-emerald-500/30 shadow-emerald-950/20':'border-purple-900/40 shadow-purple-950/20'} space-y-3.5 shadow-lg relative">
+                    <div class="bg-gradient-to-b from-[#191031] to-[#110a22] p-4 rounded-xl border ${isEntregado ? 'border-pink-500/30 shadow-pink-950/10':'border-purple-900/40'} shadow-lg space-y-3">
                         <div class="flex justify-between items-center border-b border-purple-900/30 pb-2">
-                            <span class="text-xs font-black text-amber-400 tracking-wider uppercase">Puesto Operativo Nro. ${p.numero_puesto}</span>
-                            <span class="text-[9px] font-black uppercase text-purple-400 tracking-widest">${p.estado_pago}</span>
+                            <span class="text-xs font-black text-amber-400 tracking-wider">RONDA ADMINISTRATIVA ${r.ronda}</span>
+                            <span class="text-[9px] text-purple-300/80 font-medium font-mono">${r.fecha ? r.fecha.split("T")[0] : ''}</span>
                         </div>
-                        
-                        <div class="space-y-2">
-                            <div class="bg-[#0c0817] p-2 rounded border border-purple-950 flex justify-between items-center">
-                                <span class="text-[9px] font-bold text-purple-400 uppercase tracking-wider">Cliente:</span>
-                                <input type="text" value="${p.cliente_asignado}" onblur="updateCell('${id}', ${p.numero_puesto}, 'cliente_asignado', this.value)" class="bg-transparent text-right font-black text-xs text-white border-none outline-none w-2/3 focus:text-pink-400">
+
+                        <!-- Sub-Bloque: Control del Ganador del Producto -->
+                        <div class="bg-[#120b24]/80 p-3 rounded-lg border border-purple-950 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-black text-purple-400 uppercase tracking-wider">🏆 Se lleva el producto:</span>
+                                <input type="text" value="${r.beneficiario}" onblur="updateBeneficiario('${id}', ${r.ronda}, this.value)" class="bg-[#0c0817] px-2 py-1 text-right font-black text-xs text-white rounded border border-purple-900/40 w-1/2 focus:text-pink-400 focus:outline-none">
                             </div>
-                            <div class="bg-[#0c0817] p-2 rounded border border-purple-950 flex justify-between items-center">
-                                <span class="text-[9px] font-bold text-purple-400 uppercase tracking-wider">Día Cobro:</span>
-                                <input type="date" value="${dateVal}" onchange="updateCell('${id}', ${p.numero_puesto}, 'fecha_pago', this.value)" class="bg-transparent text-right font-black text-xs text-white border-none outline-none focus:text-pink-400">
+                            <div class="flex justify-between items-center pt-1">
+                                <span class="text-[9px] font-black text-purple-400 uppercase tracking-wider">Estado del Artículo:</span>
+                                <button onclick="toggleEstadoEntrega('${id}', ${r.ronda}, '${r.estadoEntrega}', this)" class="text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest transition-all ${isEntregado ? 'bg-pink-600 border-pink-700 text-white shadow-lg':'bg-purple-950/40 border-purple-800 text-purple-400'}">
+                                    ${isEntregado ? '🏆 Entregado' : '📦 En Almacén'}
+                                </button>
                             </div>
                         </div>
 
-                        <!-- BOTONERA DIRECTA DE UN SOLO TOQUE -->
-                        <div class="grid grid-cols-3 gap-1 pt-1">
-                            <button onclick="updateButtonStatus('${id}', ${p.numero_puesto}, '🟡 Sin pagar', this)" class="py-2 text-[9px] font-black uppercase tracking-wider rounded border ${isAuto ? 'bg-yellow-500 border-yellow-600 text-black shadow-lg':'bg-[#140d28] border-purple-900/40 text-purple-400'} transition-all">⏳ Ciclo</button>
-                            <button onclick="updateButtonStatus('${id}', ${p.numero_puesto}, '🟢 Pagado', this)" class="py-2 text-[9px] font-black uppercase tracking-wider rounded border ${isPagado ? 'bg-emerald-500 border-emerald-600 text-black shadow-lg':'bg-[#140d28] border-purple-900/40 text-purple-400'} transition-all">🟢 Pago</button>
-                            <button onclick="updateButtonStatus('${id}', ${p.numero_puesto}, '🟢 Pagado - Entregado', this)" class="py-2 text-[9px] font-black uppercase tracking-wider rounded border ${isEntregado ? 'bg-pink-600 border-pink-700 text-white shadow-lg':'bg-[#140d28] border-purple-900/40 text-purple-400'} transition-all">🏆 Entrega</button>
+                        <!-- Sub-Bloque: Lista de Asistencia (¿Quién pagó su cuota de esta ronda?) -->
+                        <div class="space-y-1.5">
+                            <span class="text-[9px] font-black text-purple-400/80 uppercase tracking-widest block px-0.5 mb-1">Pasar Asistencia de Cuotas:</span>
+                            ${listaAsistenciaHtml}
                         </div>
                     </div>`;
             }).join('');
         }
 
-        async function updateCell(idSan, numPuesto, field, value) {
-            let payload = { action: "updatePago", id_san: idSan, numero_puesto: numPuesto };
-            payload[field] = value;
-            try {
-                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-                const cache = globalData.pagos.find(p => p.id_san === idSan && parseInt(p.numero_puesto) === numPuesto);
-                if(cache) cache[field] = value;
-            } catch (e) { console.error(e); }
-        }
-
-        async function updateButtonStatus(idSan, numPuesto, valStatus, btnElement) {
-            // Animación reactiva inmediata antes de enviar a la base de datos
-            const rowContainer = btnElement.closest('.grid');
-            rowContainer.querySelectorAll('button').forEach(b => {
-                b.className = "py-2 text-[9px] font-black uppercase tracking-wider rounded border bg-[#140d28] border-purple-900/40 text-purple-400";
-            });
+        // INTERRUPTORES DE UN SOLO TOQUE CON RESPUESTA RECOLECTORA INMEDIATA
+        async function toggleCuotaAsistencia(idSan, ronda, cliente, statusActual, btn) {
+            const nuevoEstado = (statusActual.includes("🟢") || statusActual.toLowerCase().includes("pagado")) ? "🔴 Pendiente" : "🟢 Pagado";
             
-            if(valStatus.includes('🟡')) btnElement.className = "py-2 text-[9px] font-black uppercase tracking-wider rounded border bg-yellow-500 border-yellow-600 text-black shadow-lg";
-            if(valStatus === '🟢 Pagado') btnElement.className = "py-2 text-[9px] font-black uppercase tracking-wider rounded border bg-emerald-500 border-emerald-600 text-black shadow-lg";
-            if(valStatus.includes('Entregado')) btnElement.className = "py-2 text-[9px] font-black uppercase tracking-wider rounded border bg-pink-600 border-pink-700 text-white shadow-lg";
+            // Animación reactiva instantánea en la pantalla antes del fetch
+            if(nuevoEstado === "🟢 Pagado") {
+                btn.className = "text-[9px] font-black uppercase px-2.5 py-1 rounded border bg-emerald-500 border-emerald-600 text-black shadow-md transition-all";
+                btn.innerText = "🟢 Pagó";
+            } else {
+                btn.className = "text-[9px] font-black uppercase px-2.5 py-1 rounded border bg-red-500/10 border-red-500/30 text-red-400 transition-all";
+                btn.innerText = "🔴 Pendiente";
+            }
 
-            await updateCell(idSan, numPuesto, 'estado_pago', valStatus);
-            setTimeout(() => init(), 400); // Recargar caché para refrescar etiquetas descriptivas
-        }
-
-        async function triggerCascadeFechas() {
-            const id = document.getElementById('admin-san-selector').value;
-            const san = globalData.sanes.find(s => s.id_san === id);
-            const nuevaFecha = document.getElementById('admin-master-date').value;
-            
-            if(!nuevaFecha) return alert("Seleccione una fecha base");
-            
-            document.getElementById('loading').classList.remove('hidden');
             try {
                 await fetch(API_URL, {
                     method: "POST",
                     mode: "no-cors",
-                    body: JSON.stringify({ action: "recascadeFechas", id_san: id, fecha_inicio: nuevaFecha, frecuencia: san.frecuencia })
+                    body: JSON.stringify({ action: "updateCuota", id_san: idSan, ronda: ronda, cliente_paga: cliente, estado_pago: nuevoEstado })
                 });
-                setTimeout(() => init(), 1500);
-            } catch(e) {
-                alert("Fallo al propagar cambios.");
-                document.getElementById('loading').classList.add('hidden');
+                // Actualizamos localmente el caché sin refrescar toda la UI
+                const cached = globalData.pagos.find(p => (p.id_san || p.ID_San) === idSan && parseInt(p.ronda || p.Ronda || p.numero_puesto) === ronda && (p.cliente_asignado || p.Cliente_Que_Paga || p.cliente) === cliente);
+                if(cached) cached.estado_pago = nuevoEstado;
+            } catch(e) { console.error(e); }
+        }
+
+        async function updateBeneficiario(idSan, ronda, nuevoNombre) {
+            try {
+                await fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, beneficiario: nuevoNombre })
+                });
+                globalData.pagos.forEach(p => {
+                    if((p.id_san || p.ID_San) === idSan && parseInt(p.ronda || p.Ronda || p.numero_puesto) === ronda) {
+                        p.beneficiario_premio = nuevoNombre;
+                    }
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        async function toggleEstadoEntrega(idSan, ronda, estadoActual, btn) {
+            const nuevoEstado = estadoActual.toLowerCase().includes("entregado") ? "📦 Retención" : "🏆 Entregado";
+            
+            if(nuevoEstado === "🏆 Entregado") {
+                btn.className = "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-pink-600 border-pink-700 text-white shadow-lg transition-all";
+                btn.innerText = "🏆 Entregado";
+            } else {
+                btn.className = "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-purple-950/40 border-purple-800 text-purple-400 transition-all";
+                btn.innerText = "📦 En Almacén";
             }
+
+            try {
+                await fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, estado_entrega: nuevoEstado })
+                });
+                globalData.pagos.forEach(p => {
+                    if((p.id_san || p.ID_San) === idSan && parseInt(p.ronda || p.Ronda || p.numero_puesto) === ronda) {
+                        p.estado_entrega = nuevoEstado;
+                    }
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        async function triggerCascadeFechas() {
+            const id = document.getElementById('admin-san-selector').value;
+            const nuevaFecha = document.getElementById('admin-master-date').value;
+            if(!nuevaFecha) return alert("Seleccione la fecha inicial.");
+            
+            document.getElementById('loading').classList.remove('hidden');
+            await fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify({ action: "recascadeFechas", id_san: id, fecha_inicio: nuevaFecha })
+            });
+            setTimeout(() => init(), 1500);
         }
 
         async function submitAddSan() {
@@ -360,7 +448,7 @@
             const total = document.getElementById('new-san-total').value;
             const fInicio = document.getElementById('new-san-date').value;
 
-            if(!id || !name || !cuota || !fInicio) return alert("Complete todas las casillas del bloque.");
+            if(!id || !name || !cuota || !fInicio) return alert("Complete los datos requeridos.");
 
             document.getElementById('loading').classList.remove('hidden');
             await fetch(API_URL, {
@@ -379,13 +467,13 @@
             const desc = document.getElementById('new-of-desc').value;
             const img = document.getElementById('new-of-img').value;
 
-            if(!prod || !price || !disp) return alert("Complete los datos requeridos.");
+            if(!prod || !price || !disp) return alert("Complete los campos obligatorios.");
 
             document.getElementById('loading').classList.remove('hidden');
             await fetch(API_URL, {
                 method: "POST",
                 mode: "no-cors",
-                body: JSON.stringify({ action: "addOferta", producto: prod, precio_oferta: price, descripción: desc, disponibilidad: disp, imgUrl: img })
+                body: JSON.stringify({ action: "addOferta", producto: prod, precio_oferta: price, descripcion: desc, disponibilidad: disp, imgUrl: img })
             });
             document.getElementById('block-add-oferta').classList.add('hidden');
             setTimeout(() => init(), 1500);
@@ -394,7 +482,7 @@
         function renderOfertas() {
             const container = document.getElementById('section-ofertas');
             if (!globalData.ofertas || globalData.ofertas.length === 0) {
-                container.innerHTML = `<p class="text-xs text-purple-400/40 text-center py-12 font-bold uppercase tracking-widest">Sin promociones cargadas.</p>`;
+                container.innerHTML = `<p class="text-xs text-purple-400/40 text-center py-12 font-bold uppercase tracking-widest">Sin promociones vigentes.</p>`;
                 return;
             }
             container.innerHTML = globalData.ofertas.map(o => {
@@ -420,7 +508,7 @@
         }
 
         function orderViaWhatsApp(name, price) {
-            const message = encodeURIComponent(`¡Hola! Me interesa la oferta:\n\n📦 *Producto:* ${name}\n💰 *Precio:* $${parseFloat(price).toFixed(2)}`);
+            const message = encodeURIComponent(`¡Hola! Me interesa apartar el artículo en oferta:\n\n📦 *Producto:* ${name}\n💰 *Precio:* $${parseFloat(price).toFixed(2)}`);
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
         }
 
