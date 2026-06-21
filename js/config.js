@@ -8,13 +8,13 @@ export const CONFIG = {
      * GOOGLE APPS SCRIPT
      ********************************************/
     API_URL:
-        "https://script.google.com/macros/s/TU_DEPLOY_ID/exec",
+        "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec",
 
     /********************************************
      * WHATSAPP
      ********************************************/
     WHATSAPP_NUMBER:
-        "584242961164",
+        "584242818145",
 
     /********************************************
      * ADMIN
@@ -26,9 +26,9 @@ export const CONFIG = {
      * APP
      ********************************************/
     APP_NAME:
-        "SANES LA PATRONA",
+        "INVIERTE CON LA PATRONA",
 
     VERSION:
-        "2.0.0"
+        "2.0.1"
 
 };
