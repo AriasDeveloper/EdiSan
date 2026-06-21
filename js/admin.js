@@ -1,5 +1,5 @@
 /************************************************
- * ADMIN
+ * ADMIN FULL FIXED
  ************************************************/
 
 import {
@@ -23,8 +23,7 @@ import {
     showToast,
     showLoading,
     hideLoading,
-    confirmAction,
-    escapeHtml
+    confirmAction
 } from "./ui.js";
 
 /************************************************
@@ -34,6 +33,7 @@ import {
 export function initAdmin() {
 
     registerForms();
+    initSelector();   // 🔥 FIX CLAVE
 
 }
 
@@ -44,42 +44,72 @@ export function initAdmin() {
 function registerForms() {
 
     const formSan =
-        document.getElementById(
-            "form-add-san"
-        );
+        document.getElementById("form-add-san");
 
     if (formSan) {
-
-        formSan.addEventListener(
-            "submit",
-            handleCreateSan
-        );
-
+        formSan.addEventListener("submit", handleCreateSan);
     }
 
     const formOferta =
-        document.getElementById(
-            "form-add-oferta"
-        );
+        document.getElementById("form-add-oferta");
 
     if (formOferta) {
-
-        formOferta.addEventListener(
-            "submit",
-            handleCreateOferta
-        );
-
+        formOferta.addEventListener("submit", handleCreateOferta);
     }
+}
 
+/************************************************
+ * SELECTOR ADMIN (🔥 FALTABA ESTO)
+ ************************************************/
+
+function initSelector() {
+
+    const selector =
+        document.getElementById("admin-san-selector");
+
+    if (!selector) return;
+
+    selector.innerHTML =
+        '<option value="">Seleccione un SAN</option>';
+
+    cache.data.sanes.forEach(san => {
+
+        const opt =
+            document.createElement("option");
+
+        opt.value = san.id_san;
+        opt.textContent = san.nombre_san;
+
+        selector.appendChild(opt);
+
+    });
+
+    selector.addEventListener("change", e => {
+
+        const id = e.target.value;
+
+        if (!id) return;
+
+        renderAdminSan(id);
+
+    });
+
+    // auto load first SAN
+    if (cache.data.sanes.length) {
+
+        const first = cache.data.sanes[0].id_san;
+
+        selector.value = first;
+
+        renderAdminSan(first);
+    }
 }
 
 /************************************************
  * CREAR SAN
  ************************************************/
 
-async function handleCreateSan(
-    e
-) {
+async function handleCreateSan(e) {
 
     e.preventDefault();
 
@@ -87,48 +117,30 @@ async function handleCreateSan(
 
         showLoading();
 
-        const form =
-            e.target;
-
         const data =
-            Object.fromEntries(
-                new FormData(form)
-            );
+            Object.fromEntries(new FormData(e.target));
 
         await addSan(data);
 
-        showToast(
-            "SAN creado correctamente"
-        );
+        showToast("SAN creado");
 
-        form.reset();
+        location.reload();
 
-        window.location.reload();
+    } catch (err) {
 
-    } catch (error) {
-
-        console.error(error);
-
-        showToast(
-            error.message,
-            "error"
-        );
+        showToast(err.message, "error");
 
     } finally {
 
         hideLoading();
-
     }
-
 }
 
 /************************************************
  * CREAR OFERTA
  ************************************************/
 
-async function handleCreateOferta(
-    e
-) {
+async function handleCreateOferta(e) {
 
     e.preventDefault();
 
@@ -136,329 +148,51 @@ async function handleCreateOferta(
 
         showLoading();
 
-        const form =
-            e.target;
-
         const data =
-            Object.fromEntries(
-                new FormData(form)
-            );
+            Object.fromEntries(new FormData(e.target));
 
         await addOferta(data);
 
-        showToast(
-            "Oferta agregada"
-        );
+        showToast("Oferta creada");
 
-        form.reset();
+        location.reload();
 
-        window.location.reload();
+    } catch (err) {
 
-    } catch (error) {
-
-        showToast(
-            error.message,
-            "error"
-        );
+        showToast(err.message, "error");
 
     } finally {
 
         hideLoading();
-
     }
-
 }
 
 /************************************************
- * ELIMINAR SAN
- ************************************************/
-
-export async function removeSan(
-    idSan
-) {
-
-    const san =
-        getSan(idSan);
-
-    if (!san) return;
-
-    const ok =
-        confirmAction(
-            `Eliminar SAN "${san.nombre_san}" ?`
-        );
-
-    if (!ok) return;
-
-    try {
-
-        showLoading();
-
-        await deleteSan(
-            idSan
-        );
-
-        showToast(
-            "SAN eliminado"
-        );
-
-        window.location.reload();
-
-    } catch (error) {
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    } finally {
-
-        hideLoading();
-
-    }
-
-}
-
-/************************************************
- * ACTUALIZAR PAGO
- ************************************************/
-
-export async function setPagoEstado(
-    {
-        id_san,
-        ronda,
-        cliente_paga,
-        estado_pago
-    }
-) {
-
-    try {
-
-        await updateCuota({
-
-            id_san,
-            ronda,
-            cliente_paga,
-            estado_pago
-
-        });
-
-        showToast(
-            "Pago actualizado"
-        );
-
-    } catch (error) {
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
-/************************************************
- * RENOMBRAR CLIENTE
- ************************************************/
-
-export async function renameCliente(
-    {
-        id_san,
-        nombre_viejo,
-        nombre_nuevo
-    }
-) {
-
-    try {
-
-        await updateClienteNombre({
-
-            id_san,
-            nombre_viejo,
-            nombre_nuevo
-
-        });
-
-        showToast(
-            "Cliente actualizado"
-        );
-
-    } catch (error) {
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
-/************************************************
- * BENEFICIARIO
- ************************************************/
-
-export async function setBeneficiario(
-    {
-        id_san,
-        ronda,
-        beneficiario
-    }
-) {
-
-    try {
-
-        await updateBeneficiario({
-
-            id_san,
-            ronda,
-            beneficiario
-
-        });
-
-        showToast(
-            "Beneficiario actualizado"
-        );
-
-    } catch (error) {
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
-/************************************************
- * ENTREGA
- ************************************************/
-
-export async function setEntregaEstado(
-    {
-        id_san,
-        ronda,
-        estado_entrega
-    }
-) {
-
-    try {
-
-        await updateEstadoEntrega({
-
-            id_san,
-            ronda,
-            estado_entrega
-
-        });
-
-        showToast(
-            "Entrega actualizada"
-        );
-
-    } catch (error) {
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    }
-
-}
-
-/************************************************
- * RECALCULAR FECHAS
- ************************************************/
-
-export async function recalcularFechas(
-    {
-        id_san,
-        fecha_inicio,
-        frecuencia
-    }
-) {
-
-    try {
-
-        showLoading();
-
-        await recascadeFechas({
-
-            id_san,
-            fecha_inicio,
-            frecuencia
-
-        });
-
-        showToast(
-            "Fechas actualizadas"
-        );
-
-    } catch (error) {
-
-        showToast(
-            error.message,
-            "error"
-        );
-
-    } finally {
-
-        hideLoading();
-
-    }
-
-}
-
-/************************************************
- * PANEL ADMIN
+ * RENDER ADMIN SAN (FIXED)
  ************************************************/
 
 export function renderAdminSan(idSan) {
 
-    const san =
-        getSan(idSan);
-
-    if (!san) return;
-
-    const pagos =
-        getPagosSan(idSan);
+    const san = getSan(idSan);
+    const pagos = getPagosSan(idSan);
 
     const container =
-        document.getElementById(
-            "admin-container"
-        );
+        document.getElementById("admin-container");
+
+    if (!container || !san) return;
 
     container.innerHTML = `
 
     <div class="bg-[#0f081f] p-4 rounded-xl mb-4">
 
-        <h3 class="text-xl font-bold mb-2">
-            ${san.nombre_san}
-        </h3>
+        <h2 class="text-xl font-bold">${san.nombre_san}</h2>
 
-        <div class="grid md:grid-cols-4 gap-3">
+        <div class="grid grid-cols-4 gap-2 mt-2 text-sm">
 
-            <div>
-                <strong>Cuota:</strong><br>
-                $${san.cuota}
-            </div>
-
-            <div>
-                <strong>Frecuencia:</strong><br>
-                ${san.frecuencia}
-            </div>
-
-            <div>
-                <strong>Puestos:</strong><br>
-                ${san.total_puestos}
-            </div>
-
-            <div>
-                <strong>Inicio:</strong><br>
-                ${san.fecha_inicio}
-            </div>
+            <div>Cuota: $${san.cuota}</div>
+            <div>Frecuencia: ${san.frecuencia}</div>
+            <div>Puestos: ${san.total_puestos}</div>
+            <div>Inicio: ${san.fecha_inicio}</div>
 
         </div>
 
@@ -469,66 +203,34 @@ export function renderAdminSan(idSan) {
         <table class="w-full text-sm">
 
             <thead>
-
-                <tr class="border-b border-purple-700">
-
-                    <th class="p-2">Ronda</th>
-                    <th class="p-2">Fecha</th>
-                    <th class="p-2">Cliente</th>
-                    <th class="p-2">Pago</th>
-                    <th class="p-2">Beneficiario</th>
-                    <th class="p-2">Entrega</th>
-
+                <tr>
+                    <th>Ronda</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Pago</th>
+                    <th>Beneficiario</th>
+                    <th>Entrega</th>
                 </tr>
-
             </thead>
 
             <tbody>
 
                 ${pagos.map(p => `
 
-                    <tr class="border-b border-slate-800">
+                    <tr>
 
-                        <td class="p-2">
-                            ${p.ronda}
-                        </td>
+                        <td>${p.ronda}</td>
+                        <td>${p.fecha}</td>
+                        <td>${p.cliente}</td>
 
-                        <td class="p-2">
-                            ${p.fecha}
-                        </td>
-
-                        <td class="p-2">
-                            ${p.cliente}
-                        </td>
-
-                        <td class="p-2">
-
-                            <button
-                                class="bg-slate-700 px-2 py-1 rounded"
-                                onclick="togglePago(
-                                    '${idSan}',
-                                    '${p.ronda}',
-                                    '${p.cliente}',
-                                    '${p.estado_pago}'
-                                )">
-
+                        <td>
+                            <button onclick="togglePago('${idSan}','${p.ronda}','${p.cliente}','${p.estado_pago}')">
                                 ${p.estado_pago}
-
                             </button>
-
                         </td>
 
-                        <td class="p-2">
-
-                            ${p.beneficiario}
-
-                        </td>
-
-                        <td class="p-2">
-
-                            ${p.estado_entrega}
-
-                        </td>
+                        <td>${p.beneficiario}</td>
+                        <td>${p.estado_entrega}</td>
 
                     </tr>
 
@@ -540,17 +242,60 @@ export function renderAdminSan(idSan) {
 
     </div>
 
-    <div class="mt-4">
+    <button onclick="window.removeSan('${idSan}')"
+        class="bg-red-600 px-4 py-2 mt-4 rounded">
 
-        <button
-            onclick="window.removeSan('${idSan}')"
-            class="bg-red-600 px-4 py-2 rounded-xl">
+        Eliminar SAN
 
-            Eliminar SAN
-
-        </button>
-
-    </div>
+    </button>
 
     `;
 }
+
+/************************************************
+ * TOGGLE PAGO
+ ************************************************/
+
+window.togglePago = async function (
+    idSan,
+    ronda,
+    cliente,
+    estado
+) {
+
+    const nuevo =
+        estado.includes("Pagado")
+            ? "🔴 Pendiente"
+            : "🟢 Pagado";
+
+    try {
+
+        await updateCuota({
+            id_san: idSan,
+            ronda,
+            cliente_paga: cliente,
+            estado_pago: nuevo
+        });
+
+        renderAdminSan(idSan);
+
+    } catch (e) {
+
+        showToast(e.message, "error");
+    }
+};
+
+/************************************************
+ * REMOVE SAN
+ ************************************************/
+
+window.removeSan = async function (idSan) {
+
+    const ok = confirmAction("¿Eliminar SAN?");
+
+    if (!ok) return;
+
+    await deleteSan(idSan);
+
+    location.reload();
+};
