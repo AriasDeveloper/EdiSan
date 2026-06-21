@@ -207,6 +207,7 @@
             document.getElementById(id).classList.toggle('hidden');
         }
 
+        // SOLUCIÓN AL CAMBIO DE PESTAÑAS Y REFRESCADO DE VISTAS
         function switchTab(tab) {
             ['sanes', 'ofertas', 'admin'].forEach(t => {
                 if(document.getElementById(`section-${t}`)) document.getElementById(`section-${t}`).classList.add('hidden');
@@ -217,7 +218,7 @@
             document.getElementById(`section-${tab}`).classList.remove('hidden');
             if(tab !== 'admin') {
                 const activeTab = document.getElementById(`tab-${tab}`);
-                activeTab.className = `w-1/2 py-4 tab-transition border-b-2 ${tab === 'sanes' ? 'border-purple-500' : 'border-pink-500'} text-${tab === 'sanes' ? 'purple' : 'pink'}-400 font-black flex flex-col items-center justify-center gap-1 scale-[1.02] btn-interactive`;
+                if(activeTab) activeTab.className = `w-1/2 py-4 tab-transition border-b-2 ${tab === 'sanes' ? 'border-purple-500' : 'border-pink-500'} text-${tab === 'sanes' ? 'purple' : 'pink'}-400 font-black flex flex-col items-center justify-center gap-1 scale-[1.02] btn-interactive`;
             }
             if(tab === 'admin') renderAdminPuestos();
             if(tab === 'sanes') renderSanDetails();
@@ -229,8 +230,8 @@
             document.getElementById('san-selector').innerHTML = options;
             document.getElementById('admin-san-selector').innerHTML = options;
             
-            // Poblar selector de consulta de clientes filtrando nombres únicos
-            const clientesUnicos = [...new Set(globalData.pagos.map(p => p.cliente_asignado || p.cliente).filter(Boolean))].sort();
+            // SOLUCIÓN DE NOMBRES: Unifica propiedades redundantes para armar la lista limpia de clientes
+            const clientesUnicos = [...new Set(globalData.pagos.map(p => p.cliente || p.cliente_asignado).filter(Boolean))].sort();
             document.getElementById('client-name-selector').innerHTML = clientesUnicos.map(c => `<option value="${c}">${c}</option>`).join('');
             
             renderSanDetails();
@@ -246,16 +247,21 @@
             document.getElementById('san-table-container').classList.remove('hidden');
             document.getElementById('client-lookup-card').classList.remove('hidden');
             
-            document.getElementById('detail-san-name').innerText = san.nombre_san;
-            document.getElementById('detail-san-cuota').innerText = `$${parseFloat(san.cuota || 0).toFixed(2)}`;
+            document.getElementById('detail-san-name').innerText = san.nombre_san || san.nombre;
+            
+            // SOLUCIÓN DE PRECIOS EN EL CLIENTE: Búsqueda flexible con fallbacks integrados
+            const montoCuota = san.cuota || san.monto || 0;
+            document.getElementById('detail-san-cuota').innerText = `$${parseFloat(montoCuota).toFixed(2)}`;
             document.getElementById('detail-san-frecuencia').innerText = san.frecuencia || "Semanal";
 
             const rMap = {};
             globalData.pagos.filter(p => (p.id_san || p.id) === id).forEach(p => {
                 const r = parseInt(p.ronda || 1);
-                if(!rMap[r]) rMap[r] = { ronda: r, fecha: p.fecha, beneficiario: p.beneficiario_premio || "", total: 0, pagados: 0, primerCliente: p.cliente_asignado || p.cliente || "" };
+                const beneficiarioNombre = p.beneficiario || p.beneficiario_premio || "Por Asignar";
+                if(!rMap[r]) rMap[r] = { ronda: r, fecha: p.fecha, beneficiario: beneficiarioNombre, total: 0, pagados: 0 };
                 rMap[r].total++;
-                if((p.estado_pago || "").toLowerCase().includes("pagado")) rMap[r].pagados++;
+                const est = (p.estado_pago || "").toLowerCase();
+                if(est.includes("pagado") || est.includes("pagó") || est.includes("🟢")) rMap[r].pagados++;
             });
 
             document.getElementById('client-puestos-container').innerHTML = Object.values(rMap).sort((a,b) => a.ronda - b.ronda).map(r => {
@@ -287,7 +293,7 @@
             const container = document.getElementById('client-history-result');
             container.classList.remove('hidden');
             
-            const misPagos = globalData.pagos.filter(p => (p.cliente_asignado || p.cliente) === cliente);
+            const misPagos = globalData.pagos.filter(p => (p.cliente || p.cliente_asignado || '') === cliente);
             if(misPagos.length === 0) {
                 container.innerHTML = `<p class="text-purple-400/60 text-center py-2 font-bold uppercase text-[10px]">Sin movimientos registrados.</p>`;
                 return;
@@ -295,8 +301,9 @@
 
             let totalPendiente = 0;
             let listadoHtml = misPagos.map(p => {
-                const esPagado = (p.estado_pago || "").toLowerCase().includes("pagado");
-                if(!esPagado) totalPendiente += parseFloat(p.cuota || 0);
+                const esPagado = (p.estado_pago || "").toLowerCase().includes("pagado") || (p.estado_pago || "").includes("🟢");
+                const valorCuota = p.cuota || p.monto || 0;
+                if(!esPagado) totalPendiente += parseFloat(valorCuota);
                 return `
                 <div class="flex justify-between items-center border-b border-purple-950/40 py-1.5 last:border-0">
                     <div>
@@ -305,7 +312,7 @@
                     </div>
                     <div class="text-right">
                         <span class="font-black text-[11px] block ${esPagado ? 'text-emerald-400' : 'text-red-400'}">${esPagado ? '🟢 PAGADO' : '🔴 PENDIENTE'}</span>
-                        <span class="text-[10px] text-purple-300 font-bold">$${parseFloat(p.cuota || 0).toFixed(2)}</span>
+                        <span class="text-[10px] text-purple-300 font-bold">$${parseFloat(valorCuota).toFixed(2)}</span>
                     </div>
                 </div>`;
             }).join('');
@@ -330,9 +337,10 @@
             const rMap = {};
             globalData.pagos.filter(p => (p.id_san || p.id) === id).forEach(p => {
                 const r = parseInt(p.ronda || 1);
-                if(!rMap[r]) rMap[r] = { ronda: r, beneficiario: p.beneficiario_premio || "", estadoEntrega: p.estado_entrega || "📦 Retención", clientes: [] };
+                const bName = p.beneficiario || p.beneficiario_premio || "";
+                if(!rMap[r]) rMap[r] = { ronda: r, beneficiario: bName, estadoEntrega: p.estado_entrega || "📦 Retención", clientes: [] };
                 rMap[r].clientes.push({
-                    nombre: p.cliente_asignado || p.cliente || "",
+                    nombre: p.cliente || p.cliente_asignado || "",
                     status: p.estado_pago || "🔴 Pendiente"
                 });
             });
@@ -375,7 +383,7 @@
             const nuevoEstado = (statusActual.includes("🟢") || statusActual.toLowerCase().includes("pagado")) ? "🔴 Pendiente" : "🟢 Pagado";
             
             btn.className = nuevoEstado === "🟢 Pagado" ? 
-                "text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-black font-black shadow-md btn-interactive" : 
+                "text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-black shadow-md btn-interactive" : 
                 "text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-red-500/10 border-red-500/30 text-red-400 btn-interactive";
             btn.innerText = nuevoEstado === "🟢 Pagado" ? "🟢 Pagó" : "🔴 Pendiente";
 
@@ -385,23 +393,33 @@
                     mode: "no-cors",
                     body: JSON.stringify({ action: "updateCuota", id_san: idSan, ronda: ronda, cliente_paga: cliente, estado_pago: nuevoEstado })
                 });
-                const cached = globalData.pagos.find(p => (p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda && (p.cliente_assigned || p.cliente || '') === cliente);
+                // SOLUCIÓN CACHÉ: Apunta correctamente a las propiedades unificadas
+                const cached = globalData.pagos.find(p => (p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda && (p.cliente || p.cliente_asignado || '') === cliente);
                 if(cached) cached.estado_pago = nuevoEstado;
             } catch(e) { console.error(e); }
         }
 
+        // SOLUCIÓN DEFINICIÓN Y ACTUALIZACIÓN EN VIVO DE NOMBRES DE CLIENTES
         async function editClienteNombreDirecto(idSan, nombreViejo, nombreNuevo) {
-            if(!nombreNuevo || nombreViejo === nombreNuevo) return;
+            if(!nombreNuevo || nombreViejo.trim() === nombreNuevo.trim()) return;
             try {
                 await fetch(API_URL, {
                     method: "POST",
                     mode: "no-cors",
                     body: JSON.stringify({ action: "updateClienteNombre", id_san: idSan, nombre_viejo: nombreViejo, nombre_nuevo: nombreNuevo })
                 });
+                
+                // Actualiza dinámicamente todo el caché local de la memoria sin tener que recargar
                 globalData.pagos.forEach(p => {
                     if((p.id_san || p.id) === idSan) {
-                        if((p.cliente_asignado || p.cliente || '') === nombreViejo) { p.cliente_asignado = nombreNuevo; p.cliente = nombreNuevo; }
-                        if(p.beneficiario_premio === nombreViejo) p.beneficiario_premio = nombreNuevo;
+                        if((p.cliente || p.cliente_asignado || '') === nombreViejo) {
+                            p.cliente = nombreNuevo;
+                            p.cliente_asignado = nombreNuevo;
+                        }
+                        if((p.beneficiario || p.beneficiario_premio || '') === nombreViejo) {
+                            p.beneficiario = nombreNuevo;
+                            p.beneficiario_premio = nombreNuevo;
+                        }
                     }
                 });
             } catch(e) { console.error(e); }
@@ -416,6 +434,7 @@
                 });
                 globalData.pagos.forEach(p => {
                     if((p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda) {
+                        p.beneficiario = nuevoNombre;
                         p.beneficiario_premio = nuevoNombre;
                     }
                 });
@@ -426,7 +445,7 @@
             const nuevoEstado = estadoActual.toLowerCase().includes("entregado") ? "📦 Retención" : "🏆 Entregado";
             
             btn.className = nuevoEstado === "🏆 Entregado" ? 
-                "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-gradient-to-r from-pink-500 to-purple-600 border-pink-500 text-white shadow-lg font-black btn-interactive" : 
+                "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-gradient-to-r from-pink-500 to-purple-600 border-pink-500 text-white shadow-lg btn-interactive" : 
                 "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-purple-950/40 border-purple-800 text-purple-400 btn-interactive";
             btn.innerText = nuevoEstado === "🏆 Entregado" ? "🏆 Entregado" : "📦 En Almacén";
 
@@ -496,6 +515,10 @@
             }
             container.innerHTML = globalData.ofertas.map((o, idx) => {
                 const img = o.imgurl ? o.imgurl : 'https://images.unsplash.com/photo-1601524909162-be87252be298?auto=format&fit=crop&w=300&q=80';
+                
+                // SOLUCIÓN DE PRECIOS EN OFERTAS: Tolerancia automática de columnas
+                const precioOferta = o.precio_oferta || o.precio || 0;
+                
                 return `
                     <div class="bg-[#170f2c] rounded-2xl border border-purple-900/30 overflow-hidden flex flex-col justify-between shadow-lg animate-fade-in hover:border-pink-500/30 transition-all duration-300" style="animation-delay: ${idx * 0.05}s">
                         <div class="p-4 flex space-x-4">
@@ -507,8 +530,8 @@
                             </div>
                         </div>
                         <div class="bg-[#120b24]/60 px-4 py-3 border-t border-purple-900/20 flex items-center justify-between">
-                            <span class="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">$${parseFloat(o.precio_oferta || 0).toFixed(2)}</span>
-                            <button onclick=\"orderViaWhatsApp('${o.producto}', '${o.precio_oferta}')\" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-black text-[10px] py-2 px-4 rounded-lg uppercase tracking-widest shadow-md btn-interactive">Pedir</button>
+                            <span class="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">$${parseFloat(precioOferta).toFixed(2)}</span>
+                            <button onclick=\"orderViaWhatsApp('${o.producto}', '${precioOferta}')\" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-black text-[10px] py-2 px-4 rounded-lg uppercase tracking-widest shadow-md btn-interactive">Pedir</button>
                         </div>
                     </div>`;
             }).join('');
