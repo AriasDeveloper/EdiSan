@@ -204,8 +204,7 @@
         }
 
         function toggleForm(id) {
-            const el = document.getElementById(id);
-            el.classList.toggle('hidden');
+            document.getElementById(id).classList.toggle('hidden');
         }
 
         function switchTab(tab) {
@@ -229,6 +228,11 @@
             const options = globalData.sanes.map(s => `<option value="${s.id_san || s.id}">${s.nombre_san || s.nombre}</option>`).join('');
             document.getElementById('san-selector').innerHTML = options;
             document.getElementById('admin-san-selector').innerHTML = options;
+            
+            // Poblar selector de consulta de clientes filtrando nombres únicos
+            const clientesUnicos = [...new Set(globalData.pagos.map(p => p.cliente_asignado || p.cliente).filter(Boolean))].sort();
+            document.getElementById('client-name-selector').innerHTML = clientesUnicos.map(c => `<option value="${c}">${c}</option>`).join('');
+            
             renderSanDetails();
         }
 
@@ -249,18 +253,69 @@
             const rMap = {};
             globalData.pagos.filter(p => (p.id_san || p.id) === id).forEach(p => {
                 const r = parseInt(p.ronda || 1);
-                if(!rMap[r]) rMap[r] = { ronda: r, fecha: p.fecha, beneficiario: p.beneficiario_premio || "", estadoEntrega: p.estado_entrega || "📦 Retención", total: 0, pagados: 0, primer: p.cliente_asignado || p.cliente || "" };
+                if(!rMap[r]) rMap[r] = { ronda: r, fecha: p.fecha, beneficiario: p.beneficiario_premio || "", total: 0, pagados: 0, primerCliente: p.cliente_asignado || p.cliente || "" };
                 rMap[r].total++;
                 if((p.estado_pago || "").toLowerCase().includes("pagado")) rMap[r].pagados++;
             });
 
             document.getElementById('client-puestos-container').innerHTML = Object.values(rMap).sort((a,b) => a.ronda - b.ronda).map(r => {
-                let nombreMostrado = (!r.beneficiario || r.beneficiario.toLowerCase().includes("cupo") || r.beneficiario.toLowerCase().includes("cliente")) ? (r.primer || "Por Asignar") : r.beneficiario;
-                return `<div class="p-4 rounded-xl bg-[#170f2c] border border-purple-900/30 shadow-md">
-                    <span class="text-[9px] font-black text-purple-400 uppercase block">Ronda Nro. ${r.ronda}</span>
-                    <h5 class="text-xs font-black text-white mt-0.5">🏆 Premio para: <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-pink-400">${nombreMostrado}</span></h5>
+                let nombreMostrado = (!r.beneficiario || r.beneficiario.toLowerCase().includes("cupo") || r.beneficiario.toLowerCase().includes("cliente")) ? "Por Asignar" : r.beneficiario;
+                let fechaFormateada = r.fecha ? r.fecha.split('T')[0] : '---';
+                return `
+                <div class="bg-[#170f2c] border border-purple-900/40 rounded-xl p-4 flex justify-between items-center shadow-md">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-purple-950 border border-purple-800 text-purple-300">Ronda ${r.ronda}</span>
+                            <span class="text-[10px] text-purple-400 font-bold"><i class="fa-regular fa-calendar mr-1"></i>${fechaFormateada}</span>
+                        </div>
+                        <h4 class="text-xs font-black text-white uppercase tracking-wider mt-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-crown text-amber-400"></i> Beneficiario: 
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-pink-400 to-purple-400">${nombreMostrado}</span>
+                        </h4>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[9px] font-black uppercase block tracking-wider text-purple-400">Recaudado</span>
+                        <span class="text-xs font-black text-white">${r.pagados} / ${r.total} <span class="text-[9px] text-emerald-400 font-medium">Pagados</span></span>
+                    </div>
                 </div>`;
             }).join('');
+        }
+
+        function checkClientCreditHistory() {
+            const cliente = document.getElementById('client-name-selector').value;
+            if(!cliente) return;
+            const container = document.getElementById('client-history-result');
+            container.classList.remove('hidden');
+            
+            const misPagos = globalData.pagos.filter(p => (p.cliente_asignado || p.cliente) === cliente);
+            if(misPagos.length === 0) {
+                container.innerHTML = `<p class="text-purple-400/60 text-center py-2 font-bold uppercase text-[10px]">Sin movimientos registrados.</p>`;
+                return;
+            }
+
+            let totalPendiente = 0;
+            let listadoHtml = misPagos.map(p => {
+                const esPagado = (p.estado_pago || "").toLowerCase().includes("pagado");
+                if(!esPagado) totalPendiente += parseFloat(p.cuota || 0);
+                return `
+                <div class="flex justify-between items-center border-b border-purple-950/40 py-1.5 last:border-0">
+                    <div>
+                        <span class="font-bold text-white uppercase block text-[10px]">${p.id_san || 'Tanda'} - Ronda ${p.ronda}</span>
+                        <span class="text-[9px] text-purple-400">${p.fecha ? p.fecha.split('T')[0] : ''}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-black text-[11px] block ${esPagado ? 'text-emerald-400' : 'text-red-400'}">${esPagado ? '🟢 PAGADO' : '🔴 PENDIENTE'}</span>
+                        <span class="text-[10px] text-purple-300 font-bold">$${parseFloat(p.cuota || 0).toFixed(2)}</span>
+                    </div>
+                </div>`;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="border-b border-purple-900/50 pb-2 mb-2 flex justify-between items-center">
+                    <span class="text-purple-300 font-bold uppercase tracking-wider text-[9px]">Resumen de Cuenta:</span>
+                    <span class="font-black text-red-400 text-xs bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">Deuda: $${totalPendiente.toFixed(2)}</span>
+                </div>
+                <div class="max-h-40 overflow-y-auto space-y-1 pr-1">${listadoHtml}</div>`;
         }
 
         function renderAdminPuestos() {
@@ -275,26 +330,194 @@
             const rMap = {};
             globalData.pagos.filter(p => (p.id_san || p.id) === id).forEach(p => {
                 const r = parseInt(p.ronda || 1);
-                if(!rMap[r]) rMap[r] = { ronda: r, beneficiario: p.beneficiario_premio || "", tracker: {} };
-                rMap[r].tracker[p.cliente_asignado || p.cliente || ""] = p.estado_pago || "🔴 Pendiente";
+                if(!rMap[r]) rMap[r] = { ronda: r, beneficiario: p.beneficiario_premio || "", estadoEntrega: p.estado_entrega || "📦 Retención", clientes: [] };
+                rMap[r].clientes.push({
+                    nombre: p.cliente_asignado || p.cliente || "",
+                    status: p.estado_pago || "🔴 Pendiente"
+                });
             });
 
             container.innerHTML = Object.values(rMap).sort((a,b) => a.ronda - b.ronda).map(r => {
                 let nombrePremio = (!r.beneficiario || r.beneficiario.toLowerCase().includes("cupo") || r.beneficiario.toLowerCase().includes("cliente")) ? "" : r.beneficiario;
-                return `<div class="bg-gradient-to-b from-[#191031] to-[#110a22] p-4 rounded-xl border border-purple-900/40 shadow-lg space-y-3">
-                    <span class="text-xs font-black text-amber-400">RONDA ${r.ronda}</span>
-                    <input type="text" value="${nombrePremio}" onblur=\"updateBeneficiario('${id}', ${r.ronda}, this.value)\" placeholder="Nombre beneficiario..." class="w-full bg-[#0c0817] p-2 text-xs text-white rounded border border-purple-900/40">
+                
+                let clientesHtml = r.clientes.map(c => {
+                    const isPagado = c.status.toLowerCase().includes("pagado") || c.status.includes("🟢");
+                    return `
+                    <div class="bg-[#0c0817] p-2.5 rounded-lg border border-purple-950 flex justify-between items-center gap-2">
+                        <input type="text" value="${c.nombre}" onblur=\"editClienteNombreDirecto('${id}', '${c.nombre}', this.value)\" class="bg-transparent text-white font-bold text-xs p-1 rounded focus:bg-[#1a1133] focus:outline-none flex-1 uppercase">
+                        <button onclick=\"toggleCuotaAsistencia('${id}', ${r.ronda}, '${c.nombre}', '${c.status}', this)\" class="${isPagado ? 'text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-black shadow-md btn-interactive' : 'text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-red-500/10 border-red-500/30 text-red-400 btn-interactive'}">
+                            ${isPagado ? '🟢 Pagó' : '🔴 Pendiente'}
+                        </button>
+                    </div>`;
+                }).join('');
+
+                return `
+                <div class="bg-gradient-to-b from-[#191031] to-[#110a22] p-4 rounded-xl border border-purple-900/40 shadow-lg space-y-3 animate-fade-in">
+                    <div class="flex justify-between items-center border-b border-purple-900/30 pb-2">
+                        <span class="text-xs font-black text-amber-400 tracking-wider">RONDA NRO. ${r.ronda}</span>
+                        <button onclick=\"toggleEstadoEntrega('${id}', ${r.ronda}, '${r.estadoEntrega}', this)\" class="${r.estadoEntrega.toLowerCase().includes('entregado') ? 'text-[9px] font-black uppercase px-3 py-1.5 rounded border bg-gradient-to-r from-pink-500 to-purple-600 border-pink-500 text-white shadow-lg btn-interactive' : 'text-[9px] font-black uppercase px-3 py-1.5 rounded border bg-purple-950/40 border-purple-800 text-purple-400 btn-interactive'}">
+                            ${r.estadoEntrega.toLowerCase().includes('entregado') ? '🏆 Entregado' : '📦 En Almacén'}
+                        </button>
+                    </div>
+                    <div>
+                        <label class="text-[9px] text-purple-400 font-black uppercase block mb-1">Beneficiario del Premio:</label>
+                        <input type="text" value="${nombrePremio}" onblur=\"updateBeneficiario('${id}', ${r.ronda}, this.value)\" placeholder="Por Asignar (Escribir nombre...)" class="w-full bg-[#0c0817] p-2 text-xs text-amber-400 uppercase font-black rounded border border-purple-800/60 focus:border-amber-400 focus:outline-none">
+                    </div>
+                    <div class="space-y-1.5 mt-2">
+                        <label class="text-[9px] text-purple-400 font-black uppercase block">Control de Cuotas del Grupo:</label>
+                        ${clientesHtml}
+                    </div>
                 </div>`;
             }).join('');
         }
 
-        // Funciones de API simplificadas para el mantenimiento
-        async function updateBeneficiario(idSan, ronda, nuevoNombre) {
-            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, beneficiario: nuevoNombre }) });
+        async function toggleCuotaAsistencia(idSan, ronda, cliente, statusActual, btn) {
+            const nuevoEstado = (statusActual.includes("🟢") || statusActual.toLowerCase().includes("pagado")) ? "🔴 Pendiente" : "🟢 Pagado";
+            
+            btn.className = nuevoEstado === "🟢 Pagado" ? 
+                "text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-black font-black shadow-md btn-interactive" : 
+                "text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-red-500/10 border-red-500/30 text-red-400 btn-interactive";
+            btn.innerText = nuevoEstado === "🟢 Pagado" ? "🟢 Pagó" : "🔴 Pendiente";
+
+            try {
+                await fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({ action: "updateCuota", id_san: idSan, ronda: ronda, cliente_paga: cliente, estado_pago: nuevoEstado })
+                });
+                const cached = globalData.pagos.find(p => (p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda && (p.cliente_assigned || p.cliente || '') === cliente);
+                if(cached) cached.estado_pago = nuevoEstado;
+            } catch(e) { console.error(e); }
         }
 
-        // (Mantén tus funciones originales de submit, toggle, etc., tal cual las tenías en la Parte 3)
-        // ... (las funciones restantes funcionan correctamente como las pasaste)
+        async function editClienteNombreDirecto(idSan, nombreViejo, nombreNuevo) {
+            if(!nombreNuevo || nombreViejo === nombreNuevo) return;
+            try {
+                await fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({ action: "updateClienteNombre", id_san: idSan, nombre_viejo: nombreViejo, nombre_nuevo: nombreNuevo })
+                });
+                globalData.pagos.forEach(p => {
+                    if((p.id_san || p.id) === idSan) {
+                        if((p.cliente_asignado || p.cliente || '') === nombreViejo) { p.cliente_asignado = nombreNuevo; p.cliente = nombreNuevo; }
+                        if(p.beneficiario_premio === nombreViejo) p.beneficiario_premio = nombreNuevo;
+                    }
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        async function updateBeneficiario(idSan, ronda, nuevoNombre) {
+            try {
+                await fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, beneficiario: nuevoNombre })
+                });
+                globalData.pagos.forEach(p => {
+                    if((p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda) {
+                        p.beneficiario_premio = nuevoNombre;
+                    }
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        async function toggleEstadoEntrega(idSan, ronda, estadoActual, btn) {
+            const nuevoEstado = estadoActual.toLowerCase().includes("entregado") ? "📦 Retención" : "🏆 Entregado";
+            
+            btn.className = nuevoEstado === "🏆 Entregado" ? 
+                "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-gradient-to-r from-pink-500 to-purple-600 border-pink-500 text-white shadow-lg font-black btn-interactive" : 
+                "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-purple-950/40 border-purple-800 text-purple-400 btn-interactive";
+            btn.innerText = nuevoEstado === "🏆 Entregado" ? "🏆 Entregado" : "📦 En Almacén";
+
+            try {
+                await fetch(API_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, estado_entrega: nuevoEstado })
+                });
+                globalData.pagos.forEach(p => {
+                    if((p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda) {
+                        p.estado_entrega = nuevoEstado;
+                    }
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        async function deleteCurrentSan() {
+            const id = document.getElementById('admin-san-selector').value;
+            if(!id) return;
+            if(confirm(`⚠️ ¿Eliminar por completo el San [${id}]?`)) {
+                document.getElementById('loading').classList.remove('hidden');
+                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "deleteSan", id_san: id }) });
+                setTimeout(() => init(), 1500);
+            }
+        }
+
+        async function triggerCascadeFechas() {
+            const id = document.getElementById('admin-san-selector').value;
+            const nuevaFecha = document.getElementById('admin-master-date').value;
+            if(!nuevaFecha) return alert("Seleccione la fecha inicial.");
+            document.getElementById('loading').classList.remove('hidden');
+            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "recascadeFechas", id_san: id, fecha_inicio: nuevaFecha }) });
+            setTimeout(() => init(), 1500);
+        }
+
+        async function submitAddSan() {
+            const id = document.getElementById('new-san-id').value.toUpperCase().trim();
+            const name = document.getElementById('new-san-name').value;
+            const cuota = document.getElementById('new-san-cuota').value;
+            const freq = document.getElementById('new-san-freq').value;
+            const total = document.getElementById('new-san-total').value;
+            const fInicio = document.getElementById('new-san-date').value;
+            if(!id || !name || !cuota || !fInicio) return alert("Complete los datos.");
+            document.getElementById('loading').classList.remove('hidden');
+            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "addSan", id_san: id, nombre_san: name, cuota: cuota, frecuencia: freq, total_puestos: total, fecha_inicio: fInicio }) });
+            setTimeout(() => init(), 1800);
+        }
+
+        async function submitAddOferta() {
+            const prod = document.getElementById('new-of-prod').value;
+            const price = document.getElementById('new-of-price').value;
+            const disp = document.getElementById('new-of-disp').value;
+            const desc = document.getElementById('new-of-desc').value;
+            const img = document.getElementById('new-of-img').value;
+            if(!prod || !price || !disp) return alert("Complete campos.");
+            document.getElementById('loading').classList.remove('hidden');
+            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "addOferta", producto: prod, precio_oferta: price, descripcion: desc, disponibilidad: disp, imgUrl: img }) });
+            setTimeout(() => init(), 1500);
+        }
+
+        function renderOfertas() {
+            const container = document.getElementById('section-ofertas');
+            if (!globalData.ofertas || globalData.ofertas.length === 0) {
+                container.innerHTML = `<p class="text-xs text-purple-400/40 text-center py-12 font-bold uppercase">Sin promociones de momento.</p>`;
+                return;
+            }
+            container.innerHTML = globalData.ofertas.map((o, idx) => {
+                const img = o.imgurl ? o.imgurl : 'https://images.unsplash.com/photo-1601524909162-be87252be298?auto=format&fit=crop&w=300&q=80';
+                return `
+                    <div class="bg-[#170f2c] rounded-2xl border border-purple-900/30 overflow-hidden flex flex-col justify-between shadow-lg animate-fade-in hover:border-pink-500/30 transition-all duration-300" style="animation-delay: ${idx * 0.05}s">
+                        <div class="p-4 flex space-x-4">
+                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl bg-purple-950 border border-purple-900/40 transform hover:scale-110 transition-transform duration-300">
+                            <div class="flex-1 min-w-0">
+                                <span class="text-[8px] font-black text-amber-400 uppercase block mb-0.5">${o.disponibilidad || 'Disponible'}</span>
+                                <h4 class="text-xs font-black text-white truncate uppercase tracking-wider">${o.producto || 'Artículo'}</h4>
+                                <p class="text-[11px] text-purple-300/70 line-clamp-2 mt-0.5 font-medium">${o.descripcion || ''}</p>
+                            </div>
+                        </div>
+                        <div class="bg-[#120b24]/60 px-4 py-3 border-t border-purple-900/20 flex items-center justify-between">
+                            <span class="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">$${parseFloat(o.precio_oferta || 0).toFixed(2)}</span>
+                            <button onclick=\"orderViaWhatsApp('${o.producto}', '${o.precio_oferta}')\" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-black text-[10px] py-2 px-4 rounded-lg uppercase tracking-widest shadow-md btn-interactive">Pedir</button>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function orderViaWhatsApp(name, price) {
+            const message = encodeURIComponent("¡Hola! Me interesa apartar:\n\n📦 *Producto:* " + name + "\n💰 *Precio:* $" + parseFloat(price).toFixed(2));
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
+        }
 
         init();
     </script>
