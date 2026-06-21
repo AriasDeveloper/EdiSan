@@ -425,22 +425,6 @@ export function renderAdminSan(idSan) {
     const pagos =
         getPagosSan(idSan);
 
-    const total =
-        pagos.length;
-
-    const pagados =
-        pagos.filter(
-            p =>
-            String(
-                p.estado_pago
-            ).includes(
-                "Pagado"
-            )
-        ).length;
-
-    const pendientes =
-        total - pagados;
-
     const container =
         document.getElementById(
             "admin-container"
@@ -448,81 +432,119 @@ export function renderAdminSan(idSan) {
 
     container.innerHTML = `
 
-    <div class="grid md:grid-cols-4 gap-4">
+    <div class="bg-[#0f081f] p-4 rounded-xl mb-4">
 
-        <div class="bg-[#0f081f] p-4 rounded-xl">
+        <h3 class="text-xl font-bold mb-2">
+            ${san.nombre_san}
+        </h3>
 
-            <div class="text-purple-400">
+        <div class="grid md:grid-cols-4 gap-3">
 
-                SAN
-
+            <div>
+                <strong>Cuota:</strong><br>
+                $${san.cuota}
             </div>
 
-            <div class="font-bold">
-
-                ${san.nombre_san}
-
+            <div>
+                <strong>Frecuencia:</strong><br>
+                ${san.frecuencia}
             </div>
 
-        </div>
-
-        <div class="bg-[#0f081f] p-4 rounded-xl">
-
-            <div class="text-purple-400">
-
-                Pagados
-
-            </div>
-
-            <div class="font-bold">
-
-                ${pagados}
-
-            </div>
-
-        </div>
-
-        <div class="bg-[#0f081f] p-4 rounded-xl">
-
-            <div class="text-purple-400">
-
-                Pendientes
-
-            </div>
-
-            <div class="font-bold">
-
-                ${pendientes}
-
-            </div>
-
-        </div>
-
-        <div class="bg-[#0f081f] p-4 rounded-xl">
-
-            <div class="text-purple-400">
-
-                Puestos
-
-            </div>
-
-            <div class="font-bold">
-
+            <div>
+                <strong>Puestos:</strong><br>
                 ${san.total_puestos}
+            </div>
 
+            <div>
+                <strong>Inicio:</strong><br>
+                ${san.fecha_inicio}
             </div>
 
         </div>
 
     </div>
 
-    <div class="mt-6">
+    <div class="overflow-auto">
+
+        <table class="w-full text-sm">
+
+            <thead>
+
+                <tr class="border-b border-purple-700">
+
+                    <th class="p-2">Ronda</th>
+                    <th class="p-2">Fecha</th>
+                    <th class="p-2">Cliente</th>
+                    <th class="p-2">Pago</th>
+                    <th class="p-2">Beneficiario</th>
+                    <th class="p-2">Entrega</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${pagos.map(p => `
+
+                    <tr class="border-b border-slate-800">
+
+                        <td class="p-2">
+                            ${p.ronda}
+                        </td>
+
+                        <td class="p-2">
+                            ${p.fecha}
+                        </td>
+
+                        <td class="p-2">
+                            ${p.cliente}
+                        </td>
+
+                        <td class="p-2">
+
+                            <button
+                                class="bg-slate-700 px-2 py-1 rounded"
+                                onclick="togglePago(
+                                    '${idSan}',
+                                    '${p.ronda}',
+                                    '${p.cliente}',
+                                    '${p.estado_pago}'
+                                )">
+
+                                ${p.estado_pago}
+
+                            </button>
+
+                        </td>
+
+                        <td class="p-2">
+
+                            ${p.beneficiario}
+
+                        </td>
+
+                        <td class="p-2">
+
+                            ${p.estado_entrega}
+
+                        </td>
+
+                    </tr>
+
+                `).join("")}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="mt-4">
 
         <button
-
             onclick="window.removeSan('${idSan}')"
-
-            class="bg-red-600 px-5 py-3 rounded-xl">
+            class="bg-red-600 px-4 py-2 rounded-xl">
 
             Eliminar SAN
 
@@ -532,3 +554,45 @@ export function renderAdminSan(idSan) {
 
     `;
 }
+import {
+    updateCuota
+} from "./api.js";
+
+window.togglePago =
+async function(
+    idSan,
+    ronda,
+    cliente,
+    estadoActual
+) {
+
+    const nuevoEstado =
+        estadoActual.includes("Pagado")
+            ? "🔴 Pendiente"
+            : "🟢 Pagado";
+
+    try {
+
+        await updateCuota({
+
+            id_san: idSan,
+
+            ronda,
+
+            cliente_paga: cliente,
+
+            estado_pago:
+                nuevoEstado
+
+        });
+
+        location.reload();
+
+    } catch (error) {
+
+        alert(
+            error.message
+        );
+
+    }
+};
