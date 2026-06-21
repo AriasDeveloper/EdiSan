@@ -149,28 +149,142 @@
 
         <!-- ADMIN -->
 
-        <section
-            id="section-admin"
-            class="hidden">
+        <section id="section-admin" class="hidden">
 
-            <div
-                class="bg-[#170f2c] p-4 rounded-2xl mb-4">
+            <!-- CREAR SAN -->
 
-                <h2 class="font-bold mb-4">
+            <div class="bg-[#170f2c] p-5 rounded-2xl mb-5">
 
-                    Administración
+                <h2 class="text-xl font-bold mb-4">
+                    Crear SAN
+                </h2>
+
+                <form id="form-add-san" class="grid md:grid-cols-2 gap-3">
+
+                    <input
+                        name="id_san"
+                        placeholder="ID SAN"
+                        required
+                        class="bg-[#0f081f] p-3 rounded-xl">
+
+                    <input
+                        name="nombre_san"
+                        placeholder="Nombre SAN"
+                        required
+                        class="bg-[#0f081f] p-3 rounded-xl">
+
+                    <input
+                        name="cuota"
+                        type="number"
+                        placeholder="Cuota"
+                        required
+                        class="bg-[#0f081f] p-3 rounded-xl">
+
+                    <select
+                        name="frecuencia"
+                        class="bg-[#0f081f] p-3 rounded-xl">
+
+                        <option>Semanal</option>
+                        <option>Quincenal</option>
+                        <option>Mensual</option>
+
+                    </select>
+
+                    <input
+                        name="total_puestos"
+                        type="number"
+                        placeholder="Puestos"
+                        required
+                        class="bg-[#0f081f] p-3 rounded-xl">
+
+                    <input
+                        name="fecha_inicio"
+                        type="date"
+                        required
+                        class="bg-[#0f081f] p-3 rounded-xl">
+
+                    <button
+                        type="submit"
+                        class="bg-green-600 rounded-xl py-3">
+
+                        Crear SAN
+
+                    </button>
+
+                </form>
+
+            </div>
+
+            <!-- CREAR OFERTA -->
+
+            <div class="bg-[#170f2c] p-5 rounded-2xl mb-5">
+
+                <h2 class="text-xl font-bold mb-4">
+
+                    Crear Oferta
+
+                </h2>
+
+                <form id="form-add-oferta"
+                    class="grid md:grid-cols-2 gap-3">
+
+                    <input
+                        name="producto"
+                        placeholder="Producto"
+                        required
+                        class="bg-[#0f081f] p-3 rounded-xl">
+
+                    <input
+                        name="precio_oferta"
+                        type="number"
+                        placeholder="Precio"
+                        required
+                        class="bg-[#0f081f] p-3 rounded-xl">
+
+                    <input
+                        name="descripcion"
+                        placeholder="Descripción"
+                        class="bg-[#0f081f] p-3 rounded-xl">
+
+                    <input
+                        name="disponibilidad"
+                        placeholder="Disponibilidad"
+                        class="bg-[#0f081f] p-3 rounded-xl">
+
+                    <input
+                        name="imgUrl"
+                        placeholder="URL Imagen"
+                        class="bg-[#0f081f] p-3 rounded-xl">
+
+                    <button
+                        type="submit"
+                        class="bg-blue-600 rounded-xl py-3">
+
+                        Crear Oferta
+
+                    </button>
+
+                </form>
+
+            </div>
+
+            <!-- GESTIÓN SAN -->
+
+            <div class="bg-[#170f2c] p-5 rounded-2xl">
+
+                <h2 class="text-xl font-bold mb-4">
+
+                    Gestión SAN
 
                 </h2>
 
                 <select
                     id="admin-san-selector"
-                    class="w-full bg-[#0f081f] rounded-xl p-3">
+                    class="w-full bg-[#0f081f] rounded-xl p-3 mb-4">
                 </select>
 
-            </div>
+                <div id="admin-container"></div>
 
-            <div
-                id="admin-container">
             </div>
 
         </section>

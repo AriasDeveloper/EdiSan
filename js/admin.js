@@ -415,9 +415,7 @@ export async function recalcularFechas(
  * PANEL ADMIN
  ************************************************/
 
-export function renderAdminSan(
-    idSan
-) {
+export function renderAdminSan(idSan) {
 
     const san =
         getSan(idSan);
@@ -427,81 +425,110 @@ export function renderAdminSan(
     const pagos =
         getPagosSan(idSan);
 
+    const total =
+        pagos.length;
+
+    const pagados =
+        pagos.filter(
+            p =>
+            String(
+                p.estado_pago
+            ).includes(
+                "Pagado"
+            )
+        ).length;
+
+    const pendientes =
+        total - pagados;
+
     const container =
         document.getElementById(
             "admin-container"
         );
 
-    if (!container) return;
-
     container.innerHTML = `
 
-        <div
-            class="bg-[#170f2c]
-                   rounded-2xl
-                   p-5">
+    <div class="grid md:grid-cols-4 gap-4">
 
-            <h2
-                class="text-xl
-                       font-bold
-                       mb-4">
+        <div class="bg-[#0f081f] p-4 rounded-xl">
 
-                ${escapeHtml(
-                    san.nombre_san
-                )}
+            <div class="text-purple-400">
 
-            </h2>
-
-            <div
-                class="grid
-                       md:grid-cols-4
-                       gap-3">
-
-                <div>
-                    Cuota:
-                    ${san.cuota}
-                </div>
-
-                <div>
-                    Frecuencia:
-                    ${escapeHtml(
-                        san.frecuencia
-                    )}
-                </div>
-
-                <div>
-                    Puestos:
-                    ${san.total_puestos}
-                </div>
-
-                <div>
-                    Registros:
-                    ${pagos.length}
-                </div>
+                SAN
 
             </div>
 
-            <div
-                class="mt-5">
+            <div class="font-bold">
 
-                <button
-
-                    onclick="window.removeSan('${idSan}')"
-
-                    class="bg-red-600
-                           hover:bg-red-500
-                           px-4
-                           py-2
-                           rounded-xl">
-
-                    Eliminar SAN
-
-                </button>
+                ${san.nombre_san}
 
             </div>
 
         </div>
 
-    `;
+        <div class="bg-[#0f081f] p-4 rounded-xl">
 
+            <div class="text-purple-400">
+
+                Pagados
+
+            </div>
+
+            <div class="font-bold">
+
+                ${pagados}
+
+            </div>
+
+        </div>
+
+        <div class="bg-[#0f081f] p-4 rounded-xl">
+
+            <div class="text-purple-400">
+
+                Pendientes
+
+            </div>
+
+            <div class="font-bold">
+
+                ${pendientes}
+
+            </div>
+
+        </div>
+
+        <div class="bg-[#0f081f] p-4 rounded-xl">
+
+            <div class="text-purple-400">
+
+                Puestos
+
+            </div>
+
+            <div class="font-bold">
+
+                ${san.total_puestos}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="mt-6">
+
+        <button
+
+            onclick="window.removeSan('${idSan}')"
+
+            class="bg-red-600 px-5 py-3 rounded-xl">
+
+            Eliminar SAN
+
+        </button>
+
+    </div>
+
+    `;
 }
