@@ -1,578 +1,193 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sanes Inversiones Edimar - La Patrona</title>
+
+    <title>SANES LA PATRONA</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: #0c0817; color: #f3f4f6; overflow-x: hidden; }
-        .purple-glow { box-shadow: 0 0 35px rgba(168, 85, 247, 0.2); }
-        .pink-glow-soft { box-shadow: 0 0 25px rgba(236, 72, 153, 0.15); }
-        .amber-glow-soft { box-shadow: 0 0 25px rgba(245, 158, 11, 0.15); }
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.4) sepia(1) saturate(3) hue-rotate(270deg); cursor: pointer; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); filter: blur(4px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
-        @keyframes pulseGlow { 0%, 100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 10px rgba(236, 72, 153, 0.2); } 50% { transform: scale(1.03); opacity: 1; box-shadow: 0 0 25px rgba(236, 72, 153, 0.4); } }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        .animate-fade-in { animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
-        .animate-crown-pulse { animation: pulseGlow 2s infinite ease-in-out; }
-        .shimmer-loading { background: linear-gradient(90deg, #170f2c 25%, #28194d 50%, #170f2c 75%); background-size: 200% 100%; animation: shimmer 1.6s infinite linear; }
-        .btn-interactive { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .btn-interactive:active { transform: scale(0.94); }
-        .tab-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    </style>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
-<body class="font-sans antialiased pb-24 selection:bg-pink-500 selection:text-white">
 
-    <header class="bg-gradient-to-b from-[#1f113a] to-[#120826] border-b border-pink-500/20 py-6 px-4 text-center sticky top-0 z-40 shadow-2xl backdrop-blur-md bg-opacity-95">
-        <div class="inline-flex items-center justify-center bg-pink-500/10 border border-pink-500/30 px-4 py-1.5 rounded-full mb-2 animate-crown-pulse">
-            <i class="fa-solid fa-crown text-amber-400 text-3xl mr-2"></i>
-            <span class="text-[10px] uppercase tracking-widest font-black text-pink-400">Inversiones Edimar</span>
+<body class="bg-[#0b0618] text-white min-h-screen">
+
+    <!-- LOADING -->
+
+    <div id="loading"
+         class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+
+        <div class="text-center">
+
+            <div
+                class="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mx-auto mb-4">
+            </div>
+
+            <p>Cargando información...</p>
+
         </div>
-        <h1 class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 uppercase drop-shadow-md">
-            SANES LA PATRONA
-        </h1>
-    </header>
 
-    <div class="flex bg-[#120b24] border-b border-purple-900/30 text-center text-xs font-black uppercase tracking-widest sticky top-[97px] z-30 shadow-md">
-        <button onclick="switchTab('sanes')" id="tab-sanes" class="w-1/2 py-4 tab-transition border-b-2 border-transparent text-purple-400/50 flex flex-col items-center justify-center gap-1 hover:text-purple-300 btn-interactive">
-            <i class="fa-solid fa-vault text-2xl mb-0.5"></i>
-            <span>Cronograma</span>
-        </button>
-        <button onclick="switchTab('ofertas')" id="tab-ofertas" class="w-1/2 py-4 tab-transition border-b-2 border-transparent text-purple-400/50 flex flex-col items-center justify-center gap-1 hover:text-pink-400 btn-interactive">
-            <i class="fa-solid fa-tags text-2xl mb-0.5"></i>
-            <span>Catálogo Club</span>
-        </button>
     </div>
 
-    <main class="max-w-md mx-auto px-4 mt-6">
-        <div id="loading" class="text-center py-20 space-y-4">
-            <div class="relative inline-block">
-                <div class="animate-spin inline-block w-14 h-14 border-[3px] border-purple-500 border-t-transparent rounded-full shadow-lg"></div>
-                <i class="fa-solid fa-crown text-pink-500 absolute top-4 left-4 text-xl animate-bounce"></i>
-            </div>
-            <div class="w-32 h-2.5 mx-auto rounded-full overflow-hidden bg-purple-950/40 relative">
-                <div class="shimmer-loading w-full h-full"></div>
-            </div>
-            <p class="text-[10px] text-purple-400 font-black tracking-widest uppercase animate-pulse">Sincronizando Servidor...</p>
+    <!-- HEADER -->
+
+    <header
+        class="sticky top-0 z-40 bg-[#12091f] border-b border-purple-900/30">
+
+        <div
+            class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+
+            <h1 class="font-bold text-xl">
+
+                SANES LA PATRONA
+
+            </h1>
+
+            <button
+                id="btn-admin"
+                class="bg-purple-700 hover:bg-purple-600 px-4 py-2 rounded-xl">
+
+                <i class="fa-solid fa-lock"></i>
+
+                Admin
+
+            </button>
+
         </div>
 
-        <section id="section-sanes" class="hidden space-y-5">
-            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 shadow-xl animate-fade-in purple-glow">
-                <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2">Seleccione un Grupo Activo:</label>
-                <select id="san-selector" onchange="renderSanDetails()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-sm focus:border-pink-500 focus:outline-none transition-all duration-300"></select>
+    </header>
+
+    <!-- NAV -->
+
+    <nav
+        class="bg-[#12091f] border-b border-purple-900/30">
+
+        <div
+            class="max-w-7xl mx-auto px-4 py-3 flex gap-2 flex-wrap">
+
+            <button
+                data-tab="sanes"
+                class="tab-btn px-4 py-2 rounded-xl bg-purple-700">
+
+                SANES
+
+            </button>
+
+            <button
+                data-tab="ofertas"
+                class="tab-btn px-4 py-2 rounded-xl bg-[#1a1030]">
+
+                Ofertas
+
+            </button>
+
+            <button
+                data-tab="admin"
+                class="tab-btn px-4 py-2 rounded-xl bg-[#1a1030] hidden">
+
+                Administración
+
+            </button>
+
+        </div>
+
+    </nav>
+
+    <!-- MAIN -->
+
+    <main
+        class="max-w-7xl mx-auto p-4">
+
+        <!-- SANES -->
+
+        <section id="section-sanes">
+
+            <div
+                class="bg-[#170f2c] p-4 rounded-2xl mb-4">
+
+                <label class="block mb-2">
+
+                    Seleccionar SAN
+
+                </label>
+
+                <select
+                    id="san-selector"
+                    class="w-full bg-[#0f081f] rounded-xl p-3">
+                </select>
+
             </div>
 
-            <div id="client-lookup-card" class="bg-gradient-to-r from-[#1e113c] to-[#140b29] p-4 rounded-xl border border-pink-500/20 shadow-md space-y-3 hidden animate-fade-in pink-glow-soft">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-address-card text-pink-400 text-2xl"></i>
-                    <span class="text-[10px] font-black text-pink-400 uppercase tracking-widest">Mi Estado de Cuenta Particular</span>
-                </div>
-                <div class="flex gap-2">
-                    <select id="client-name-selector" class="flex-1 bg-[#0c0817] text-white p-2 rounded text-xs font-bold border border-purple-800/60 focus:outline-none focus:border-pink-500"></select>
-                    <button onclick="checkClientCreditHistory()" class="bg-pink-600 hover:bg-pink-700 text-white font-black text-[10px] px-4 py-2 rounded uppercase tracking-wider btn-interactive shadow-md shadow-pink-900/20">Ver Mi Record</button>
-                </div>
-                <div id="client-history-result" class="hidden bg-[#0c0817] p-3 rounded-lg border border-purple-950 text-xs space-y-2 animate-fade-in"></div>
+            <div
+                id="san-details">
             </div>
 
-            <div id="san-info-card" class="bg-gradient-to-br from-[#1c1236] to-[#120b24] p-5 rounded-2xl border border-purple-900/40 purple-glow hidden animate-fade-in">
-                <h3 id="detail-san-name" class="text-base font-extrabold text-white tracking-wide">---</h3>
-                <div class="grid grid-cols-2 gap-3 mt-4 text-center">
-                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950 transform hover:scale-[1.02] transition-transform duration-300">
-                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Cuota Requerida</span>
-                        <span id="detail-san-cuota" class="text-lg font-black text-amber-400">$0.00</span>
-                    </div>
-                    <div class="bg-[#0c0817] p-3 rounded-xl border border-purple-950 transform hover:scale-[1.02] transition-transform duration-300">
-                        <span class="block text-[9px] text-purple-400 font-bold uppercase tracking-wider">Frecuencia</span>
-                        <span id="detail-san-frecuencia" class="text-xs font-bold text-gray-200 mt-1 block">---</span>
-                    </div>
-                </div>
+            <div
+                id="client-puestos-container"
+                class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
             </div>
 
-            <div id="san-table-container" class="hidden space-y-2.5">
-                <div class="space-y-3.5" id="client-puestos-container"></div>
-            </div>
         </section>
 
-        <section id="section-ofertas" class="hidden grid grid-cols-1 gap-4"></section>
+        <!-- OFERTAS -->
 
-        <section id="section-admin" class="hidden space-y-6 animate-fade-in">
-            <div class="flex justify-between items-center border-b border-purple-900/40 pb-3">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-crown text-pink-400 text-3xl animate-bounce"></i>
-                    <h2 class="text-xs font-black text-pink-400 uppercase tracking-widest">Consola Administradora</h2>
-                </div>
-                <button onclick="switchTab('sanes')" class="text-[9px] font-black bg-purple-950/60 border border-purple-800/40 px-3 py-1.5 rounded-lg text-purple-300 uppercase btn-interactive">Salir</button>
+        <section
+            id="section-ofertas"
+            class="hidden">
+
+            <div
+                id="ofertas-container"
+                class="grid md:grid-cols-3 gap-4">
             </div>
 
-            <div class="bg-gradient-to-r from-[#1d123a] to-[#251849] p-4 rounded-xl border border-purple-800/40 shadow-md space-y-3 purple-glow">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-folder-plus text-amber-400 text-2xl"></i>
-                    <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest">Gestión de Datos</span>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="toggleForm('block-add-san')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase hover:border-purple-500 transition-all btn-interactive">Reg. Nuevo San</button>
-                    <button onclick="toggleForm('block-add-oferta')" class="bg-[#120b24] p-2.5 rounded-lg border border-purple-900 text-[10px] font-bold text-purple-300 text-center uppercase hover:border-purple-500 transition-all btn-interactive">Cargar Oferta</button>
-                </div>
-
-                <div id="block-add-san" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2 animate-fade-in">
-                    <input type="text" id="new-san-id" placeholder="ID Único (Ej: SAN-BERA)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white uppercase font-bold focus:border-pink-500 focus:outline-none transition-colors">
-                    <input type="text" id="new-san-name" placeholder="Nombre (Ej: Tanda de Motos)" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:border-pink-500 focus:outline-none transition-colors">
-                    <div class="grid grid-cols-3 gap-1.5">
-                        <input type="number" id="new-san-cuota" placeholder="Cuota $" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none focus:border-pink-500">
-                        <select id="new-san-freq" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
-                            <option value="Semanal">Semanal</option>
-                            <option value="Quincenal">Quincenal</option>
-                            <option value="Mensual">Mensual</option>
-                        </select>
-                        <input type="number" id="new-san-total" placeholder="Puestos" class="bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none focus:border-pink-500">
-                    </div>
-                    <div>
-                        <label class="text-[9px] font-black text-purple-400 uppercase block mb-1">Fecha de inicio:</label>
-                        <input type="date" id="new-san-date" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
-                    </div>
-                    <button onclick="submitAddSan()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-2 rounded font-black text-[10px] uppercase text-white shadow-lg btn-interactive">Crear Todo el San</button>
-                </div>
-
-                <div id="block-add-oferta" class="hidden bg-[#0c0817] p-3.5 rounded-xl border border-purple-900 space-y-2.5 mt-2 animate-fade-in">
-                    <input type="text" id="new-of-prod" placeholder="Nombre del Artículo" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
-                    <div class="grid grid-cols-2 gap-1.5">
-                        <input type="number" id="new-of-price" placeholder="Precio $" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
-                        <input type="text" id="new-of-disp" placeholder="Disponibilidad" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
-                    </div>
-                    <input type="text" id="new-of-desc" placeholder="Descripción" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
-                    <input type="text" id="new-of-img" placeholder="URL Imagen" class="w-full bg-[#17102b] border border-purple-800/60 p-2 rounded text-xs text-white focus:outline-none">
-                    <button onclick="submitAddOferta()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 py-2 rounded font-black text-[10px] uppercase text-black font-black shadow-lg btn-interactive">Publicar Oferta</button>
-                </div>
-            </div>
-
-            <div class="bg-[#170f2c] p-4 rounded-xl border border-purple-900/30 space-y-3 amber-glow-soft">
-                <label class="block text-[10px] font-black text-purple-400 uppercase tracking-widest">Seleccione Tanda a Gestionar:</label>
-                <select id="admin-san-selector" onchange="renderAdminPuestos()" class="w-full bg-[#231742] text-white p-3 rounded-lg border border-purple-800/60 font-bold text-xs focus:outline-none"></select>
-                
-                <button onclick="deleteCurrentSan()" class="w-full bg-red-950/20 border border-red-700/40 hover:bg-red-900/40 text-red-400 font-black text-[10px] py-2.5 px-4 rounded-lg uppercase tracking-wider transition-all flex items-center justify-center gap-2 btn-interactive">
-                    <i class="fa-solid fa-trash-can text-base"></i> Eliminar Tanda Completa
-                </button>
-            </div>
-
-            <div id="admin-cascada-card" class="bg-gradient-to-r from-[#21113a] to-[#120a24] p-4 rounded-xl border border-purple-800/50 space-y-2.5 hidden animate-fade-in">
-                <div class="flex justify-between items-center">
-                    <span class="text-[10px] font-black text-purple-300 uppercase">Mover Cronograma</span>
-                    <span id="admin-cascada-freq" class="text-[9px] font-bold px-2 py-0.5 rounded bg-purple-900/40 text-purple-400 border border-purple-800/50 uppercase">---</span>
-                </div>
-                <div class="flex gap-2">
-                    <input type="date" id="admin-master-date" class="flex-1 bg-[#0c0817] border border-purple-800 p-2 rounded text-xs text-white focus:outline-none">
-                    <button onclick="triggerCascadeFechas()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-[10px] font-black uppercase shadow-md btn-interactive">Propagar</button>
-                </div>
-            </div>
-
-            <div class="space-y-4" id="admin-puestos-container"></div>
         </section>
+
+        <!-- ADMIN -->
+
+        <section
+            id="section-admin"
+            class="hidden">
+
+            <div
+                class="bg-[#170f2c] p-4 rounded-2xl mb-4">
+
+                <h2 class="font-bold mb-4">
+
+                    Administración
+
+                </h2>
+
+                <select
+                    id="admin-san-selector"
+                    class="w-full bg-[#0f081f] rounded-xl p-3">
+                </select>
+
+            </div>
+
+            <div
+                id="admin-container">
+            </div>
+
+        </section>
+
     </main>
 
-    <button onclick="loginAdmin()" class="fixed bottom-6 right-6 bg-[#211342] hover:bg-purple-900 text-pink-400 p-5 rounded-full shadow-2xl border border-purple-700/60 z-50 transition-all duration-300 purple-glow btn-interactive hover:rotate-12">
-        <i class="fa-solid fa-crown text-3xl"></i>
-    </button>
+    <!-- TOAST -->
 
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
-        const WHATSAPP_NUMBER = "584242961164"; 
-        const ADMIN_PASSWORD = "1234"; 
-        let globalData = {};
+    <div
+        id="toast"
+        class="hidden fixed bottom-6 right-6 bg-green-600 px-4 py-3 rounded-xl shadow-xl">
+    </div>
 
-        async function init() {
-            try {
-                document.getElementById('loading').classList.remove('hidden');
-                const response = await fetch(API_URL);
-                globalData = await response.json();
-                document.getElementById('loading').classList.add('hidden');
-                switchTab('sanes');
-                populateSelectors();
-                renderOfertas();
-            } catch (error) {
-                document.getElementById('loading').innerHTML = `<p class="text-red-500 font-bold text-xs uppercase animate-bounce">⚠️ Error de Enlace.</p>`;
-            }
-        }
+    <!-- JS -->
 
-        function loginAdmin() {
-            if (prompt("Contraseña Velvet de Seguridad:") === ADMIN_PASSWORD) {
-                switchTab('admin');
-            } else if (prompt !== null) {
-                alert("Credencial Incorrecta.");
-            }
-        }
+    <script type="module" src="./js/app.js"></script>
 
-        function toggleForm(id) {
-            document.getElementById(id).classList.toggle('hidden');
-        }
-
-        function switchTab(tab) {
-            ['sanes', 'ofertas', 'admin'].forEach(t => {
-                if(document.getElementById(`section-${t}`)) document.getElementById(`section-${t}`).classList.add('hidden');
-                if(document.getElementById(`tab-${t}`)) {
-                    document.getElementById(`tab-${t}`).className = "w-1/2 py-4 tab-transition border-b-2 border-transparent text-purple-400/50 flex flex-col items-center justify-center gap-1 hover:text-purple-300 btn-interactive";
-                }
-            });
-            document.getElementById(`section-${tab}`).classList.remove('hidden');
-            if(tab !== 'admin') {
-                const activeTab = document.getElementById(`tab-${tab}`);
-                if(activeTab) activeTab.className = `w-1/2 py-4 tab-transition border-b-2 ${tab === 'sanes' ? 'border-purple-500' : 'border-pink-500'} text-${tab === 'sanes' ? 'purple' : 'pink'}-400 font-black flex flex-col items-center justify-center gap-1 scale-[1.02] btn-interactive`;
-            }
-            if(tab === 'admin') renderAdminPuestos();
-            if(tab === 'sanes') renderSanDetails();
-        }
-
-        function populateSelectors() {
-            if(!globalData.sanes || globalData.sanes.length === 0) return;
-            const options = globalData.sanes.map(s => `<option value="${s.id_san || s.id}">${s.nombre_san || s.nombre}</option>`).join('');
-            document.getElementById('san-selector').innerHTML = options;
-            document.getElementById('admin-san-selector').innerHTML = options;
-            
-            // FILTRADO ABSOLUTO DE DUPLICADOS EN EL SELECTOR DE CLIENTES PARTICULAR
-            const todosLosClientes = globalData.pagos.map(p => (p.cliente || p.cliente_asignado || '').trim()).filter(Boolean);
-            const clientesUnicos = [];
-            const registroMinusculas = new Set();
-            
-            todosLosClientes.forEach(c => {
-                if (!registroMinusculas.has(c.toLowerCase()) && !c.toLowerCase().includes("cliente") && !c.toLowerCase().includes("cupo")) {
-                    registroMinusculas.add(c.toLowerCase());
-                    clientesUnicos.push(c);
-                }
-            });
-            
-            clientesUnicos.sort();
-            document.getElementById('client-name-selector').innerHTML = clientesUnicos.map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join('');
-            
-            renderSanDetails();
-        }
-
-        function renderSanDetails() {
-            const id = document.getElementById('san-selector').value;
-            if(!id) return;
-            const san = globalData.sanes.find(s => (s.id_san || s.id) === id);
-            if (!san) return;
-
-            document.getElementById('san-info-card').classList.remove('hidden');
-            document.getElementById('san-table-container').classList.remove('hidden');
-            document.getElementById('client-lookup-card').classList.remove('hidden');
-            
-            document.getElementById('detail-san-name').innerText = san.nombre_san || san.nombre;
-            
-            // SOPORTE DE CONTEXTO CONTRA $0.00: Busca en propiedades o extrae el valor desde los pagos vigentes
-            let montoCuota = san.cuota || san.monto || san.monto_cuota || 0;
-            if (!montoCuota || parseFloat(montoCuota) === 0) {
-                const unPagoAsociado = globalData.pagos.find(p => (p.id_san || p.id) === id);
-                if (unPagoAsociado) {
-                    montoCuota = unPagoAsociado.cuota || unPagoAsociado.monto || unPagoAsociado.monto_cuota || 0;
-                }
-            }
-            document.getElementById('detail-san-cuota').innerText = `$${parseFloat(montoCuota).toFixed(2)}`;
-            document.getElementById('detail-san-frecuencia').innerText = san.frecuencia || "Semanal";
-
-            const rMap = {};
-            globalData.pagos.filter(p => (p.id_san || p.id) === id).forEach(p => {
-                const r = parseInt(p.ronda || p.nro_ronda || p.ronda_nro || 1);
-                const beneficiarioNombre = p.beneficiario || p.beneficiario_premio || p.beneficiario_del_premio || "";
-                const clienteNombre = p.cliente || p.cliente_asignado || "";
-                
-                if(!rMap[r]) rMap[r] = { ronda: r, fecha: p.fecha, beneficiario: beneficiarioNombre, total: 0, pagados: 0, listaClientes: [] };
-                rMap[r].total++;
-                if(clienteNombre) rMap[r].listaClientes.push(clienteNombre);
-                
-                const est = (p.estado_pago || "").toLowerCase();
-                if(est.includes("pagado") || est.includes("pagó") || est.includes("🟢")) rMap[r].pagados++;
-            });
-
-            document.getElementById('client-puestos-container').innerHTML = Object.values(rMap).sort((a,b) => a.ronda - b.ronda).map(r => {
-                // ASIGNACIÓN AUTOMÁTICA DEL BENEFICIARIO CORRESPONDIENTE A LA POSICIÓN DE LA RONDA
-                let nombreMostrado = "Por Asignar";
-                if (r.beneficiario && !r.beneficiario.toLowerCase().includes("asignar") && !r.beneficiario.toLowerCase().includes("cliente") && !r.beneficiario.toLowerCase().includes("cupo")) {
-                    nombreMostrado = r.beneficiario;
-                } else {
-                    if (r.listaClientes && r.listaClientes[r.ronda - 1]) {
-                        nombreMostrado = r.listaClientes[r.ronda - 1];
-                    }
-                }
-                if (nombreMostrado.toLowerCase().includes("cliente") || nombreMostrado.toLowerCase().includes("cupo")) {
-                    nombreMostrado = "Por Asignar";
-                }
-                
-                let fechaFormateada = r.fecha ? r.fecha.split('T')[0] : '---';
-                return `
-                <div class="bg-[#170f2c] border border-purple-900/40 rounded-xl p-4 flex justify-between items-center shadow-md">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-purple-950 border border-purple-800 text-purple-300">Ronda ${r.ronda}</span>
-                            <span class="text-[10px] text-purple-400 font-bold"><i class="fa-regular fa-calendar mr-1"></i>${fechaFormateada}</span>
-                        </div>
-                        <h4 class="text-xs font-black text-white uppercase tracking-wider mt-2 flex items-center gap-1.5">
-                            <i class="fa-solid fa-crown text-amber-400"></i> Beneficiario: 
-                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-pink-400 to-purple-400">${nombreMostrado.toUpperCase()}</span>
-                        </h4>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-xs font-black text-white">${r.pagados} / ${r.total} <span class="text-[9px] text-emerald-400 font-medium">Pagados</span></span>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function checkClientCreditHistory() {
-            const cliente = document.getElementById('client-name-selector').value;
-            if(!cliente) return;
-            const container = document.getElementById('client-history-result');
-            container.classList.remove('hidden');
-            
-            const misPagos = globalData.pagos.filter(p => (p.cliente || p.cliente_asignado || '') === cliente);
-            if(misPagos.length === 0) {
-                container.innerHTML = `<p class="text-purple-400/60 text-center py-2 font-bold uppercase text-[10px]">Sin movimientos registrados.</p>`;
-                return;
-            }
-
-            let totalPendiente = 0;
-            let listadoHtml = misPagos.map(p => {
-                const esPagado = (p.estado_pago || "").toLowerCase().includes("pagado") || (p.estado_pago || "").includes("🟢");
-                const valorCuota = p.cuota || p.monto || p.monto_cuota || 0;
-                if(!esPagado) totalPendiente += parseFloat(valorCuota);
-                
-                // Corrección de propiedad Ronda para evitar visualizaciones 'Undefined'
-                const nroRondaCorrecto = p.ronda || p.nro_ronda || p.ronda_nro || 1;
-                
-                return `
-                <div class="flex justify-between items-center border-b border-purple-950/40 py-1.5 last:border-0">
-                    <div>
-                        <span class="font-bold text-white uppercase block text-[10px]">${p.id_san || 'Tanda'} - Ronda ${nroRondaCorrecto}</span>
-                        <span class="text-[9px] text-purple-400">${p.fecha ? p.fecha.split('T')[0] : ''}</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="font-black text-[11px] block ${esPagado ? 'text-emerald-400' : 'text-red-400'}">${esPagado ? '🟢 PAGADO' : '🔴 PENDIENTE'}</span>
-                        <span class="text-[10px] text-purple-300 font-bold">$${parseFloat(valorCuota).toFixed(2)}</span>
-                    </div>
-                </div>`;
-            }).join('');
-
-            container.innerHTML = `
-                <div class="border-b border-purple-900/50 pb-2 mb-2 flex justify-between items-center">
-                    <span class="text-purple-300 font-bold uppercase tracking-wider text-[9px]">Resumen de Cuenta:</span>
-                    <span class="font-black text-red-400 text-xs bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20">Deuda: $${totalPendiente.toFixed(2)}</span>
-                </div>
-                <div class="max-h-40 overflow-y-auto space-y-1 pr-1">${listadoHtml}</div>`;
-        }
-
-        function renderAdminPuestos() {
-            const id = document.getElementById('admin-san-selector').value;
-            if(!id) return;
-            const san = globalData.sanes.find(s => (s.id_san || s.id) === id);
-            const container = document.getElementById('admin-puestos-container');
-            
-            document.getElementById('admin-cascada-card').classList.remove('hidden');
-            document.getElementById('admin-cascada-freq').innerText = san.frecuencia || "Semanal";
-            
-            const rMap = {};
-            globalData.pagos.filter(p => (p.id_san || p.id) === id).forEach(p => {
-                const r = parseInt(p.ronda || p.nro_ronda || p.ronda_nro || 1);
-                const bName = p.beneficiario || p.beneficiario_premio || p.beneficiario_del_premio || "";
-                if(!rMap[r]) rMap[r] = { ronda: r, beneficiario: bName, estadoEntrega: p.estado_entrega || "📦 Retención", clientes: [] };
-                rMap[r].clientes.push({
-                    nombre: p.cliente || p.cliente_asignado || "",
-                    status: p.estado_pago || "🔴 Pendiente"
-                });
-            });
-
-            container.innerHTML = Object.values(rMap).sort((a,b) => a.ronda - b.ronda).map(r => {
-                let nombrePremio = (!r.beneficiario || r.beneficiario.toLowerCase().includes("cupo") || r.beneficiario.toLowerCase().includes("cliente") || r.beneficiario.toLowerCase().includes("asignar")) ? "" : r.beneficiario;
-                
-                let clientesHtml = r.clientes.map(c => {
-                    const isPagado = c.status.toLowerCase().includes("pagado") || c.status.includes("🟢");
-                    return `
-                    <div class="bg-[#0c0817] p-2.5 rounded-lg border border-purple-950 flex justify-between items-center gap-2">
-                        <input type="text" value="${c.nombre}" onblur=\"editClienteNombreDirecto('${id}', '${c.nombre}', this.value)\" class="bg-transparent text-white font-bold text-xs p-1 rounded focus:bg-[#1a1133] focus:outline-none flex-1 uppercase">
-                        <button onclick=\"toggleCuotaAsistencia('${id}', ${r.ronda}, '${c.nombre}', '${c.status}', this)\" class="${isPagado ? 'text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-black shadow-md btn-interactive' : 'text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-red-500/10 border-red-500/30 text-red-400 btn-interactive'}">
-                            ${isPagado ? '🟢 Pagó' : '🔴 Pendiente'}
-                        </button>
-                    </div>`;
-                }).join('');
-
-                return `
-                <div class="bg-gradient-to-b from-[#191031] to-[#110a22] p-4 rounded-xl border border-purple-900/40 shadow-lg space-y-3 animate-fade-in">
-                    <div class="flex justify-between items-center border-b border-purple-900/30 pb-2">
-                        <span class="text-xs font-black text-amber-400 tracking-wider">RONDA NRO. ${r.ronda}</span>
-                        <button onclick=\"toggleEstadoEntrega('${id}', ${r.ronda}, '${r.estadoEntrega}', this)\" class="${r.estadoEntrega.toLowerCase().includes('entregado') ? 'text-[9px] font-black uppercase px-3 py-1.5 rounded border bg-gradient-to-r from-pink-500 to-purple-600 border-pink-500 text-white shadow-lg btn-interactive' : 'text-[9px] font-black uppercase px-3 py-1.5 rounded border bg-purple-950/40 border-purple-800 text-purple-400 btn-interactive'}">
-                            ${r.estadoEntrega.toLowerCase().includes('entregado') ? '🏆 Entregado' : '📦 En Almacén'}
-                        </button>
-                    </div>
-                    <div>
-                        <label class="text-[9px] text-purple-400 font-black uppercase block mb-1">Beneficiario del Premio:</label>
-                        <input type="text" value="${nombrePremio}" onblur=\"updateBeneficiario('${id}', ${r.ronda}, this.value)\" placeholder="Por Asignar (Escribir nombre...)" class="w-full bg-[#0c0817] p-2 text-xs text-amber-400 uppercase font-black rounded border border-purple-800/60 focus:border-amber-400 focus:outline-none">
-                    </div>
-                    <div class="space-y-1.5 mt-2">
-                        <label class="text-[9px] text-purple-400 font-black uppercase block">Control de Cuotas del Grupo:</label>
-                        ${clientesHtml}
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        async function toggleCuotaAsistencia(idSan, ronda, cliente, statusActual, btn) {
-            const nuevoEstado = (statusActual.includes("🟢") || statusActual.toLowerCase().includes("pagado")) ? "🔴 Pendiente" : "🟢 Pagado";
-            
-            btn.className = nuevoEstado === "🟢 Pagado" ? 
-                "text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-gradient-to-r from-emerald-500 to-teal-500 border-emerald-600 text-black shadow-md btn-interactive" : 
-                "text-[9px] font-black uppercase px-2.5 py-1.5 rounded border bg-red-500/10 border-red-500/30 text-red-400 btn-interactive";
-            btn.innerText = nuevoEstado === "🟢 Pagado" ? "🟢 Pagó" : "🔴 Pendiente";
-
-            try {
-                await fetch(API_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({ action: "updateCuota", id_san: idSan, ronda: ronda, cliente_paga: cliente, estado_pago: nuevoEstado })
-                });
-                const cached = globalData.pagos.find(p => (p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda && (p.cliente || p.cliente_asignado || '') === cliente);
-                if(cached) cached.estado_pago = nuevoEstado;
-            } catch(e) { console.error(e); }
-        }
-
-        async function editClienteNombreDirecto(idSan, nombreViejo, nombreNuevo) {
-            if(!nombreNuevo || nombreViejo.trim() === nombreNuevo.trim()) return;
-            try {
-                await fetch(API_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({ action: "updateClienteNombre", id_san: idSan, nombre_viejo: nombreViejo, nombre_nuevo: nombreNuevo })
-                });
-                
-                globalData.pagos.forEach(p => {
-                    if((p.id_san || p.id) === idSan) {
-                        if((p.cliente || p.cliente_asignado || '') === nombreViejo) {
-                            p.cliente = nombreNuevo;
-                            p.cliente_asignado = nombreNuevo;
-                        }
-                        if((p.beneficiario || p.beneficiario_premio || '') === nombreViejo) {
-                            p.beneficiario = nombreNuevo;
-                            p.beneficiario_premio = nombreNuevo;
-                        }
-                    }
-                });
-            } catch(e) { console.error(e); }
-        }
-
-        async function updateBeneficiario(idSan, ronda, nuevoNombre) {
-            try {
-                await fetch(API_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, beneficiario: nuevoNombre })
-                });
-                globalData.pagos.forEach(p => {
-                    if((p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda) {
-                        p.beneficiario = nuevoNombre;
-                        p.beneficiario_premio = nuevoNombre;
-                    }
-                });
-            } catch(e) { console.error(e); }
-        }
-
-        async function toggleEstadoEntrega(idSan, ronda, estadoActual, btn) {
-            const nuevoEstado = estadoActual.toLowerCase().includes("entregado") ? "📦 Retención" : "🏆 Entregado";
-            
-            btn.className = nuevoEstado === "🏆 Entregado" ? 
-                "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-gradient-to-r from-pink-500 to-purple-600 border-pink-500 text-white shadow-lg btn-interactive" : 
-                "text-[9px] font-black uppercase px-3 py-1.5 rounded border tracking-widest bg-purple-950/40 border-purple-800 text-purple-400 btn-interactive";
-            btn.innerText = nuevoEstado === "🏆 Entregado" ? "🏆 Entregado" : "📦 En Almacén";
-
-            try {
-                await fetch(API_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    body: JSON.stringify({ action: "updateEntrega", id_san: idSan, ronda: ronda, estado_entrega: nuevoEstado })
-                });
-                globalData.pagos.forEach(p => {
-                    if((p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda) {
-                        p.estado_entrega = nuevoEstado;
-                    }
-                });
-            } catch(e) { console.error(e); }
-        }
-
-        async function deleteCurrentSan() {
-            const id = document.getElementById('admin-san-selector').value;
-            if(!id) return;
-            if(confirm(`⚠️ ¿Eliminar por completo el San [${id}]?`)) {
-                document.getElementById('loading').classList.remove('hidden');
-                await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "deleteSan", id_san: id }) });
-                setTimeout(() => init(), 1500);
-            }
-        }
-
-        async function triggerCascadeFechas() {
-            const id = document.getElementById('admin-san-selector').value;
-            const nuevaFecha = document.getElementById('admin-master-date').value;
-            if(!nuevaFecha) return alert("Seleccione la fecha inicial.");
-            document.getElementById('loading').classList.remove('hidden');
-            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "recascadeFechas", id_san: id, fecha_inicio: nuevaFecha }) });
-            setTimeout(() => init(), 1500);
-        }
-
-        async function submitAddSan() {
-            const id = document.getElementById('new-san-id').value.toUpperCase().trim();
-            const name = document.getElementById('new-san-name').value;
-            const cuota = document.getElementById('new-san-cuota').value;
-            const freq = document.getElementById('new-san-freq').value;
-            const total = document.getElementById('new-san-total').value;
-            const fInicio = document.getElementById('new-san-date').value;
-            if(!id || !name || !cuota || !fInicio) return alert("Complete los datos.");
-            document.getElementById('loading').classList.remove('hidden');
-            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "addSan", id_san: id, nombre_san: name, cuota: cuota, frecuencia: freq, total_puestos: total, fecha_inicio: fInicio }) });
-            setTimeout(() => init(), 1800);
-        }
-
-        async function submitAddOferta() {
-            const prod = document.getElementById('new-of-prod').value;
-            const price = document.getElementById('new-of-price').value;
-            const disp = document.getElementById('new-of-disp').value;
-            const desc = document.getElementById('new-of-desc').value;
-            const img = document.getElementById('new-of-img').value;
-            if(!prod || !price || !disp) return alert("Complete campos.");
-            document.getElementById('loading').classList.remove('hidden');
-            await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({ action: "addOferta", producto: prod, precio_oferta: price, descripcion: desc, disponibilidad: disp, imgUrl: img }) });
-            setTimeout(() => init(), 1500);
-        }
-
-        function renderOfertas() {
-            const container = document.getElementById('section-ofertas');
-            if (!globalData.ofertas || globalData.ofertas.length === 0) {
-                container.innerHTML = `<p class="text-xs text-purple-400/40 text-center py-12 font-bold uppercase">Sin promociones de momento.</p>`;
-                return;
-            }
-            container.innerHTML = globalData.ofertas.map((o, idx) => {
-                const img = o.imgurl ? o.imgurl : 'https://images.unsplash.com/photo-1601524909162-be87252be298?auto=format&fit=crop&w=300&q=80';
-                const precioOferta = o.precio_oferta || o.precio || 0;
-                
-                return `
-                    <div class="bg-[#170f2c] rounded-2xl border border-purple-900/30 overflow-hidden flex flex-col justify-between shadow-lg animate-fade-in hover:border-pink-500/30 transition-all duration-300" style="animation-delay: ${idx * 0.05}s">
-                        <div class="p-4 flex space-x-4">
-                            <img src="${img}" class="w-16 h-16 object-cover rounded-xl bg-purple-950 border border-purple-900/40 transform hover:scale-110 transition-transform duration-300">
-                            <div class="flex-1 min-w-0">
-                                <span class="text-[8px] font-black text-amber-400 uppercase block mb-0.5">${o.disponibilidad || 'Disponible'}</span>
-                                <h4 class="text-xs font-black text-white truncate uppercase tracking-wider">${o.producto || 'Artículo'}</h4>
-                                <p class="text-[11px] text-purple-300/70 line-clamp-2 mt-0.5 font-medium">${o.descripcion || ''}</p>
-                            </div>
-                        </div>
-                        <div class="bg-[#120b24]/60 px-4 py-3 border-t border-purple-900/20 flex items-center justify-between">
-                            <span class="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-400">$${parseFloat(precioOferta).toFixed(2)}</span>
-                            <button onclick=\"orderViaWhatsApp('${o.producto}', '${precioOferta}')\" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-black text-[10px] py-2 px-4 rounded-lg uppercase tracking-widest shadow-md btn-interactive">Pedir</button>
-                        </div>
-                    </div>`;
-            }).join('');
-        }
-
-        function orderViaWhatsApp(name, price) {
-            const message = encodeURIComponent("¡Hola! Me interesa apartar:\n\n📦 *Producto:* " + name + "\n💰 *Precio:* $" + parseFloat(price).toFixed(2));
-            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
-        }
-
-        init();
-    </script>
 </body>
+
 </html>
