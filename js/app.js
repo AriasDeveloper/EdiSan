@@ -280,10 +280,29 @@ function renderInitialViews() {
         cache.data.sanes.length
     ) {
 
-        renderSanDetails(
+        const firstSan =
             cache.data.sanes[0]
-                .id_san
+                .id_san;
+
+        renderSanDetails(
+            firstSan
         );
+
+        renderAdminSan(
+            firstSan
+        );
+
+        const adminSelector =
+            document.getElementById(
+                "admin-san-selector"
+            );
+
+        if (adminSelector) {
+
+            adminSelector.value =
+                firstSan;
+
+        }
 
     }
 
