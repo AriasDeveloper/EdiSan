@@ -207,7 +207,6 @@
             document.getElementById(id).classList.toggle('hidden');
         }
 
-        // SOLUCIÓN AL CAMBIO DE PESTAÑAS Y REFRESCADO DE VISTAS
         function switchTab(tab) {
             ['sanes', 'ofertas', 'admin'].forEach(t => {
                 if(document.getElementById(`section-${t}`)) document.getElementById(`section-${t}`).classList.add('hidden');
@@ -230,9 +229,20 @@
             document.getElementById('san-selector').innerHTML = options;
             document.getElementById('admin-san-selector').innerHTML = options;
             
-            // SOLUCIÓN DE NOMBRES: Unifica propiedades redundantes para armar la lista limpia de clientes
-            const clientesUnicos = [...new Set(globalData.pagos.map(p => p.cliente || p.cliente_asignado).filter(Boolean))].sort();
-            document.getElementById('client-name-selector').innerHTML = clientesUnicos.map(c => `<option value="${c}">${c}</option>`).join('');
+            // FILTRADO ABSOLUTO DE DUPLICADOS EN EL SELECTOR DE CLIENTES PARTICULAR
+            const todosLosClientes = globalData.pagos.map(p => (p.cliente || p.cliente_asignado || '').trim()).filter(Boolean);
+            const clientesUnicos = [];
+            const registroMinusculas = new Set();
+            
+            todosLosClientes.forEach(c => {
+                if (!registroMinusculas.has(c.toLowerCase()) && !c.toLowerCase().includes("cliente") && !c.toLowerCase().includes("cupo")) {
+                    registroMinusculas.add(c.toLowerCase());
+                    clientesUnicos.push(c);
+                }
+            });
+            
+            clientesUnicos.sort();
+            document.getElementById('client-name-selector').innerHTML = clientesUnicos.map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join('');
             
             renderSanDetails();
         }
@@ -249,23 +259,45 @@
             
             document.getElementById('detail-san-name').innerText = san.nombre_san || san.nombre;
             
-            // SOLUCIÓN DE PRECIOS EN EL CLIENTE: Búsqueda flexible con fallbacks integrados
-            const montoCuota = san.cuota || san.monto || 0;
+            // SOPORTE DE CONTEXTO CONTRA $0.00: Busca en propiedades o extrae el valor desde los pagos vigentes
+            let montoCuota = san.cuota || san.monto || san.monto_cuota || 0;
+            if (!montoCuota || parseFloat(montoCuota) === 0) {
+                const unPagoAsociado = globalData.pagos.find(p => (p.id_san || p.id) === id);
+                if (unPagoAsociado) {
+                    montoCuota = unPagoAsociado.cuota || unPagoAsociado.monto || unPagoAsociado.monto_cuota || 0;
+                }
+            }
             document.getElementById('detail-san-cuota').innerText = `$${parseFloat(montoCuota).toFixed(2)}`;
             document.getElementById('detail-san-frecuencia').innerText = san.frecuencia || "Semanal";
 
             const rMap = {};
             globalData.pagos.filter(p => (p.id_san || p.id) === id).forEach(p => {
-                const r = parseInt(p.ronda || 1);
-                const beneficiarioNombre = p.beneficiario || p.beneficiario_premio || "Por Asignar";
-                if(!rMap[r]) rMap[r] = { ronda: r, fecha: p.fecha, beneficiario: beneficiarioNombre, total: 0, pagados: 0 };
+                const r = parseInt(p.ronda || p.nro_ronda || p.ronda_nro || 1);
+                const beneficiarioNombre = p.beneficiario || p.beneficiario_premio || p.beneficiario_del_premio || "";
+                const clienteNombre = p.cliente || p.cliente_asignado || "";
+                
+                if(!rMap[r]) rMap[r] = { ronda: r, fecha: p.fecha, beneficiario: beneficiarioNombre, total: 0, pagados: 0, listaClientes: [] };
                 rMap[r].total++;
+                if(clienteNombre) rMap[r].listaClientes.push(clienteNombre);
+                
                 const est = (p.estado_pago || "").toLowerCase();
                 if(est.includes("pagado") || est.includes("pagó") || est.includes("🟢")) rMap[r].pagados++;
             });
 
             document.getElementById('client-puestos-container').innerHTML = Object.values(rMap).sort((a,b) => a.ronda - b.ronda).map(r => {
-                let nombreMostrado = (!r.beneficiario || r.beneficiario.toLowerCase().includes("cupo") || r.beneficiario.toLowerCase().includes("cliente")) ? "Por Asignar" : r.beneficiario;
+                // ASIGNACIÓN AUTOMÁTICA DEL BENEFICIARIO CORRESPONDIENTE A LA POSICIÓN DE LA RONDA
+                let nombreMostrado = "Por Asignar";
+                if (r.beneficiario && !r.beneficiario.toLowerCase().includes("asignar") && !r.beneficiario.toLowerCase().includes("cliente") && !r.beneficiario.toLowerCase().includes("cupo")) {
+                    nombreMostrado = r.beneficiario;
+                } else {
+                    if (r.listaClientes && r.listaClientes[r.ronda - 1]) {
+                        nombreMostrado = r.listaClientes[r.ronda - 1];
+                    }
+                }
+                if (nombreMostrado.toLowerCase().includes("cliente") || nombreMostrado.toLowerCase().includes("cupo")) {
+                    nombreMostrado = "Por Asignar";
+                }
+                
                 let fechaFormateada = r.fecha ? r.fecha.split('T')[0] : '---';
                 return `
                 <div class="bg-[#170f2c] border border-purple-900/40 rounded-xl p-4 flex justify-between items-center shadow-md">
@@ -276,11 +308,10 @@
                         </div>
                         <h4 class="text-xs font-black text-white uppercase tracking-wider mt-2 flex items-center gap-1.5">
                             <i class="fa-solid fa-crown text-amber-400"></i> Beneficiario: 
-                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-pink-400 to-purple-400">${nombreMostrado}</span>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-pink-400 to-purple-400">${nombreMostrado.toUpperCase()}</span>
                         </h4>
                     </div>
                     <div class="text-right">
-                        <span class="text-[9px] font-black uppercase block tracking-wider text-purple-400">Recaudado</span>
                         <span class="text-xs font-black text-white">${r.pagados} / ${r.total} <span class="text-[9px] text-emerald-400 font-medium">Pagados</span></span>
                     </div>
                 </div>`;
@@ -302,12 +333,16 @@
             let totalPendiente = 0;
             let listadoHtml = misPagos.map(p => {
                 const esPagado = (p.estado_pago || "").toLowerCase().includes("pagado") || (p.estado_pago || "").includes("🟢");
-                const valorCuota = p.cuota || p.monto || 0;
+                const valorCuota = p.cuota || p.monto || p.monto_cuota || 0;
                 if(!esPagado) totalPendiente += parseFloat(valorCuota);
+                
+                // Corrección de propiedad Ronda para evitar visualizaciones 'Undefined'
+                const nroRondaCorrecto = p.ronda || p.nro_ronda || p.ronda_nro || 1;
+                
                 return `
                 <div class="flex justify-between items-center border-b border-purple-950/40 py-1.5 last:border-0">
                     <div>
-                        <span class="font-bold text-white uppercase block text-[10px]">${p.id_san || 'Tanda'} - Ronda ${p.ronda}</span>
+                        <span class="font-bold text-white uppercase block text-[10px]">${p.id_san || 'Tanda'} - Ronda ${nroRondaCorrecto}</span>
                         <span class="text-[9px] text-purple-400">${p.fecha ? p.fecha.split('T')[0] : ''}</span>
                     </div>
                     <div class="text-right">
@@ -336,8 +371,8 @@
             
             const rMap = {};
             globalData.pagos.filter(p => (p.id_san || p.id) === id).forEach(p => {
-                const r = parseInt(p.ronda || 1);
-                const bName = p.beneficiario || p.beneficiario_premio || "";
+                const r = parseInt(p.ronda || p.nro_ronda || p.ronda_nro || 1);
+                const bName = p.beneficiario || p.beneficiario_premio || p.beneficiario_del_premio || "";
                 if(!rMap[r]) rMap[r] = { ronda: r, beneficiario: bName, estadoEntrega: p.estado_entrega || "📦 Retención", clientes: [] };
                 rMap[r].clientes.push({
                     nombre: p.cliente || p.cliente_asignado || "",
@@ -346,7 +381,7 @@
             });
 
             container.innerHTML = Object.values(rMap).sort((a,b) => a.ronda - b.ronda).map(r => {
-                let nombrePremio = (!r.beneficiario || r.beneficiario.toLowerCase().includes("cupo") || r.beneficiario.toLowerCase().includes("cliente")) ? "" : r.beneficiario;
+                let nombrePremio = (!r.beneficiario || r.beneficiario.toLowerCase().includes("cupo") || r.beneficiario.toLowerCase().includes("cliente") || r.beneficiario.toLowerCase().includes("asignar")) ? "" : r.beneficiario;
                 
                 let clientesHtml = r.clientes.map(c => {
                     const isPagado = c.status.toLowerCase().includes("pagado") || c.status.includes("🟢");
@@ -393,13 +428,11 @@
                     mode: "no-cors",
                     body: JSON.stringify({ action: "updateCuota", id_san: idSan, ronda: ronda, cliente_paga: cliente, estado_pago: nuevoEstado })
                 });
-                // SOLUCIÓN CACHÉ: Apunta correctamente a las propiedades unificadas
                 const cached = globalData.pagos.find(p => (p.id_san || p.id) === idSan && parseInt(p.ronda || 1) === ronda && (p.cliente || p.cliente_asignado || '') === cliente);
                 if(cached) cached.estado_pago = nuevoEstado;
             } catch(e) { console.error(e); }
         }
 
-        // SOLUCIÓN DEFINICIÓN Y ACTUALIZACIÓN EN VIVO DE NOMBRES DE CLIENTES
         async function editClienteNombreDirecto(idSan, nombreViejo, nombreNuevo) {
             if(!nombreNuevo || nombreViejo.trim() === nombreNuevo.trim()) return;
             try {
@@ -409,7 +442,6 @@
                     body: JSON.stringify({ action: "updateClienteNombre", id_san: idSan, nombre_viejo: nombreViejo, nombre_nuevo: nombreNuevo })
                 });
                 
-                // Actualiza dinámicamente todo el caché local de la memoria sin tener que recargar
                 globalData.pagos.forEach(p => {
                     if((p.id_san || p.id) === idSan) {
                         if((p.cliente || p.cliente_asignado || '') === nombreViejo) {
@@ -515,8 +547,6 @@
             }
             container.innerHTML = globalData.ofertas.map((o, idx) => {
                 const img = o.imgurl ? o.imgurl : 'https://images.unsplash.com/photo-1601524909162-be87252be298?auto=format&fit=crop&w=300&q=80';
-                
-                // SOLUCIÓN DE PRECIOS EN OFERTAS: Tolerancia automática de columnas
                 const precioOferta = o.precio_oferta || o.precio || 0;
                 
                 return `
