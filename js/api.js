@@ -103,31 +103,22 @@ export async function postAction(
 
     try {
 
+        const formData =
+            new FormData();
+
+        formData.append(
+            "data",
+            JSON.stringify(payload)
+        );
+
         const response =
             await fetchWithTimeout(
                 CONFIG.API_URL,
                 {
                     method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    body:
-                        JSON.stringify(
-                            payload
-                        )
+                    body: formData
                 }
             );
-
-        if (!response.ok) {
-
-            throw new Error(
-                `HTTP ${response.status}`
-            );
-
-        }
 
         const result =
             await response.json();
