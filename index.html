@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDISAN - Sistema Premium de Gestión de San</title>
+    <title>EDISAN - Panel de Gestión</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 </head>
@@ -20,144 +20,172 @@
         
         <nav class="role-selector">
             <button id="btn-vista-cliente" class="nav-btn active">
-                <span class="material-icons-round">person</span> Vista Cliente
+                <span class="material-icons-round">person</span> Clientes
             </button>
             <button id="btn-vista-admin" class="nav-btn">
-                <span class="material-icons-round">admin_panel_settings</span> Panel Admin
+                <span class="material-icons-round">admin_panel_settings</span> Administrador
             </button>
         </nav>
 
         <div class="sync-status" id="sheets-sync-indicator">
-            <span class="material-icons-round icon-spin">sync</span>
-            <span class="sync-text">Conectado a Sheets</span>
+            <span class="material-icons-round" id="sync-icon">sync</span>
+            <span id="sync-text">Cargando Sistema...</span>
         </div>
     </header>
 
     <main class="app-container">
 
         <section id="seccion-cliente" class="view-section view-active">
-            <div class="welcome-card glass-card">
-                <h2>Bienvenido a tu panel de ahorro</h2>
-                <p>Monitorea tus turnos, cuotas pendientes y descubre nuevas oportunidades de inversión.</p>
+            
+            <div id="cliente-vista-publica">
+                <div class="welcome-card glass-card">
+                    <h2>Sanes Disponibles de Ahorro Colectivo</h2>
+                    <p>Inicia sesión con tus credenciales asignadas para ver tus puestos privados, chequear estados de cuenta o subir tus recibos de pago.</p>
+                    <button id="btn-ir-a-login" class="btn-primary" style="margin-top: 15px;">
+                        <span class="material-icons-round">login</span> Acceder a mi Cuenta Privada
+                    </button>
+                </div>
+                
+                <div class="glass-card full-width">
+                    <h3><span class="material-icons-round">local_fire_department</span> Grupos Abiertos Actualmente</h3>
+                    <div id="contenedor-ofertas-publicas" class="cards-ofertas-grid"></div>
+                </div>
             </div>
 
-            <div class="grid-cliente">
-                <div class="glass-card status-san-box">
-                    <h3><span class="material-icons-round">account_balance_wallet</span> Mi San Activo</h3>
-                    <div id="cliente-san-progreso" class="progreso-container">
-                        <p class="placeholder-text">Cargando la línea de tiempo de tus turnos...</p>
+            <div id="cliente-vista-privada" class="oculto">
+                <div class="welcome-card glass-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2 id="txt-bienvenida-cliente">Bienvenido</h2>
+                        <p>Monitorea y reporta las cuotas de tus turnos.</p>
                     </div>
-                </div>
-
-                <div class="glass-card cuotas-box">
-                    <h3><span class="material-icons-round">calendar_month</span> Mis Cuotas y Fechas</h3>
-                    <div class="table-responsive">
-                        <table class="premium-table">
-                            <thead>
-                                <tr>
-                                    <th>Turno / Mes</th>
-                                    <th>Monto</th>
-                                    <th>Fecha Límite</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-cuotas-cliente">
-                                </tbody>
-                        </table>
-                    </div>
-                    <button id="btn-reportar-pago" class="btn-primary ripple">
-                        <span class="material-icons-round">upload_file</span> Reportar Pago
+                    <button id="btn-logout-cliente" class="btn-secondary">
+                        <span class="material-icons-round">logout</span> Salir
                     </button>
                 </div>
 
-                <div class="glass-card ofertas-box full-width">
-                    <h3><span class="material-icons-round">local_fire_department</span> Nuevos Sanes Disponibles</h3>
-                    <div id="contenedor-ofertas" class="cards-ofertas-grid">
+                <div class="grid-cliente">
+                    <div class="glass-card">
+                        <h3><span class="material-icons-round">account_balance_wallet</span> Resumen de mis Puestos</h3>
+                        <div id="tabla-puestos-inscritos" class="table-responsive">
+                            </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <h3><span class="material-icons-round">calendar_month</span> Reportar Cuota Pendiente</h3>
+                        <p style="font-size: 0.85rem; color: var(--texto-secundario); margin-bottom: 15px;">Selecciona uno de tus puestos pendientes para adjuntar tu comprobante de pago.</p>
+                        <div class="table-responsive">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th>San / Turno</th>
+                                        <th>Monto</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lista-cuotas-pagar"></tbody>
+                            </table>
                         </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <section id="seccion-admin" class="view-section">
-            <div class="admin-dashboard-grid">
-                
-                <div class="glass-card formal-box animate-fade-in">
-                    <div class="card-header">
-                        <span class="material-icons-round card-icon-purple">add_box</span>
-                        <h3>Crear y Configurar Nuevo San</h3>
-                    </div>
-                    <form id="form-crear-san" class="premium-form">
-                        <div class="form-group">
-                            <label for="san-nombre">Nombre identificador</label>
-                            <input type="text" id="san-nombre" placeholder="Ej. San Oro Julio" required>
-                        </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 1.5rem; overflow-x: auto; padding-bottom: 5px;">
+                <button id="tab-admin-sanes" class="btn-primary">Gestionar Sanes</button>
+                <button id="tab-admin-clientes" class="btn-secondary">Clientes y Claves</button>
+                <button id="tab-admin-puestos" class="btn-secondary">Asignar Puestos</button>
+            </div>
+
+            <div id="sub-panel-sanes" class="admin-dashboard-grid">
+                <div class="glass-card">
+                    <h3>Crear Nuevo San</h3>
+                    <form id="form-crear-san" class="premium-form" style="margin-top:1rem;">
+                        <div class="form-group"><label>Nombre del San</label><input type="text" id="san-nombre" placeholder="Ej. San Oro Agosto" required></div>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label for="san-monto">Monto de la Cuota ($)</label>
-                                <input type="number" id="san-monto" placeholder="50" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="san-turnos">Total de Turnos</label>
-                                <input type="number" id="san-turnos" placeholder="12" required>
-                            </div>
+                            <div class="form-group"><label>Monto Cuota ($)</label><input type="number" id="san-monto" required></div>
+                            <div class="form-group"><label>Total Turnos</label><input type="number" id="san-turnos" required></div>
                         </div>
-                        <div class="form-group">
-                            <label for="san-fecha">Fecha de Primer Pago</label>
-                            <input type="date" id="san-fecha" required>
-                        </div>
-                        <button type="submit" class="btn-admin-submit gold-glow">
-                            <span class="material-icons-round">rocket_launch</span> Lanzar Nuevo San
-                        </button>
+                        <button type="submit" class="btn-admin-submit">Lanzar San</button>
                     </form>
                 </div>
 
-                <div class="glass-card control-box">
-                    <div class="card-header">
-                        <span class="material-icons-round card-icon-gold">tune</span>
-                        <h3>Asignación de Clientes y Turnos</h3>
-                    </div>
-                    <div id="admin-interactive-setup">
-                        <p class="placeholder-text">Selecciona o crea un San arriba para empezar a distribuir turnos.</p>
-                    </div>
-                </div>
-
-                <div class="glass-card control-pagos-box full-width">
-                    <div class="card-header header-space">
-                        <h3><span class="material-icons-round">analytics</span> Monitor Global de Recaudación</h3>
-                        <button id="btn-forzar-sync" class="btn-secondary">
-                            <span class="material-icons-round">cloud_sync</span> Sincronizar Google Sheets
-                        </button>
-                    </div>
+                <div class="glass-card">
+                    <h3>Sanes Activos e Historial</h3>
                     <div class="table-responsive">
-                        <table class="premium-table admin-table">
+                        <table class="premium-table">
                             <thead>
-                                <tr>
-                                    <th>Edisan Grupo</th>
-                                    <th>Progreso Cobros</th>
-                                    <th>Cuotas Atrasadas</th>
-                                    <th>Fecha de Inicio</th>
-                                    <th>Acciones</th>
-                                </tr>
+                                <tr><th>Nombre</th><th>Cuota</th><th>Turnos</th><th>Acción</th></tr>
                             </thead>
-                            <tbody id="tabla-control-global">
-                                </tbody>
+                            <tbody id="lista-admin-sanes-tabla"></tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
-        </section>
 
+            <div id="sub-panel-clientes" class="admin-dashboard-grid oculto">
+                <div class="glass-card">
+                    <h3>Registrar Nuevo Cliente</h3>
+                    <form id="form-crear-cliente" class="premium-form" style="margin-top:1rem;">
+                        <div class="form-group"><label>Nombre Completo</label><input type="text" id="cli-nombre" required></div>
+                        <div class="form-group"><label>Teléfono</label><input type="text" id="cli-telefono" placeholder="+58..." required></div>
+                        <div class="form-group"><label>Contraseña de Acceso</label><input type="text" id="cli-pass" placeholder="Clave123" required></div>
+                        <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Guardar Cliente</button>
+                    </form>
+                </div>
+                <div class="glass-card">
+                    <h3>Directorio de Clientes</h3>
+                    <div class="table-responsive">
+                        <table class="premium-table">
+                            <thead><tr><th>ID</th><th>Nombre</th><th>Clave</th></tr></thead>
+                            <tbody id="lista-admin-clientes-tabla"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sub-panel-puestos" class="glass-card full-width oculto">
+                <h3>Control de Puestos y Validar Recibos</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div class="premium-form">
+                        <label>Seleccionar San para Asignar puesto:</label>
+                        <select id="sel-puesto-san"></select>
+                    </div>
+                    <div class="premium-form">
+                        <label>Seleccionar Cliente:</label>
+                        <select id="sel-puesto-cliente"></select>
+                    </div>
+                    <div class="premium-form">
+                        <label>Número de Turno:</label>
+                        <input type="number" id="num-puesto-turno" placeholder="Ej. 5">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button id="btn-guardar-puesto" class="btn-primary" style="width: 100%; justify-content: center;">Asignar Puesto</button>
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 2rem; color: var(--oro-brillante);">Matriz de Control de Pagos Global</h4>
+                <div class="table-responsive">
+                    <table class="premium-table">
+                        <thead>
+                            <tr><th>San</th><th>Cliente</th><th>Turno</th><th>Estado</th><th>Comprobante</th><th>Acción</th></tr>
+                        </thead>
+                        <tbody id="tabla-admin-pagos-global"></tbody>
+                    </div>
+                </div>
+            </div>
+
+        </section>
     </main>
 
     <div id="modal-premium" class="modal-overlay">
-        <div class="modal-content glass-card animate-scale-up">
+        <div class="modal-content glass-card">
             <div class="modal-header">
-                <h4 id="modal-titulo">Reportar Pago</h4>
+                <h3 id="modal-titulo">Título</h3>
                 <button id="btn-cerrar-modal" class="close-modal-btn">&times;</button>
             </div>
-            <div class="modal-body" id="modal-cuerpo">
-                </div>
+            <div class="modal-body" id="modal-cuerpo" style="margin-top:15px;"></div>
         </div>
     </div>
 
