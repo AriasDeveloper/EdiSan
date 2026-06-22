@@ -86,6 +86,7 @@
                         <div class="form-row">
                             <div class="form-group"><label>Monto Cuota ($)</label><input type="number" id="san-monto" required></div>
                             <div class="form-group"><label>Total Turnos Max</label><input type="number" id="san-turnos" required></div>
+                            <div class="form-group"><label>Fecha de Cobro General</label><input type="date" id="san-fecha-inicio" required></div>
                         </div>
                         <div class="form-group">
                             <label>Ciclo de Rotación</label>
@@ -121,15 +122,15 @@
             </div>
 
             <div id="sub-panel-puestos" class="glass-card full-width oculto">
-                <h3>Asignación de Puestos Manual y Matriz de Control</h3>
-                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-top:1rem;">
-                    <div class="premium-form"><label>Grupo:</label><select id="sel-puesto-san"></select></div>
-                    <div class="premium-form"><label>Cliente:</label><select id="sel-puesto-cliente"></select></div>
-                    <div class="premium-form"><label>Turno:</label><input type="number" id="num-puesto-turno"></div>
-                    <div class="premium-form"><label>Fecha Límite Cobro:</label><input type="date" id="date-puesto-limite"></div>
-                    <div style="display:flex; align-items:flex-end;"><button id="btn-guardar-puesto" class="btn-primary" style="width:100%; justify-content:center;">Asignar</button></div>
+                <h3>Control de Puestos y Validar Recibos</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div class="premium-form"><label>Seleccionar San:</label><select id="sel-puesto-san"></select></div>
+                    <div class="premium-form"><label>Seleccionar Cliente:</label><select id="sel-puesto-cliente"></select></div>
+                    <div class="premium-form"><label>Número de Turno Disponible:</label><select id="num-puesto-turno"></select></div>
+                    <div style="display: flex; align-items: flex-end;"><button id="btn-guardar-puesto" class="btn-primary" style="width: 100%; justify-content: center;">Asignar Puesto</button></div>
                 </div>
-                <div class="table-responsive" style="margin-top:2rem;"><table class="premium-table"><thead><tr><th>San</th><th>Cliente</th><th>Turno</th><th>Vencimiento</th><th>Estado</th><th>Comprobante</th><th>Validar</th></tr></thead><tbody id="tabla-admin-pagos-global"></tbody></table></div>
+                <h4 style="margin-top: 2rem; color: var(--oro-brillante);">Matriz de Control de Pagos Global</h4>
+                <div class="table-responsive"><table class="premium-table"><thead><tr><th>San</th><th>Cliente</th><th>Turno</th><th>Fecha Cobro</th><th>Estado</th><th>Comprobante</th><th>Acción</th></tr></thead><tbody id="tabla-admin-pagos-global"></tbody></table></div>
             </div>
 
             <div id="sub-panel-solicitudes" class="admin-dashboard-grid oculto">
