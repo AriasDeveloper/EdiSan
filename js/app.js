@@ -372,18 +372,39 @@ function inicializarFormularios() {
 }
 
 function inicializarNavegacionSecreta() {
-    document.getElementById('btn-llave-admin').onclick = () => {
-        const pass = prompt("Clave Maestra:");
+    const btnLlaveAdmin = document.getElementById('btn-llave-admin');
+    const seccionAdmin = document.getElementById('seccion-admin');
+    const seccionCliente = document.getElementById('seccion-cliente');
+    const btnCerrarAdmin = document.getElementById('btn-cerrar-admin');
+
+    btnLlaveAdmin.onclick = () => {
+        const pass = prompt("Clave Maestra de Administrador:");
         if (pass === ADMIN_CONFIG.CLAVE_ACCESO) {
-            document.getElementById('seccion-cliente').classList.remove('view-active');
-            document.getElementById('seccion-admin').add('view-active');
+            seccionCliente.classList.remove('view-active');
+            seccionAdmin.classList.add('view-active'); // <-- Corregido .classList.add
+            
+            // Forzamos el renderizado inmediato de los datos de la administración
+            renderizarAdminTodo(); 
+            mostrarToast("Acceso de administrador verificado", "success");
+        } else if (pass !== null) {
+            mostrarToast("Clave incorrecta", "error");
         }
     };
-    document.getElementById('btn-cerrar-admin').onclick = () => {
-        document.getElementById('seccion-admin').classList.remove('view-active');
-        document.getElementById('seccion-cliente').classList.add('view-active');
+
+    btnCerrarAdmin.onclick = () => {
+        seccionAdmin.classList.remove('view-active');
+        seccionCliente.classList.add('view-active');
     };
+
+    // Asegurar los flujos del Login del Cliente
     document.getElementById('btn-ir-a-login').onclick = () => abrirModalLoginCliente();
+    
+    document.getElementById('btn-logout-cliente').onclick = () => {
+        clienteLogueado = null;
+        document.getElementById('cliente-vista-privada').classList.add('oculto');
+        document.getElementById('cliente-vista-publica').classList.remove('oculto');
+        mostrarToast("Sesión de cliente cerrada", "info");
+    };
 }
 
 function inicializarTabsAdmin() {
