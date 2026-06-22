@@ -1,197 +1,104 @@
-/* ==========================================================================
-   1. VARIABLES GLOBALES Y PALETA PREMIUM (Morado & Oro)
-   ========================================================================== */
 :root {
-    --bg-principal: #0b071e;       
-    --bg-gradiente: linear-gradient(135deg, #0b071e 0%, #1a0f3c 50%, #0d0626 100%);
-    --bg-cristal: rgba(25, 15, 50, 0.45);  
-    --borde-cristal: rgba(147, 51, 234, 0.2); 
-    
+    --bg-principal: #070414;       
+    --bg-gradiente: linear-gradient(135deg, #070414 0%, #160b35 50%, #0a041c 100%);
+    --bg-cristal: rgba(20, 12, 44, 0.5);  
+    --borde-cristal: rgba(147, 51, 234, 0.25); 
     --morado-premium: #9333ea;    
     --morado-brillante: #c084fc;  
     --oro-premium: #f59e0b;       
     --oro-brillante: #fbbf24;
-    
     --color-pagado: #10b981;      
     --color-pendiente: #f59e0b;   
     --color-atrasado: #ef4444;    
-    
     --texto-principal: #f3f4f6;
     --texto-secundario: #a78bfa;   
-    --sombra-premium: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-    --curva-animacion: cubic-bezier(0.4, 0, 0.2, 1);
+    --sombra-premium: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
 }
 
-/* ==========================================================================
-   2. RESETS Y CONFIGURACIÓN RESPONSIVA (Evita recortes en móvil)
-   ========================================================================== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Roboto, sans-serif;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+body { background: var(--bg-gradiente); color: var(--texto-principal); min-height: 100vh; overflow-x: hidden; }
+.app-container { padding: 1.5rem; max-width: 1400px; margin: 0 auto; }
 
-body {
-    background: var(--bg-gradiente);
-    color: var(--texto-principal);
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-}
-
-.background-glow {
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, rgba(0,0,0,0) 70%);
-    top: -10%;
-    right: -10%;
-    z-index: -1;
-    pointer-events: none;
-}
-
-.app-container {
-    padding: 1rem; /* Margen adaptivo */
-    max-width: 1400px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-}
-
-@media (min-width: 768px) {
-    .app-container { padding: 2rem; }
-}
-
-/* ==========================================================================
-   3. ESTILO GLASSMORPHISM (Tarjetas de Cristal)
-   ========================================================================== */
+/* Efecto de Vidrio de Alta Fidelidad */
 .glass-card {
     background: var(--bg-cristal);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--borde-cristal);
     border-radius: 16px;
-    padding: 1.25rem;
+    padding: 1.5rem;
     box-shadow: var(--sombra-premium);
-    transition: transform 0.4s var(--curva-animacion), border-color 0.4s var(--curva-animacion);
 }
 
-.glass-card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(192, 132, 252, 0.4);
-}
-
-/* ==========================================================================
-   4. HEADER Y RECAUDACIÓN
-   ========================================================================== */
 .main-header {
-    background: rgba(11, 7, 30, 0.85);
-    backdrop-filter: blur(20px);
+    background: rgba(7, 4, 20, 0.8);
+    backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--borde-cristal);
-    padding: 1rem;
+    padding: 1rem 2rem;
     display: flex;
-    flex-direction: column; /* Apilado en móvil */
-    gap: 1rem;
+    justify-content: space-between;
     align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+}
+#btn-llave-admin { background: transparent; border: none; color: rgba(255,255,255,0.12); cursor: pointer; transition: color 0.3s; }
+#btn-llave-admin:hover { color: var(--morado-brillante); }
+
+/* Pantalla de Carga de Cristal Líquido (Punto 6) */
+.sub-blur {
+    background: rgba(5, 3, 15, 0.4) !important;
+    backdrop-filter: blur(35px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(35px) saturate(180%) !important;
+}
+.loader-content {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2.5rem;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: var(--sombra-premium);
+}
+.spinner-premium {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(147, 51, 234, 0.1);
+    border-top-color: var(--morado-brillante);
+    border-radius: 50%;
+    margin: 0 auto 1.5rem auto;
+    animation: rotar 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }
 
-@media (min-width: 768px) {
-    .main-header {
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 1rem 2rem;
-    }
-}
+.table-responsive { width: 100%; overflow-x: auto; margin-top: 1rem; }
+.premium-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+.premium-table th { padding: 12px; color: var(--texto-secundario); font-size: 0.8rem; border-bottom: 1px solid var(--borde-cristal); text-transform: uppercase; }
+.premium-table td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.9rem; }
 
-.logo-area { display: flex; align-items: center; gap: 0.5rem; }
-.brand-icon { color: var(--morado-brillante); font-size: 2rem; }
-.logo-area h1 { font-size: 1.4rem; font-weight: 800; color: #fff; }
-.badge-premium { font-size: 0.65rem; background: linear-gradient(90deg, var(--oro-premium), var(--oro-brillante)); color: #000; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+.btn-primary { background: linear-gradient(135deg, var(--morado-premium), #5b21b6); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; }
+.btn-secondary { background: rgba(255,255,255,0.06); color: white; padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+.btn-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+.btn-danger:hover { background: rgba(239, 68, 68, 0.3); }
+.btn-admin-submit { background: linear-gradient(135deg, var(--oro-premium), #b45309); color: #070414; font-weight: 700; width: 100%; padding: 12px; border-radius: 8px; border: none; cursor: pointer; }
 
-.role-selector { background: rgba(0, 0, 0, 0.3); padding: 4px; border-radius: 30px; display: flex; border: 1px solid rgba(255, 255, 255, 0.05); }
-.nav-btn { background: transparent; border: none; color: var(--texto-secundario); padding: 6px 16px; border-radius: 25px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
-.nav-btn.active { background: var(--morado-premium); color: var(--texto-principal); box-shadow: 0 0 15px rgba(147, 51, 234, 0.5); }
+.premium-form .form-group { margin-bottom: 1.25rem; }
+.premium-form label { display: block; color: var(--texto-secundario); font-size: 0.8rem; margin-bottom: 5px; }
+.premium-form input, .premium-form select { width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--borde-cristal); padding: 11px 14px; border-radius: 8px; color: white; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1fr; }
 
-.sync-status { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); }
-.sync-status.cargando { color: var(--oro-premium); background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3); }
+.view-section { display: none; }
+.view-active { display: block !important; }
+.grid-cliente, .admin-dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+@media(min-width: 992px) { .grid-cliente, .admin-dashboard-grid { grid-template-columns: 1fr 1fr; } .full-width { grid-column: 1 / -1; } }
+.cards-ofertas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
 
-/* ==========================================================================
-   5. TABLAS RESPONSIVAS
-   ========================================================================== */
-.table-responsive {
-    width: 100%;
-    overflow-x: auto; /* Permite scroll horizontal en móvil sin romper la pantalla */
-    margin-top: 1rem;
-    -webkit-overflow-scrolling: touch;
-}
+.badge-estado { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+.badge-estado.pagado { background: rgba(16, 185, 129, 0.15); color: var(--color-pagado); }
+.badge-estado.pendiente { background: rgba(245, 158, 11, 0.15); color: var(--color-pendiente); }
+.badge-estado.atrasado { background: rgba(239, 68, 68, 0.15); color: var(--color-atrasado); }
 
-.premium-table { width: 100%; border-collapse: collapse; text-align: left; min-width: 600px; }
-.premium-table th { padding: 12px; color: var(--texto-secundario); font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid var(--borde-cristal); }
-.premium-table td { padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 0.9rem; }
-
-/* ==========================================================================
-   6. BOTONES Y INPUTS
-   ========================================================================== */
-.btn-primary, .btn-secondary, .btn-danger {
-    padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; border: none; transition: all 0.2s;
-}
-.btn-primary { background: linear-gradient(135deg, var(--morado-premium), #6366f1); color: white; }
-.btn-secondary { background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.1); }
-.btn-secondary:hover { background: rgba(255,255,255,0.15); }
-.btn-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-.btn-danger:hover { background: rgba(239, 68, 68, 0.4); }
-.btn-admin-submit { background: linear-gradient(135deg, var(--oro-premium), #d97706); color: #0b071e; width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; }
-
-.premium-form .form-group { margin-bottom: 1rem; }
-.premium-form label { display: block; color: var(--texto-secundario); font-size: 0.8rem; margin-bottom: 4px; }
-.premium-form input, .premium-form select { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--borde-cristal); padding: 10px 14px; border-radius: 8px; color: white; font-size: 0.9rem; }
-.premium-form input:focus, .premium-form select:focus { border-color: var(--morado-brillante); }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-
-/* ==========================================================================
-   7. VISTAS Y GRID
-   ========================================================================== */
-.view-section { display: none; opacity: 0; transform: translateY(15px); transition: opacity 0.4s var(--curva-animacion), transform 0.4s var(--curva-animacion); }
-.view-active { display: block !important; opacity: 1; transform: translateY(0); }
-
-.grid-cliente, .admin-dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-}
-@media (min-width: 992px) {
-    .grid-cliente, .admin-dashboard-grid { grid-template-columns: repeat(2, 1fr); }
-    .full-width { grid-column: 1 / -1; }
-}
-
-.cards-ofertas-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.25rem;
-    margin-top: 1rem;
-}
-
-/* Badges de Estado */
-.badge-estado { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
-.badge-estado.pagado { background: rgba(16, 185, 129, 0.15); color: var(--color-pagado); border: 1px solid rgba(16, 185, 129, 0.3); }
-.badge-estado.pendiente { background: rgba(245, 158, 11, 0.15); color: var(--color-pendiente); border: 1px solid rgba(245, 158, 11, 0.3); }
-.badge-estado.atrasado { background: rgba(239, 68, 68, 0.15); color: var(--color-atrasado); border: 1px solid rgba(239, 68, 68, 0.3); }
-
-/* ==========================================================================
-   8. COMPONENTE MODAL & TOASTS
-   ========================================================================== */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 7, 30, 0.7); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 1rem; }
-.modal-overlay.modal-active { opacity: 1; pointer-events: auto; }
-.modal-content { width: 100%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
-.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--borde-cristal); padding-bottom: 10px; }
-.close-modal-btn { background: transparent; border: none; color: var(--texto-secundario); font-size: 1.5rem; cursor: pointer; }
-
-.toast-area { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 1rem; }
+.modal-active { opacity: 1; pointer-events: auto; }
+.modal-content { width: 100%; max-width: 500px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--borde-cristal); padding-bottom: 8px; }
+.close-modal-btn { background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+.toast-area { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 99999; }
+.oculto { display: none !important; }
 
 @keyframes rotar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.icon-spin { animation: rotar 2s linear infinite; }
-.oculto { display: none !important; }
