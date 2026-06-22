@@ -58,3 +58,17 @@ export const SHEETS_MAP = {
     HOJA_CLIENTES: "Clientes",
     HOJA_PAGOS: "Registros_de_Turnos"
 };
+// Seguridad del Administrador
+export const ADMIN_CONFIG = {
+    CLAVE_ACCESO: "1234" // <-- Cambia tu contraseña de administrador aquí
+};
+
+// Frases aleatorias para la pantalla de carga premium
+export const FRASES_CARGA = [
+    "Hablando con la patrona...",
+    "Consultando a Edimar...",
+    "Tomando un café mientras Sheets responde...",
+    "Contando los billetes del San...",
+    "Asegurando la rotación en la nube...",
+    "Acomodando los puestos premium..."
+];

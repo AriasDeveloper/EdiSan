@@ -1,134 +1,121 @@
 // js/app.js
-import { API_CONFIG, SAN_ESTADOS, CUOTA_ESTADOS } from './config.js';
+import { API_CONFIG, ADMIN_CONFIG, FRASES_CARGA } from './config.js';
 
-// Estado global sincronizado
 let DB = { sanes: [], clientes: [], registrosTurnos: [] };
 let clienteLogueado = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    inicializarNavegacion();
+    inicializarNavegacionSecreta();
     inicializarTabsAdmin();
     inicializarFormularios();
     
-    // Cerrar modal
     document.getElementById('btn-cerrar-modal').onclick = () => {
         document.getElementById('modal-premium').classList.remove('modal-active');
     };
 
-    // Cargar datos iniciales desde Google Sheets
     cargarDatosDesdeSheets();
 });
 
 // ==========================================================================
-// CONTROL DE CARGA DESDE GOOGLE SHEETS
+// GESTIÓN DE LA PANTALLA DE CARGA (Punto 5)
 // ==========================================================================
-async function cargarDatosDesdeSheets() {
-    const icon = document.getElementById('sync-icon');
-    const text = document.getElementById('sync-text');
-    const indicator = document.getElementById('sheets-sync-indicator');
+function mostrarCarga() {
+    const pantalla = document.getElementById('pantalla-carga');
+    const texto = document.getElementById('texto-carga-divertido');
     
-    icon.classList.add('icon-spin');
-    indicator.classList.add('cargando');
-    text.innerText = "Sincronizando...";
+    // Elige una frase divertida aleatoria de la lista
+    const fraseAleatoria = FRASES_CARGA[Math.floor(Math.random() * FRASES_CARGA.length)];
+    texto.innerText = fraseAleatoria;
+    
+    pantalla.classList.add('modal-active');
+}
 
+function ocultarCarga() {
+    document.getElementById('pantalla-carga').classList.remove('modal-active');
+}
+
+async function cargarDatosDesdeSheets() {
+    mostrarCarga();
     try {
         const respuesta = await fetch(API_CONFIG.URL_APPS_SCRIPT);
         const resultado = await respuesta.json();
         
         if (resultado.status === "success") {
             DB = resultado.data;
-            
-            // Renderizados globales
             renderizarOfertasPublicas();
             renderizarAdminTodo();
             if(clienteLogueado) renderizarEspacioPrivadoCliente();
-
-            icon.classList.remove('icon-spin');
-            indicator.classList.remove('cargando');
-            icon.innerText = "cloud_done";
-            text.innerText = "Sincronizado";
-        } else {
-            throw new Error(resultado.message);
         }
     } catch (error) {
-        console.error(error);
-        icon.classList.remove('icon-spin');
-        icon.innerText = "cloud_off";
-        text.innerText = "Error de enlace";
-        mostrarToast("Error de conexión con Sheets", "error");
+        mostrarToast("Error al conectar con Sheets", "error");
+    } finally {
+        ocultarCarga();
     }
 }
 
-// Envíos de escritura POST a Sheets
 async function ejecutarPostSheets(accion, payload) {
-    const icon = document.getElementById('sync-icon');
-    icon.classList.add('icon-spin');
-    
+    mostrarCarga();
     try {
         await fetch(API_CONFIG.URL_APPS_SCRIPT, {
             method: 'POST',
-            mode: 'no-cors', // Evita bloqueos de seguridad de navegador en Web Apps
+            mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: accion, payload: payload })
         });
-        
-        mostrarToast("Operación enviada a la nube", "success");
-        // Forzar recarga pasados 1.5s para dar tiempo de procesamiento en Sheets
+        mostrarToast("Operación guardada en la nube", "success");
         setTimeout(cargarDatosDesdeSheets, 1500);
     } catch (e) {
-        mostrarToast("Error al guardar registro", "error");
-        icon.classList.remove('icon-spin');
+        mostrarToast("Error en la operación", "error");
+        ocultarCarga();
     }
 }
 
 // ==========================================================================
-// SISTEMA DE NAVEGACIÓN Y LOGINS
+// ACCESO PRIVADO ADMINISTRADOR (Punto 4)
 // ==========================================================================
-function inicializarNavegacion() {
-    const btnCliente = document.getElementById('btn-vista-cliente');
-    const btnAdmin = document.getElementById('btn-vista-admin');
-    const secCliente = document.getElementById('seccion-cliente');
-    const secAdmin = document.getElementById('seccion-admin');
+function inicializarNavegacionSecreta() {
+    const btnLlaveAdmin = document.getElementById('btn-llave-admin');
+    const seccionAdmin = document.getElementById('seccion-admin');
+    const seccionCliente = document.getElementById('seccion-cliente');
+    const btnCerrarAdmin = document.getElementById('btn-cerrar-admin');
 
-    btnCliente.onclick = () => {
-        btnAdmin.classList.remove('active'); btnCliente.classList.add('active');
-        secAdmin.classList.remove('view-active'); secCliente.classList.add('view-active');
-    };
-    btnAdmin.onclick = () => {
-        btnCliente.classList.remove('active'); btnAdmin.classList.add('active');
-        secCliente.classList.remove('view-active'); secAdmin.classList.add('view-active');
-    };
-
-    // Botón Lanzador de Login de Clientes
-    document.getElementById('btn-ir-a-login').onclick = () => {
-        abrirModalLoginCliente();
+    // Botón invisible/discreto para admin
+    btnLlaveAdmin.onclick = () => {
+        const passIngresada = prompt("Introduce la clave de acceso de Administrador:");
+        if (passIngresada === ADMIN_CONFIG.CLAVE_ACCESO) {
+            seccionCliente.classList.remove('view-active');
+            seccionAdmin.classList.add('view-active');
+            mostrarToast("Acceso de administrador verificado", "success");
+        } else if (passIngresada !== null) {
+            mostrarToast("Clave incorrecta", "error");
+        }
     };
 
+    btnCerrarAdmin.onclick = () => {
+        seccionAdmin.classList.remove('view-active');
+        seccionCliente.classList.add('view-active');
+    };
+
+    // Botones del Login de Cliente
+    document.getElementById('btn-ir-a-login').onclick = () => abrirModalLoginCliente();
     document.getElementById('btn-logout-cliente').onclick = () => {
         clienteLogueado = null;
         document.getElementById('cliente-vista-privada').classList.add('oculto');
         document.getElementById('cliente-vista-publica').classList.remove('oculto');
-        mostrarToast("Sesión cerrada", "info");
+        mostrarToast("Sesión de cliente cerrada", "info");
     };
 }
 
 function abrirModalLoginCliente() {
     const modal = document.getElementById('modal-premium');
-    document.getElementById('modal-titulo').innerText = "Ingreso Clientes Certificados";
-    
-    let opcionesClientes = DB.clientes.map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
+    document.getElementById('modal-titulo').innerText = "Acceso Clientes Certificados";
+    let opciones = DB.clientes.map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
     
     document.getElementById('modal-cuerpo').innerHTML = `
         <form id="form-autenticar" class="premium-form">
-            <div class="form-group">
-                <label>Selecciona tu Nombre</label>
-                <select id="login-id">${opcionesClientes}</select>
-            </div>
-            <div class="form-group">
-                <label>Contraseña</label>
-                <input type="password" id="login-pass" required>
-            </div>
-            <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Ver mi Actividad</button>
+            <div class="form-group"><label>Tu Nombre</label><select id="login-id">${opciones}</select></div>
+            <div class="form-group"><label>Contraseña</label><input type="password" id="login-pass" required></div>
+            <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Ingresar</button>
         </form>
     `;
     modal.classList.add('modal-active');
@@ -137,17 +124,15 @@ function abrirModalLoginCliente() {
         e.preventDefault();
         const id = document.getElementById('login-id').value;
         const pass = document.getElementById('login-pass').value;
+        const cliente = DB.clientes.find(c => c.Cliente_ID == id && String(c.Contrasena) === String(pass));
 
-        const clienteEncontrado = DB.clientes.find(c => c.Cliente_ID == id && String(c.Contrasena) === String(pass));
-
-        if (clienteEncontrado) {
-            clienteLogueado = clienteEncontrado;
+        if (cliente) {
+            clienteLogueado = cliente;
             modal.classList.remove('modal-active');
             document.getElementById('cliente-vista-publica').classList.add('oculto');
             document.getElementById('cliente-vista-privada').classList.remove('oculto');
-            document.getElementById('txt-bienvenida-cliente').innerText = `Hola, ${clienteEncontrado.Nombre_Completo}`;
+            document.getElementById('txt-bienvenida-cliente').innerText = `Hola, ${cliente.Nombre_Completo}`;
             renderizarEspacioPrivadoCliente();
-            mostrarToast("Sesión autorizada", "success");
         } else {
             mostrarToast("Contraseña incorrecta", "error");
         }
@@ -155,10 +140,9 @@ function abrirModalLoginCliente() {
 }
 
 function inicializarTabsAdmin() {
-    const tabs = ['sanes', 'clientes', 'puestos'];
-    tabs.forEach(t => {
+    ['sanes', 'clientes', 'puestos'].forEach(t => {
         document.getElementById(`tab-admin-${t}`).onclick = (e) => {
-            tabs.forEach(x => {
+            ['sanes', 'clientes', 'puestos'].forEach(x => {
                 document.getElementById(`sub-panel-${x}`).classList.add('oculto');
                 document.getElementById(`tab-admin-${x}`).className = 'btn-secondary';
             });
@@ -169,42 +153,45 @@ function inicializarTabsAdmin() {
 }
 
 // ==========================================================================
-// RENDERIZADOS DE VISTA CLIENTE
+// CONTROL DE RESERVA Y LOGICA DE PUESTOS LLENOS (Punto 2)
 // ==========================================================================
 function renderizarOfertasPublicas() {
     const contenedor = document.getElementById('contenedor-ofertas-publicas');
     contenedor.innerHTML = '';
     
-    const disponibles = DB.sanes.filter(s => s.Estado === 'Reclutando');
-    if(disponibles.length === 0) {
-        contenedor.innerHTML = `<p style="color:var(--texto-secundario);">No hay grupos en reclutamiento en este momento.</p>`;
-        return;
-    }
+    DB.sanes.forEach(san => {
+        // Calcular cuántos puestos ya se han comprado en este San
+        const puestosOcupados = DB.registrosTurnos.filter(r => r.San_ID == san.San_ID).length;
+        const estaLleno = puestosOcupados >= parseInt(san.Total_Turnos);
 
-    disponibles.forEach(san => {
         const div = document.createElement('div');
-        div.className = 'glass-card animate-fade-in';
+        div.className = 'glass-card';
         div.innerHTML = `
             <h4 style="color:var(--morado-brillante);">${san.Nombre_San}</h4>
             <div style="margin: 10px 0; font-size:0.9rem;">
-                <div>Cuota Fija: <strong>$${san.Monto_Cuota}</strong></div>
-                <div>Turnos Totales: <strong>${san.Total_Turnos} Puestos</strong></div>
+                <div>Cuota: <strong>$${san.Monto_Cuota}</strong></div>
+                <div>Llenado: <strong>${puestosOcupados} / ${san.Total_Turnos} Puestos</strong></div>
             </div>
-            <button class="btn-secondary btn-inscripcion-publica" style="width:100%; justify-content:center;">Inscribirme</button>
+            <button class="btn-inscripcion-publica ${estaLleno ? 'btn-danger' : 'btn-primary'}" style="width:100%; justify-content:center;" ${estaLleno ? 'disabled' : ''}>
+                ${estaLleno ? 'GRUPO LLENO' : 'Inscribirme'}
+            </button>
         `;
-        // Botón Inscribirse Público Lanzador
-        div.querySelector('.btn-inscripcion-publica').onclick = () => {
-            if(!clienteLogueado) {
-                mostrarToast("Inicia sesión primero para unirte a este San", "info");
-                abrirModalLoginCliente();
-            }
-        };
+        
+        if(!estaLleno) {
+            div.querySelector('.btn-inscripcion-publica').onclick = () => {
+                if(!clienteLogueado) {
+                    mostrarToast("Inicia sesión para solicitar tu ingreso", "info");
+                    abrirModalLoginCliente();
+                } else {
+                    mostrarToast(`Contacta al administrador para que asigne tu cupo en ${san.Nombre_San}`, "info");
+                }
+            };
+        }
         contenedor.appendChild(div);
     });
 }
 
 function renderizarEspacioPrivadoCliente() {
-    // 1. Puestos adquiridos
     const tablaPuestos = document.getElementById('tabla-puestos-inscritos');
     const misPuestos = DB.registrosTurnos.filter(r => r.Cliente_ID == clienteLogueado.Cliente_ID);
     
@@ -213,33 +200,18 @@ function renderizarEspacioPrivadoCliente() {
     } else {
         let rows = misPuestos.map(p => {
             const sanInfo = DB.sanes.find(s => s.San_ID == p.San_ID) || { Nombre_San: 'Desconocido' };
-            return `<tr>
-                <td><b>${sanInfo.Nombre_San}</b></td>
-                <td>Puesto Nº ${p.Numero_Turno}</td>
-                <td><span class="badge-estado ${p.Estado_Pago}">${p.Estado_Pago.toUpperCase()}</span></td>
-            </tr>`;
+            return `<tr><td><b>${sanInfo.Nombre_San}</b></td><td>Turno Nº ${p.Numero_Turno}</td><td><span class="badge-estado ${p.Estado_Pago}">${p.Estado_Pago.toUpperCase()}</span></td></tr>`;
         }).join('');
-        
         tablaPuestos.innerHTML = `<table class="premium-table"><thead><tr><th>San</th><th>Turno</th><th>Estado</th></tr></thead><tbody>${rows}</tbody></table>`;
     }
 
-    // 2. Cuotas por pagar (Pendientes / Atrasadas)
     const listaPagar = document.getElementById('lista-cuotas-pagar');
     listaPagar.innerHTML = '';
-    const pendientes = misPuestos.filter(p => p.Estado_Pago !== 'pagado');
-
-    pendientes.forEach(cuota => {
-        const sanInfo = DB.sanes.find(s => s.San_ID == cuota.San_ID) || { Nombre_San: 'Desconocido', Monto_Cuota: 0 };
+    misPuestos.filter(p => p.Estado_Pago !== 'pagado').forEach(cuota => {
+        const sanInfo = DB.sanes.find(s => s.San_ID == cuota.San_ID) || { Nombre_San: '-', Monto_Cuota: 0 };
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${sanInfo.Nombre_San} (T-${cuota.Numero_Turno})</td>
-            <td style="color:var(--oro-brillante); font-weight:bold;">$${sanInfo.Monto_Cuota}</td>
-            <td><button class="btn-primary btn-subir-recibo" style="padding:4px 10px;">Subir Recibo</button></td>
-        `;
-        
-        tr.querySelector('.btn-subir-recibo').onclick = () => {
-            abrirModalSubirComprobante(cuota.Registro_ID);
-        };
+        tr.innerHTML = `<td>${sanInfo.Nombre_San} (T-${cuota.Numero_Turno})</td><td style="color:var(--oro-brillante); font-weight:bold;">$${sanInfo.Monto_Cuota}</td><td><button class="btn-primary btn-subir-recibo" style="padding:4px 10px;">Subir Recibo</button></td>`;
+        tr.querySelector('.btn-subir-recibo').onclick = () => abrirModalSubirComprobante(cuota.Registro_ID);
         listaPagar.appendChild(tr);
     });
 }
@@ -249,15 +221,11 @@ function abrirModalSubirComprobante(registroId) {
     document.getElementById('modal-titulo').innerText = "Cargar Comprobante de Pago";
     document.getElementById('modal-cuerpo').innerHTML = `
         <form id="form-subir-comprobante" class="premium-form">
-            <div class="form-group">
-                <label>Enlace del Comprobante (O Referencia)</label>
-                <input type="text" id="comprobante-link" placeholder="Ej: Link de drive, imgur o número de referencia" required>
-            </div>
+            <div class="form-group"><label>Enlace o Referencia del Pago</label><input type="text" id="comprobante-link" required></div>
             <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Enviar Recibo</button>
         </form>
     `;
     modal.classList.add('modal-active');
-
     document.getElementById('form-subir-comprobante').onsubmit = (e) => {
         e.preventDefault();
         const link = document.getElementById('comprobante-link').value;
@@ -266,159 +234,124 @@ function abrirModalSubirComprobante(registroId) {
     };
 }
 
-// ==========================================================================
-// INTERFAZ DE ADMINISTRACIÓN COMPLETA (CRUD)
-// ==========================================================================
 function renderizarAdminTodo() {
-    // A. Llenar selects de asignación
-    const selSan = document.getElementById('sel-puesto-san');
-    const selCli = document.getElementById('sel-puesto-cliente');
-    
-    selSan.innerHTML = DB.sanes.map(s => `<option value="${s.San_ID}">${s.Nombre_San} ($${s.Monto_Cuota})</option>`).join('');
-    selCli.innerHTML = DB.clientes.map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
+    document.getElementById('sel-puesto-san').innerHTML = DB.sanes.map(s => `<option value="${s.San_ID}">${s.Nombre_San}</option>`).join('');
+    document.getElementById('sel-puesto-cliente').innerHTML = DB.clientes.map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
 
-    // B. Tabla de Sanes + Eliminar Sanes
+    // Listado de Sanes en Admin con control de cupos totales
     const tablaSanes = document.getElementById('lista-admin-sanes-tabla');
-    tablaSanes.innerHTML = DB.sanes.map(s => `
-        <tr>
+    tablaSanes.innerHTML = DB.sanes.map(s => {
+        const ocupados = DB.registrosTurnos.filter(r => r.San_ID == s.San_ID).length;
+        return `<tr>
             <td><b>${s.Nombre_San}</b></td>
             <td>$${s.Monto_Cuota}</td>
-            <td>${s.Total_Turnos}</td>
+            <td>${ocupados} / ${s.Total_Turnos}</td>
             <td><button class="btn-danger btn-del-san" data-id="${s.San_ID}" style="padding:2px 8px;">Eliminar</button></td>
-        </tr>
-    `).join('');
+        </tr>`;
+    }).join('');
 
     tablaSanes.querySelectorAll('.btn-del-san').forEach(btn => {
-        btn.onclick = (e) => {
-            if(confirm("¿Seguro que deseas eliminar este San por completo?")) {
-                ejecutarPostSheets('eliminarSan', { sanId: e.target.dataset.id });
-            }
-        };
+        btn.onclick = (e) => { if(confirm("¿Eliminar este San?")) ejecutarPostSheets('eliminarSan', { sanId: e.target.dataset.id }); };
     });
 
-    // C. Tabla de Clientes
-    document.getElementById('lista-admin-clientes-tabla').innerHTML = DB.clientes.map(c => `
-        <tr><td>${c.Cliente_ID}</td><td>${c.Nombre_Completo}</td><td><code>${c.Contrasena}</code></td></tr>
-    `).join('');
+    document.getElementById('lista-admin-clientes-tabla').innerHTML = DB.clientes.map(c => `<tr><td>${c.Cliente_ID}</td><td>${c.Nombre_Completo}</td><td><code>${c.Contrasena}</code></td></tr>`).join('');
 
-    // D. Tabla de Matriz Global de Pagos + Visualizador de Comprobante
     const tablaPagos = document.getElementById('tabla-admin-pagos-global');
-    tablaPagos.innerHTML = '';
-
-    DB.registrosTurnos.forEach(reg => {
+    tablaPagos.innerHTML = DB.registrosTurnos.map(reg => {
         const san = DB.sanes.find(s => s.San_ID == reg.San_ID) || { Nombre_San: '-' };
         const cli = DB.clientes.find(c => c.Cliente_ID == reg.Cliente_ID) || { Nombre_Completo: '-' };
+        let compHtml = reg.Comprobante ? `<button class="btn-secondary btn-ver-comp" data-link="${reg.Comprobante}" style="padding:2px 6px; font-size:0.75rem;">Ver Recibo</button>` : 'Ninguno';
         
-        const tr = document.createElement('tr');
-        
-        // Revisar si existe link de comprobante
-        let comprobanteHtml = `<span style="color:var(--texto-secundario); font-size:0.85rem;">Ninguno</span>`;
-        if (reg.Comprobante) {
-            comprobanteHtml = `<button class="btn-secondary btn-ver-comprobante" data-link="${reg.Comprobante}" style="padding:2px 6px; font-size:0.75rem;">Ver Recibo</button>`;
-        }
-
-        tr.innerHTML = `
+        return `<tr>
             <td>${san.Nombre_San}</td>
             <td>${cli.Nombre_Completo}</td>
-            <td>Puesto ${reg.Numero_Turno}</td>
+            <td>Turno ${reg.Numero_Turno}</td>
             <td><span class="badge-estado ${reg.Estado_Pago}">${reg.Estado_Pago}</span></td>
-            <td>${comprobanteHtml}</td>
+            <td>${compHtml}</td>
             <td>
-                <select class="sel-cambiar-estado" data-id="${reg.Registro_ID}" style="background:#110c2c; color:white; font-size:0.8rem; padding:4px; border-radius:4px; border:1px solid var(--borde-cristal);">
+                <select class="sel-cambiar-estado" data-id="${reg.Registro_ID}">
                     <option value="pendiente" ${reg.Estado_Pago==='pendiente'?'selected':''}>Pendiente</option>
                     <option value="pagado" ${reg.Estado_Pago==='pagado'?'selected':''}>Pagado</option>
                     <option value="atrasado" ${reg.Estado_Pago==='atrasado'?'selected':''}>Atrasado</option>
                 </select>
             </td>
-        `;
+        </tr>`;
+    }).join('');
 
-        // Evento para ver el recibo en el modal
-        if (reg.Comprobante) {
-            tr.querySelector('.btn-ver-comprobante').onclick = (e) => {
-                const link = e.target.dataset.link;
-                const modal = document.getElementById('modal-premium');
-                document.getElementById('modal-titulo').innerText = "Visualizador de Comprobante";
-                
-                if(link.startsWith('http')) {
-                    document.getElementById('modal-cuerpo').innerHTML = `
-                        <p style="margin-bottom:10px; font-size:0.9rem;">El cliente adjuntó una URL externa:</p>
-                        <a href="${link}" target="_blank" class="btn-primary" style="width:100%; justify-content:center;">Abrir Comprobante en pestaña nueva</a>
-                    `;
-                } else {
-                    document.getElementById('modal-cuerpo').innerHTML = `
-                        <div class="glass-card" style="padding:15px; text-align:center;">
-                            <label style="color:var(--texto-secundario); display:block; margin-bottom:5px;">Referencia aportada:</label>
-                            <h2 style="color:var(--oro-brillante);">${link}</h2>
-                        </div>
-                    `;
-                }
-                modal.classList.add('modal-active');
-            };
-        }
+    tablaPagos.querySelectorAll('.btn-ver-comp').forEach(btn => {
+        btn.onclick = (e) => {
+            const link = e.target.dataset.link;
+            const modal = document.getElementById('modal-premium');
+            document.getElementById('modal-titulo').innerText = "Comprobante de Pago";
+            document.getElementById('modal-cuerpo').innerHTML = link.startsWith('http') ? 
+                `<a href="${link}" target="_blank" class="btn-primary" style="width:100%; justify-content:center;">Abrir enlace del recibo</a>` : 
+                `<div class="glass-card" style="padding:15px; text-align:center;"><h3>${link}</h3></div>`;
+            modal.classList.add('modal-active');
+        };
+    });
 
-        // Evento para cambiar estados de pago directo desde el select
-        tr.querySelector('.sel-cambiar-estado').onchange = (e) => {
+    tablaPagos.querySelectorAll('.sel-cambiar-estado').forEach(sel => {
+        sel.onchange = (e) => {
+            const reg = DB.registrosTurnos.find(r => r.Registro_ID == e.target.dataset.id);
             ejecutarPostSheets('registrarPago', { registroId: e.target.dataset.id, nuevoEstado: e.target.value, comprobante: reg.Comprobante || '' });
         };
-
-        tablaPagos.appendChild(tr);
     });
 }
 
-// ==========================================================================
-// FORMULARIOS DE ACCIÓN (CREACIONES)
-// ==========================================================================
 function inicializarFormularios() {
-    // Guardar Nuevo San desde el Admin
     document.getElementById('form-crear-san').onsubmit = (e) => {
         e.preventDefault();
-        const nuevoSan = {
+        ejecutarPostSheets('crearSan', {
             id: "S" + Date.now().toString().slice(-4),
             nombre: document.getElementById('san-nombre').value,
             montoCuota: parseFloat(document.getElementById('san-monto').value),
             totalTurnos: parseInt(document.getElementById('san-turnos').value),
             estado: "Reclutando"
-        };
-        ejecutarPostSheets('crearSan', nuevoSan);
+        });
         e.target.reset();
     };
 
-    // Guardar Nuevo Cliente desde el Admin
     document.getElementById('form-crear-cliente').onsubmit = (e) => {
         e.preventDefault();
-        const nuevoCli = {
+        ejecutarPostSheets('crearCliente', {
             id: "C" + Date.now().toString().slice(-4),
             nombre: document.getElementById('cli-nombre').value,
             telefono: document.getElementById('cli-telefono').value,
             contrasena: document.getElementById('cli-pass').value
-        };
-        ejecutarPostSheets('crearCliente', nuevoCli);
+        });
         e.target.reset();
     };
 
-    // Asignar Puesto de San a Cliente
+    // Validación estricta antes de asignar puestos (Punto 2)
     document.getElementById('btn-guardar-puesto').onclick = () => {
-        const puesto = {
-            id: "R" + Date.now().toString().slice(-4),
-            sanId: document.getElementById('sel-puesto-san').value,
-            clienteId: document.getElementById('sel-puesto-cliente').value,
-            turno: parseInt(document.getElementById('num-puesto-turno').value),
-            fechaLimite: "2026-07-01", // Fecha base o dinámica calculable
-            estado: "pendiente"
-        };
+        const sanId = document.getElementById('sel-puesto-san').value;
+        const sanSeleccionado = DB.sanes.find(s => s.San_ID == sanId);
         
-        if(!puesto.turno) { mostrarToast("Digita un número de turno", "error"); return; }
-        ejecutarPostSheets('asignarPuesto', puesto);
+        const puestosOcupados = DB.registrosTurnos.filter(r => r.San_ID == sanId).length;
+        
+        if (puestosOcupados >= parseInt(sanSeleccionado.Total_Turnos)) {
+            mostrarToast("¡ERROR! Este San ya alcanzó su límite máximo de puestos", "error");
+            return;
+        }
+
+        const turno = parseInt(document.getElementById('num-puesto-turno').value);
+        if(!turno) { mostrarToast("Asigna un número de turno", "error"); return; }
+
+        ejecutarPostSheets('asignarPuesto', {
+            id: "R" + Date.now().toString().slice(-4),
+            sanId: sanId,
+            clienteId: document.getElementById('sel-puesto-cliente').value,
+            turno: turno,
+            fechaLimite: "2026-07-01",
+            estado: "pendiente"
+        });
     };
 }
 
-function mostrarToast(mensaje, tipo = "success") {
-    const contenedor = document.getElementById('toast-container');
+function mostrarToast(m, t = "success") {
+    const c = document.getElementById('toast-container');
     const toast = document.createElement('div');
-    let color = tipo === 'success' ? '#10b981' : tipo === 'error' ? '#ef4444' : '#9333ea';
-    
-    toast.style.cssText = `background:rgba(15,10,35,0.95); backdrop-filter:blur(8px); border-left:4px solid ${color}; color:white; padding:12px 20px; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.5); font-size:0.9rem; animation:fadeIn 0.3s ease;`;
-    toast.innerText = mensaje;
-    contenedor.appendChild(toast);
-    setTimeout(() => { toast.remove(); }, 3500);
+    toast.style.cssText = `background:rgba(15,10,35,0.95); border-left:4px solid ${t==='success'?'#10b981':t==='error'?'#ef4444':'#9333ea'}; color:white; padding:12px 20px; border-radius:8px; font-size:0.9rem;`;
+    toast.innerText = m; c.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
 }
