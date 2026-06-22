@@ -7,7 +7,7 @@
 // 1. Endpoint de Conexión Externa
 // Aquí pegarás la URL de publicación (Web App URL) una vez que implementemos Google Apps Script.
 export const API_CONFIG = {
-    URL_APPS_SCRIPT: "https://script.google.com/macros/s/.../exec",
+    URL_APPS_SCRIPT: "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec",
     MODO_DESARROLLO: true // Cambiar a false cuando ya usemos datos 100% reales de Sheets
 };
 
