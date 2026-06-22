@@ -1,307 +1,168 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>SANES LA PATRONA</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    <link rel="stylesheet" href="./css/styles.css">
+    <title>EDISAN - Sistema Premium de Gestión de San</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 </head>
+<body>
 
-<body class="bg-[#0b0618] text-white min-h-screen">
+    <div class="background-glow"></div>
 
-    <!-- LOADING -->
-
-    <div id="loading"
-         class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-
-        <div class="text-center">
-
-            <div
-                class="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mx-auto mb-4">
-            </div>
-
-            <p>Cargando información...</p>
-
+    <header class="main-header">
+        <div class="logo-area">
+            <span class="material-icons-round brand-icon">layers</span>
+            <h1>EDISAN</h1>
+            <span class="badge-premium">PREMIUM</span>
         </div>
-
-    </div>
-
-    <!-- HEADER -->
-
-    <header
-        class="sticky top-0 z-40 bg-[#12091f] border-b border-purple-900/30">
-
-        <div
-            class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-
-            <h1 class="font-bold text-xl">
-
-                SANES LA PATRONA
-
-            </h1>
-
-            <button
-                id="btn-admin"
-                class="bg-purple-700 hover:bg-purple-600 px-4 py-2 rounded-xl">
-
-                <i class="fa-solid fa-lock"></i>
-
-                Admin
-
+        
+        <nav class="role-selector">
+            <button id="btn-vista-cliente" class="nav-btn active">
+                <span class="material-icons-round">person</span> Vista Cliente
             </button>
+            <button id="btn-vista-admin" class="nav-btn">
+                <span class="material-icons-round">admin_panel_settings</span> Panel Admin
+            </button>
+        </nav>
 
+        <div class="sync-status" id="sheets-sync-indicator">
+            <span class="material-icons-round icon-spin">sync</span>
+            <span class="sync-text">Conectado a Sheets</span>
         </div>
-
     </header>
 
-    <!-- NAV -->
+    <main class="app-container">
 
-    <nav
-        class="bg-[#12091f] border-b border-purple-900/30">
-
-        <div
-            class="max-w-7xl mx-auto px-4 py-3 flex gap-2 flex-wrap">
-
-            <button
-                data-tab="sanes"
-                class="tab-btn px-4 py-2 rounded-xl bg-purple-700">
-
-                SANES
-
-            </button>
-
-            <button
-                data-tab="ofertas"
-                class="tab-btn px-4 py-2 rounded-xl bg-[#1a1030]">
-
-                Ofertas
-
-            </button>
-
-            <button
-                data-tab="admin"
-                class="tab-btn px-4 py-2 rounded-xl bg-[#1a1030] hidden">
-
-                Administración
-
-            </button>
-
-        </div>
-
-    </nav>
-
-    <!-- MAIN -->
-
-    <main
-        class="max-w-7xl mx-auto p-4">
-
-        <!-- SANES -->
-
-        <section id="section-sanes">
-
-            <div
-                class="bg-[#170f2c] p-4 rounded-2xl mb-4">
-
-                <label class="block mb-2">
-
-                    Seleccionar SAN
-
-                </label>
-
-                <select
-                    id="san-selector"
-                    class="w-full bg-[#0f081f] rounded-xl p-3">
-                </select>
-
+        <section id="seccion-cliente" class="view-section view-active">
+            <div class="welcome-card glass-card">
+                <h2>Bienvenido a tu panel de ahorro</h2>
+                <p>Monitorea tus turnos, cuotas pendientes y descubre nuevas oportunidades de inversión.</p>
             </div>
 
-            <div
-                id="san-details">
-            </div>
+            <div class="grid-cliente">
+                <div class="glass-card status-san-box">
+                    <h3><span class="material-icons-round">account_balance_wallet</span> Mi San Activo</h3>
+                    <div id="cliente-san-progreso" class="progreso-container">
+                        <p class="placeholder-text">Cargando la línea de tiempo de tus turnos...</p>
+                    </div>
+                </div>
 
-            <div
-                id="client-puestos-container"
-                class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
-            </div>
+                <div class="glass-card cuotas-box">
+                    <h3><span class="material-icons-round">calendar_month</span> Mis Cuotas y Fechas</h3>
+                    <div class="table-responsive">
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>Turno / Mes</th>
+                                    <th>Monto</th>
+                                    <th>Fecha Límite</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-cuotas-cliente">
+                                </tbody>
+                        </table>
+                    </div>
+                    <button id="btn-reportar-pago" class="btn-primary ripple">
+                        <span class="material-icons-round">upload_file</span> Reportar Pago
+                    </button>
+                </div>
 
+                <div class="glass-card ofertas-box full-width">
+                    <h3><span class="material-icons-round">local_fire_department</span> Nuevos Sanes Disponibles</h3>
+                    <div id="contenedor-ofertas" class="cards-ofertas-grid">
+                        </div>
+                </div>
+            </div>
         </section>
 
-        <!-- OFERTAS -->
+        <section id="seccion-admin" class="view-section">
+            <div class="admin-dashboard-grid">
+                
+                <div class="glass-card formal-box animate-fade-in">
+                    <div class="card-header">
+                        <span class="material-icons-round card-icon-purple">add_box</span>
+                        <h3>Crear y Configurar Nuevo San</h3>
+                    </div>
+                    <form id="form-crear-san" class="premium-form">
+                        <div class="form-group">
+                            <label for="san-nombre">Nombre identificador</label>
+                            <input type="text" id="san-nombre" placeholder="Ej. San Oro Julio" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="san-monto">Monto de la Cuota ($)</label>
+                                <input type="number" id="san-monto" placeholder="50" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="san-turnos">Total de Turnos</label>
+                                <input type="number" id="san-turnos" placeholder="12" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="san-fecha">Fecha de Primer Pago</label>
+                            <input type="date" id="san-fecha" required>
+                        </div>
+                        <button type="submit" class="btn-admin-submit gold-glow">
+                            <span class="material-icons-round">rocket_launch</span> Lanzar Nuevo San
+                        </button>
+                    </form>
+                </div>
 
-        <section
-            id="section-ofertas"
-            class="hidden">
+                <div class="glass-card control-box">
+                    <div class="card-header">
+                        <span class="material-icons-round card-icon-gold">tune</span>
+                        <h3>Asignación de Clientes y Turnos</h3>
+                    </div>
+                    <div id="admin-interactive-setup">
+                        <p class="placeholder-text">Selecciona o crea un San arriba para empezar a distribuir turnos.</p>
+                    </div>
+                </div>
 
-            <div
-                id="ofertas-container"
-                class="grid md:grid-cols-3 gap-4">
-            </div>
-
-        </section>
-
-        <!-- ADMIN -->
-
-        <section id="section-admin" class="hidden">
-
-            <!-- CREAR SAN -->
-
-            <div class="bg-[#170f2c] p-5 rounded-2xl mb-5">
-
-                <h2 class="text-xl font-bold mb-4">
-                    Crear SAN
-                </h2>
-
-                <form id="form-add-san" class="grid md:grid-cols-2 gap-3">
-
-                    <input
-                        name="id_san"
-                        placeholder="ID SAN"
-                        required
-                        class="bg-[#0f081f] p-3 rounded-xl">
-
-                    <input
-                        name="nombre_san"
-                        placeholder="Nombre SAN"
-                        required
-                        class="bg-[#0f081f] p-3 rounded-xl">
-
-                    <input
-                        name="cuota"
-                        type="number"
-                        placeholder="Cuota"
-                        required
-                        class="bg-[#0f081f] p-3 rounded-xl">
-
-                    <select
-                        name="frecuencia"
-                        class="bg-[#0f081f] p-3 rounded-xl">
-
-                        <option>Semanal</option>
-                        <option>Quincenal</option>
-                        <option>Mensual</option>
-
-                    </select>
-
-                    <input
-                        name="total_puestos"
-                        type="number"
-                        placeholder="Puestos"
-                        required
-                        class="bg-[#0f081f] p-3 rounded-xl">
-
-                    <input
-                        name="fecha_inicio"
-                        type="date"
-                        required
-                        class="bg-[#0f081f] p-3 rounded-xl">
-
-                    <button
-                        type="submit"
-                        class="bg-green-600 rounded-xl py-3">
-
-                        Crear SAN
-
-                    </button>
-
-                </form>
+                <div class="glass-card control-pagos-box full-width">
+                    <div class="card-header header-space">
+                        <h3><span class="material-icons-round">analytics</span> Monitor Global de Recaudación</h3>
+                        <button id="btn-forzar-sync" class="btn-secondary">
+                            <span class="material-icons-round">cloud_sync</span> Sincronizar Google Sheets
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="premium-table admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Edisan Grupo</th>
+                                    <th>Progreso Cobros</th>
+                                    <th>Cuotas Atrasadas</th>
+                                    <th>Fecha de Inicio</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-control-global">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
 
             </div>
-
-            <!-- CREAR OFERTA -->
-
-            <div class="bg-[#170f2c] p-5 rounded-2xl mb-5">
-
-                <h2 class="text-xl font-bold mb-4">
-
-                    Crear Oferta
-
-                </h2>
-
-                <form id="form-add-oferta"
-                    class="grid md:grid-cols-2 gap-3">
-
-                    <input
-                        name="producto"
-                        placeholder="Producto"
-                        required
-                        class="bg-[#0f081f] p-3 rounded-xl">
-
-                    <input
-                        name="precio_oferta"
-                        type="number"
-                        placeholder="Precio"
-                        required
-                        class="bg-[#0f081f] p-3 rounded-xl">
-
-                    <input
-                        name="descripcion"
-                        placeholder="Descripción"
-                        class="bg-[#0f081f] p-3 rounded-xl">
-
-                    <input
-                        name="disponibilidad"
-                        placeholder="Disponibilidad"
-                        class="bg-[#0f081f] p-3 rounded-xl">
-
-                    <input
-                        name="imgUrl"
-                        placeholder="URL Imagen"
-                        class="bg-[#0f081f] p-3 rounded-xl">
-
-                    <button
-                        type="submit"
-                        class="bg-blue-600 rounded-xl py-3">
-
-                        Crear Oferta
-
-                    </button>
-
-                </form>
-
-            </div>
-
-            <!-- GESTIÓN SAN -->
-
-            <div class="bg-[#170f2c] p-5 rounded-2xl">
-
-                <h2 class="text-xl font-bold mb-4">
-
-                    Gestión SAN
-
-                </h2>
-
-                <select
-                    id="admin-san-selector"
-                    class="w-full bg-[#0f081f] rounded-xl p-3 mb-4">
-                </select>
-
-                <div id="admin-container"></div>
-
-            </div>
-
         </section>
 
     </main>
 
-    <!-- TOAST -->
-
-    <div
-        id="toast"
-        class="hidden fixed bottom-6 right-6 bg-green-600 px-4 py-3 rounded-xl shadow-xl">
+    <div id="modal-premium" class="modal-overlay">
+        <div class="modal-content glass-card animate-scale-up">
+            <div class="modal-header">
+                <h4 id="modal-titulo">Reportar Pago</h4>
+                <button id="btn-cerrar-modal" class="close-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-cuerpo">
+                </div>
+        </div>
     </div>
 
-    <!-- JS -->
+    <div id="toast-container" class="toast-area"></div>
 
-    <script type="module" src="./js/app.js"></script>
-
+    <script type="module" src="js/app.js"></script>
 </body>
-
 </html>
