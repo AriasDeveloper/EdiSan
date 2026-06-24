@@ -3,63 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BaseEdimar - Vitrina Premium</title>
+    <title>EDISAN - Control Premium</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Google Fonts para tipografía moderna -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- PANTALLA DE CARGA (LOADER) -->
+    <!-- PANTALLA DE CARGA AVANZADA -->
     <div id="loader" class="loader-container">
-        <div class="spinner"></div>
-        <p>Sincronizando con BaseEdimar...</p>
+        <div class="luxury-spinner"></div>
+        <p class="loader-text">Sincronizando Sistemas de BaseEdimar...</p>
     </div>
 
-    <!-- BARRA DE NAVEGACIÓN -->
+    <!-- NAVBAR PREMIUM -->
     <header class="navbar">
-        <div class="logo">Base<span>Edimar</span></div>
-        <nav>
-            <button id="btn-admin-access" class="btn-nav-admin" onclick="abrirPanelAdmin()">
-                <span class="icon">🔒</span> Panel Admin
-            </button>
-        </nav>
+        <div class="logo-area">
+            <span class="brand-badge">EDISAN</span>
+            <span class="brand-sub">Sistemas</span>
+        </div>
+        <button class="btn-acceso-admin" onclick="alternarModalAdmin(true)">
+            <span class="glow-dot"></span> Panel de Control
+        </button>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL / VITRINA -->
-    <main class="contenedor-principal">
-        <section class="seccion-vitrina">
-            <h1 class="titulo-principal">Ciclos Activos y Productos</h1>
-            <p class="subtitulo">Gestión automatizada de Sanes y Catálogo Comercial</p>
-            
-            <!-- Contenedor dinámico donde app.js inyectará las tarjetas -->
-            <div id="contenedor-grid" class="grid-premium">
-                <!-- Se rellena dinámicamente -->
+    <!-- CUERPO PRINCIPAL -->
+    <main class="main-container">
+        <!-- Dashboard Público de Sanes -->
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Rotaciones de Sanes Activos</h2>
+                <p>Monitoreo en tiempo real de turnos y estados de pago</p>
+            </div>
+            <div id="grid-sanes" class="cards-grid">
+                <!-- Se inyecta dinámicamente -->
+            </div>
+        </section>
+
+        <!-- Catálogo de Productos -->
+        <section class="dashboard-section">
+            <div class="section-header">
+                <h2>Catálogo Comercial</h2>
+                <p>Artículos disponibles y cuotas de financiamiento</p>
+            </div>
+            <div id="grid-productos" class="cards-grid">
+                <!-- Se inyecta dinámicamente -->
             </div>
         </section>
     </main>
 
-    <!-- PANEL DE ADMINISTRACIÓN SUPER PREMIUM (OCULTO POR DEFECTO) -->
-    <div id="panel-admin-abierto" class="panel-glass" style="display: none;">
-        <div class="panel-content">
-            <div class="panel-header">
-                <h2>Acceso Restringido</h2>
-                <p class="saludo-patrona">Bienvenida, La Patrona Edimar</p>
+    <!-- MODAL DE ADMINISTRACIÓN (GLASSMORPHISM ABSOLUTO) -->
+    <div id="modal-admin" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="crown-icon">👑</div>
+                <h3>Acceso Administrativo</h3>
+                <p class="patrona-badge">La Patrona Edimar</p>
             </div>
             
-            <div class="form-grupo">
-                <label for="admin-password">Clave Maestra de Seguridad</label>
-                <input type="password" id="admin-password" placeholder="••••••••" class="input-premium">
+            <!-- Vista 1: Login de Seguridad -->
+            <div id="admin-login-view">
+                <div class="input-wrapper">
+                    <label>Firma Electrónica o Clave Maestra</label>
+                    <input type="password" id="admin-key" placeholder="••••••••">
+                </div>
+                <button class="btn-action-primary" onclick="procesarLoginAdmin()">Autenticar Autoridad</button>
+                <button class="btn-action-cancel" onclick="alternarModalAdmin(false)">Volver a la Vitrina</button>
             </div>
-            
-            <div class="panel-acciones">
-                <button onclick="verificarAccesoAdmin()" class="btn-neon">Iniciar Sesión</button>
-                <button onclick="cerrarPanelAdmin()" class="btn-secundario">Cancelar</button>
+
+            <!-- Vista 2: Consola de Gestión Interactiva (Se activa al loguearse) -->
+            <div id="admin-console-view" style="display: none;">
+                <div class="tab-menu">
+                    <button class="tab-btn active" onclick="cambiarFormulario('sanes')">+ San</button>
+                    <button class="tab-btn" onclick="cambiarFormulario('productos')">+ Producto</button>
+                </div>
+                
+                <form id="form-registro" onsubmit="enviarDatosConsola(event)">
+                    <div id="campos-dinamicos">
+                        <!-- Campos inyectados según la pestaña elegida -->
+                    </div>
+                    <button type="submit" class="btn-action-primary">Cargar Registro en Base de Datos</button>
+                </form>
+                <button class="btn-action-cancel" onclick="cerrarSesionAdmin()">Cerrar Consola</button>
             </div>
         </div>
     </div>
 
-    <!-- ENLACE AL SCRIPT DE COMPORTAMIENTO (SIN ETIQUETAS INTERNAS ROTHAS) -->
     <script src="app.js"></script>
 </body>
 </html>
