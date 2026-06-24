@@ -325,4 +325,21 @@ async function procesarAprobacion(solicitudId, esNuevo, sanId, nombre, telefono,
   }
 }
 
-function cerrarPanelAdmin() { document.getElementById("panel-admin-abierto").style.display = "none"; }
+function abrirPanelAdmin() {
+    document.getElementById("panel-admin-abierto").style.display = "flex";
+}
+
+function cerrarPanelAdmin() {
+    document.getElementById("panel-admin-abierto").style.display = "none";
+    document.getElementById("admin-password").value = ""; // Limpia el campo
+}
+
+function mostrarLoader(visibilidad) {
+    const loader = document.getElementById("loader");
+    if(loader) {
+        loader.style.opacity = visibilidad ? "1" : "0";
+        setTimeout(() => {
+            loader.style.display = visibilidad ? "flex" : "none";
+        }, 400);
+    }
+}

@@ -1,184 +1,65 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>EDISAN - Control Super Premium</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BaseEdimar - Vitrina Premium</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts para tipografía moderna -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <!-- Capa de Fondo con Halos Dinámicos (Glows) -->
-  <div class="glow-container">
-    <div class="glow-sphere glow-1"></div>
-    <div class="glow-sphere glow-2"></div>
-    <div class="glow-sphere glow-3"></div>
-  </div>
-
-  <!-- Loader Premium e Identidad de La Patrona Edimar -->
-  <div id="loader-screen" class="full-screen-loader">
-    <div class="loader-content">
-      <div class="spinner-premium"></div>
-      <h2 class="loader-title">BaseEdimar Core</h2>
-      <p id="loader-phrase" class="loader-phrase">Sincronizando cuentas con los libros contables...</p>
+    <!-- PANTALLA DE CARGA (LOADER) -->
+    <div id="loader" class="loader-container">
+        <div class="spinner"></div>
+        <p>Sincronizando con BaseEdimar...</p>
     </div>
-  </div>
 
-  <!-- Encabezado de la App -->
-  <header class="app-header">
-    <div class="logo">EDISAN</div>
-    <nav class="nav-actions">
-      <button id="btn-nav-vitrina" class="btn-nav active" onclick="cambiarVista('vitrina')">Vitrina</button>
-      <button id="btn-nav-cuenta" class="btn-nav" onclick="cambiarVista('cuenta')">Mi Cuenta</button>
-    </nav>
-  </header>
-
-  <main class="main-container">
-    <!-- VISTA: VITRINA PÚBLICA -->
-    <section id="vista-vitrina" class="app-vista active">
-      <div class="section-title-container">
-        <h1 class="section-title">Sanes Activos</h1>
-        <p class="section-subtitle">Grupos de ahorro con cupos dinámicos controlados</p>
-      </div>
-      <div id="contenedor-sanes" class="grid-container"></div>
-
-      <div class="section-title-container" style="margin-top: 4rem;">
-        <h1 class="section-title">Vitrina de Productos</h1>
-        <p class="section-subtitle">Adquisición directa e independiente</p>
-      </div>
-      <div id="contenedor-productos" class="grid-container"></div>
-    </section>
-
-    <!-- VISTA: MI CUENTA PRIVADA -->
-    <section id="vista-cuenta" class="app-vista">
-      <div id="auth-box" class="glass-card login-card">
-        <h2>Ingreso Seguro</h2>
-        <p>Introduce los datos autorizados por administración</p>
-        <div class="form-group">
-          <label>Teléfono</label>
-          <input type="text" id="login-telefono" placeholder="Ej: 04141234567">
-        </div>
-        <div class="form-group">
-          <label>Contraseña</label>
-          <input type="password" id="login-pass" placeholder="****">
-        </div>
-        <button class="btn-premium action-btn" onclick="ejecutarLogin()">Acceder Al Sistema</button>
-      </div>
-
-      <div id="dashboard-box" class="dashboard-container" style="display:none;">
-        <div class="glass-card welcome-card">
-          <h2>Bienvenido/a, <span id="client-display-name">Usuario</span></h2>
-          <p>ID Cliente único asignado: <strong id="client-display-id">---</strong></p>
-          <button class="btn-secondary" onclick="cerrarSesion()">Cerrar Sesión</button>
-        </div>
-        <h3 style="margin: 2rem 0 1rem 0; color: #fff;">Tus Turnos y Control de Pagos</h3>
-        <div id="contenedor-turnos-cliente" class="grid-container"></div>
-      </div>
-    </section>
-  </main>
-
-  <!-- MODAL: REPORTAR COMPROBANTE -->
-  <div id="modal-pago" class="modal-backdrop">
-    <div class="glass-card modal-card">
-      <h3>Reportar Referencia de Pago</h3>
-      <p>Inyecta el número de referencia o pago móvil en los libros</p>
-      <input type="hidden" id="reporte-registro-id">
-      <div class="form-group">
-        <label>Número de Comprobante / Referencia</label>
-        <input type="text" id="reporte-comprobante" placeholder="Ej: Ref 48593021">
-      </div>
-      <div class="modal-actions">
-        <button class="btn-secondary" onclick="cerrarModal('modal-pago')">Cancelar</button>
-        <button class="btn-premium" onclick="enviarReportePago()">Procesar Transmisión</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: SOLICITUD DE CUPO -->
-  <div id="modal-solicitud" class="modal-backdrop">
-    <div class="glass-card modal-card">
-      <h3>Postulación de Cupo</h3>
-      <p id="solicitud-san-nombre">Asignando San...</p>
-      <input type="hidden" id="solicitud-san-id">
-      <div id="campos-canal-a">
-        <div class="form-group">
-          <label>Tu Nombre Completo</label>
-          <input type="text" id="sol-nombre" placeholder="Nombre y Apellido">
-        </div>
-        <div class="form-group">
-          <label>Teléfono de Contacto</label>
-          <input type="text" id="sol-telefono" placeholder="Ej: 04245551122">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Número de Turno Deseado</label>
-        <input type="number" id="sol-turno" min="1" placeholder="Ej: 3">
-      </div>
-      <div class="modal-actions">
-        <button class="btn-secondary" onclick="cerrarModal('modal-solicitud')">Descartar</button>
-        <button class="btn-premium" onclick="enviarSolicitudCupo()">Enviar Solicitud</button>
-      </div>
-    </div>
-  </div>
-
-  <footer class="app-footer">
-    <p>© 2026 EDISAN Core Framework.</p>
-    <button id="btn-discreto-admin" onclick="abrirLoginAdmin()">.</button>
-  </footer>
-
-  <!-- MODAL LOGIN ADMIN -->
-  <div id="modal-admin-auth" class="modal-backdrop">
-    <div class="glass-card modal-card">
-      <h3>Consola Suprema de Acceso</h3>
-      <p>Área reservada exclusivamente para la administración</p>
-      <div class="form-group">
-        <label>Clave Maestra de Seguridad</label>
-        <input type="password" id="admin-clave-input" placeholder="••••••••">
-      </div>
-      <div class="modal-actions">
-        <button class="btn-secondary" onclick="cerrarModal('modal-admin-auth')">Cerrar</button>
-        <button class="btn-premium" onclick="autenticarAdmin()">Desbloquear Panel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PANEL ADMIN FULLSCREEN -->
-  <div id="panel-admin-abierto" class="admin-panel-fullscreen" style="display: none;">
-    <header class="admin-header">
-      <h2>Panel Supremo de Operaciones — Al Respeto de La Patrona Edimar</h2>
-      <button class="btn-secondary" onclick="cerrarPanelAdmin()">Cerrar Consola</button>
+    <!-- BARRA DE NAVEGACIÓN -->
+    <header class="navbar">
+        <div class="logo">Base<span>Edimar</span></div>
+        <nav>
+            <button id="btn-admin-access" class="btn-nav-admin" onclick="abrirPanelAdmin()">
+                <span class="icon">🔒</span> Panel Admin
+            </button>
+        </nav>
     </header>
-    <div class="admin-content">
-      <div class="admin-section">
-        <h3>Canal A: Solicitudes de Clientes Nuevos</h3>
-        <div class="table-wrapper">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>ID</th><th>Nombre</th><th>Teléfono</th><th>San Solicitado</th><th>Turno Pedido</th><th>Asignar Turno Real</th><th>Acción</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-canal-a"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="admin-section" style="margin-top: 3rem;">
-        <h3>Canal B: Propuestas de Clientes Inscritos</h3>
-        <div class="table-wrapper">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>ID Propuesta</th><th>ID Cliente</th><th>San ID</th><th>Fecha</th><th>Turno Pedido</th><th>Asignar Turno Real</th><th>Acción</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-canal-b"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <script src="app.js"></script>
+    <!-- CONTENIDO PRINCIPAL / VITRINA -->
+    <main class="contenedor-principal">
+        <section class="seccion-vitrina">
+            <h1 class="titulo-principal">Ciclos Activos y Productos</h1>
+            <p class="subtitulo">Gestión automatizada de Sanes y Catálogo Comercial</p>
+            
+            <!-- Contenedor dinámico donde app.js inyectará las tarjetas -->
+            <div id="contenedor-grid" class="grid-premium">
+                <!-- Se rellena dinámicamente -->
+            </div>
+        </section>
+    </main>
+
+    <!-- PANEL DE ADMINISTRACIÓN SUPER PREMIUM (OCULTO POR DEFECTO) -->
+    <div id="panel-admin-abierto" class="panel-glass" style="display: none;">
+        <div class="panel-content">
+            <div class="panel-header">
+                <h2>Acceso Restringido</h2>
+                <p class="saludo-patrona">Bienvenida, La Patrona Edimar</p>
+            </div>
+            
+            <div class="form-grupo">
+                <label for="admin-password">Clave Maestra de Seguridad</label>
+                <input type="password" id="admin-password" placeholder="••••••••" class="input-premium">
+            </div>
+            
+            <div class="panel-acciones">
+                <button onclick="verificarAccesoAdmin()" class="btn-neon">Iniciar Sesión</button>
+                <button onclick="cerrarPanelAdmin()" class="btn-secundario">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENLACE AL SCRIPT DE COMPORTAMIENTO (SIN ETIQUETAS INTERNAS ROTHAS) -->
+    <script src="app.js"></script>
 </body>
 </html>
