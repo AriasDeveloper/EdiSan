@@ -71,15 +71,20 @@ function iniciarRotacionFrases() {
 
 async function cargarDatosIniciales() {
   mostrarLoader(true);
-  const response = await consultarBackend({ action: "obtenerDatosVitrina" });
-  mostrarLoader(false);
-  
-  if(response.success) {
-    datosLocales.sanes = response.sanes;
-    datosLocales.productos = response.productos;
-    renderizarVitrina();
-  } else {
-    alert("Fallo en sincronización: " + response.error);
+  try {
+    const response = await consultarBackend({ action: "obtenerDatosVitrina" });
+    mostrarLoader(false); // Apaga el loader al recibir respuesta
+    
+    if(response && response.success) {
+      datosLocales.sanes = response.sanes;
+      datosLocales.productos = response.productos;
+      renderizarVitrina();
+    } else {
+      alert("Fallo en sincronización: " + (response ? response.error : "Respuesta vacía"));
+    }
+  } catch (err) {
+    mostrarLoader(false); // Fuerza el apagado si todo falla
+    console.error("Error inicial:", err);
   }
 }
 
