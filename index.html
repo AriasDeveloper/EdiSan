@@ -1,122 +1,184 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <base target="_top">
-  <?!= include('styles.html'); ?>
+  <meta charset="UTF-8">
+  <title>EDISAN - Control Super Premium</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+  <!-- Capa de Fondo con Halos Dinámicos (Glows) -->
   <div class="glow-container">
     <div class="glow-sphere glow-1"></div>
     <div class="glow-sphere glow-2"></div>
     <div class="glow-sphere glow-3"></div>
   </div>
 
-  <div id="loader-screen">
-    <div class="spinner"></div>
-    <div id="loader-text">Verificando los libros contables con la aprobación de La Patrona Edimar...</div>
+  <!-- Loader Premium e Identidad de La Patrona Edimar -->
+  <div id="loader-screen" class="full-screen-loader">
+    <div class="loader-content">
+      <div class="spinner-premium"></div>
+      <h2 class="loader-title">BaseEdimar Core</h2>
+      <p id="loader-phrase" class="loader-phrase">Sincronizando cuentas con los libros contables...</p>
+    </div>
   </div>
 
-  <header>
+  <!-- Encabezado de la App -->
+  <header class="app-header">
     <div class="logo">EDISAN</div>
-    <div id="session-controls">
-      <button class="btn" onclick="openModal('login-modal')" style="padding: 8px 16px;">Mi Cuenta Privada</button>
-    </div>
+    <nav class="nav-actions">
+      <button id="btn-nav-vitrina" class="btn-nav active" onclick="cambiarVista('vitrina')">Vitrina</button>
+      <button id="btn-nav-cuenta" class="btn-nav" onclick="cambiarVista('cuenta')">Mi Cuenta</button>
+    </nav>
   </header>
 
-  <div class="container">
-    
-    <section id="dashboard-section" style="display: none; margin-bottom: 60px;">
-      <div class="glass-card" style="margin-bottom: 30px; border-color: var(--primary-neon);">
-        <h2 id="welcome-msg" style="margin-bottom: 10px;">Bienvenido</h2>
-        <p style="color: var(--text-muted);">Gestiona tus cuotas y sube tus soportes de pago móviles.</p>
-        <button class="btn" onclick="logout()" style="width: auto; margin-top: 15px; padding: 6px 15px; background: #374151;">Cerrar Sesión</button>
+  <main class="main-container">
+    <!-- VISTA: VITRINA PÚBLICA -->
+    <section id="vista-vitrina" class="app-vista active">
+      <div class="section-title-container">
+        <h1 class="section-title">Sanes Activos</h1>
+        <p class="section-subtitle">Grupos de ahorro con cupos dinámicos controlados</p>
+      </div>
+      <div id="contenedor-sanes" class="grid-container"></div>
+
+      <div class="section-title-container" style="margin-top: 4rem;">
+        <h1 class="section-title">Vitrina de Productos</h1>
+        <p class="section-subtitle">Adquisición directa e independiente</p>
+      </div>
+      <div id="contenedor-productos" class="grid-container"></div>
+    </section>
+
+    <!-- VISTA: MI CUENTA PRIVADA -->
+    <section id="vista-cuenta" class="app-vista">
+      <div id="auth-box" class="glass-card login-card">
+        <h2>Ingreso Seguro</h2>
+        <p>Introduce los datos autorizados por administración</p>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="text" id="login-telefono" placeholder="Ej: 04141234567">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="login-pass" placeholder="****">
+        </div>
+        <button class="btn-premium action-btn" onclick="ejecutarLogin()">Acceder Al Sistema</button>
       </div>
 
-      <h3 class="section-title">Mis Cupos y Control de Pagos</h3>
-      <div id="mis-turnos-grid" class="grid"></div>
+      <div id="dashboard-box" class="dashboard-container" style="display:none;">
+        <div class="glass-card welcome-card">
+          <h2>Bienvenido/a, <span id="client-display-name">Usuario</span></h2>
+          <p>ID Cliente único asignado: <strong id="client-display-id">---</strong></p>
+          <button class="btn-secondary" onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
+        <h3 style="margin: 2rem 0 1rem 0; color: #fff;">Tus Turnos y Control de Pagos</h3>
+        <div id="contenedor-turnos-cliente" class="grid-container"></div>
+      </div>
     </section>
+  </main>
 
-    <section>
-      <h2 class="section-title">Sanes Disponibles</h2>
-      <div id="sanes-container" class="grid"></div>
-    </section>
-
-    <section>
-      <h2 class="section-title">Vitrina Comercial Exclusiva</h2>
-      <div id="productos-container" class="grid"></div>
-    </section>
-
-  </div>
-
-  <div id="login-modal" class="modal">
-    <div class="glass-card modal-content">
-      <span class="close-btn" onclick="closeModal('login-modal')">&times;</span>
-      <h3>Acceso a Cuenta Privada</h3><br>
-      <input type="text" id="login-phone" placeholder="Número de Teléfono">
-      <input type="password" id="login-pass" placeholder="Contraseña de 4 dígitos">
-      <button class="btn" onclick="handleLogin()">Ingresar Seguro</button>
+  <!-- MODAL: REPORTAR COMPROBANTE -->
+  <div id="modal-pago" class="modal-backdrop">
+    <div class="glass-card modal-card">
+      <h3>Reportar Referencia de Pago</h3>
+      <p>Inyecta el número de referencia o pago móvil en los libros</p>
+      <input type="hidden" id="reporte-registro-id">
+      <div class="form-group">
+        <label>Número de Comprobante / Referencia</label>
+        <input type="text" id="reporte-comprobante" placeholder="Ej: Ref 48593021">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="cerrarModal('modal-pago')">Cancelar</button>
+        <button class="btn-premium" onclick="enviarReportePago()">Procesar Transmisión</button>
+      </div>
     </div>
   </div>
 
-  <div id="solicitud-modal" class="modal">
-    <div class="glass-card modal-content">
-      <span class="close-btn" onclick="closeModal('solicitud-modal')">&times;</span>
-      <h3 id="solicitud-title">Inscripción al San</h3><br>
+  <!-- MODAL: SOLICITUD DE CUPO -->
+  <div id="modal-solicitud" class="modal-backdrop">
+    <div class="glass-card modal-card">
+      <h3>Postulación de Cupo</h3>
+      <p id="solicitud-san-nombre">Asignando San...</p>
       <input type="hidden" id="solicitud-san-id">
-      
-      <div id="campos-externos">
-        <label>Nombre Completo</label>
-        <input type="text" id="sol-nombre" placeholder="Ej. Juan Pérez">
-        <label>Número de Teléfono</label>
-        <input type="tel" id="sol-telefono" placeholder="Ej. 04141234567">
+      <div id="campos-canal-a">
+        <div class="form-group">
+          <label>Tu Nombre Completo</label>
+          <input type="text" id="sol-nombre" placeholder="Nombre y Apellido">
+        </div>
+        <div class="form-group">
+          <label>Teléfono de Contacto</label>
+          <input type="text" id="sol-telefono" placeholder="Ej: 04245551122">
+        </div>
       </div>
-
-      <label>Turno Deseado</label>
-      <input type="number" id="sol-turno" placeholder="Número de turno que deseas asegurar" min="1">
-      
-      <button class="btn" onclick="enviarSolicitudCanalizado()">Confirmar Registro de Solicitud</button>
+      <div class="form-group">
+        <label>Número de Turno Deseado</label>
+        <input type="number" id="sol-turno" min="1" placeholder="Ej: 3">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="cerrarModal('modal-solicitud')">Descartar</button>
+        <button class="btn-premium" onclick="enviarSolicitudCupo()">Enviar Solicitud</button>
+      </div>
     </div>
   </div>
 
-  <div id="pago-modal" class="modal">
-    <div class="glass-card modal-content">
-      <span class="close-btn" onclick="closeModal('pago-modal')">&times;</span>
-      <h3>Reportar Pago Móvil / Transferencia</h3><br>
-      <input type="hidden" id="pago-registro-id">
-      <label>Referencia Bancaria (Últimos 6 u 8 dígitos)</label>
-      <input type="text" id="pago-referencia" placeholder="Introduzca el código numérico">
-      <button class="btn" onclick="enviarReportePago()">Enviar a Revisión de la Patrona</button>
-    </div>
-  </div>
-
-  <div id="admin-auth-modal" class="modal">
-    <div class="glass-card modal-content">
-      <span class="close-btn" onclick="closeModal('admin-auth-modal')">&times;</span>
-      <h3>Panel de Control Operativo</h3><br>
-      <input type="password" id="admin-pass" placeholder="Inserte Clave Maestra de Edimar">
-      <button class="btn" onclick="autenticarAdmin()">Acceder al Libro General</button>
-    </div>
-  </div>
-
-  <div id="admin-panel-modal" class="modal" style="align-items: flex-start; overflow-y: auto; padding-top: 50px;">
-    <div class="glass-card modal-content" style="max-width: 900px; width: 95%;">
-      <span class="close-btn" onclick="closeModal('admin-panel-modal')">&times;</span>
-      <h2>Panel Operativo de La Patrona Edimar</h2><br>
-      
-      <h4 style="color: var(--accent-glow); margin-bottom: 10px;">Canal A: Solicitudes de Clientes Nuevos</h4>
-      <div id="admin-nuevos-tbl" style="overflow-x:auto; margin-bottom:30px;"></div>
-
-      <h4 style="color: var(--accent-glow); margin-bottom: 10px;">Canal B: Propuestas de Clientes Inscritos</h4>
-      <div id="admin-inscritos-tbl" style="overflow-x:auto;"></div>
-    </div>
-  </div>
-
-  <footer>
-    <p>© 2026 EDISAN Platform - Premium Design.</p>
-    <a class="admin-trigger" onclick="openModal('admin-auth-modal')">🔒 Acceso Administrativo Autorizado</a>
+  <footer class="app-footer">
+    <p>© 2026 EDISAN Core Framework.</p>
+    <button id="btn-discreto-admin" onclick="abrirLoginAdmin()">.</button>
   </footer>
 
-  <?!= include('app'); ?>
+  <!-- MODAL LOGIN ADMIN -->
+  <div id="modal-admin-auth" class="modal-backdrop">
+    <div class="glass-card modal-card">
+      <h3>Consola Suprema de Acceso</h3>
+      <p>Área reservada exclusivamente para la administración</p>
+      <div class="form-group">
+        <label>Clave Maestra de Seguridad</label>
+        <input type="password" id="admin-clave-input" placeholder="••••••••">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="cerrarModal('modal-admin-auth')">Cerrar</button>
+        <button class="btn-premium" onclick="autenticarAdmin()">Desbloquear Panel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL ADMIN FULLSCREEN -->
+  <div id="panel-admin-abierto" class="admin-panel-fullscreen" style="display: none;">
+    <header class="admin-header">
+      <h2>Panel Supremo de Operaciones — Al Respeto de La Patrona Edimar</h2>
+      <button class="btn-secondary" onclick="cerrarPanelAdmin()">Cerrar Consola</button>
+    </header>
+    <div class="admin-content">
+      <div class="admin-section">
+        <h3>Canal A: Solicitudes de Clientes Nuevos</h3>
+        <div class="table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th><th>Nombre</th><th>Teléfono</th><th>San Solicitado</th><th>Turno Pedido</th><th>Asignar Turno Real</th><th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-canal-a"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="admin-section" style="margin-top: 3rem;">
+        <h3>Canal B: Propuestas de Clientes Inscritos</h3>
+        <div class="table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID Propuesta</th><th>ID Cliente</th><th>San ID</th><th>Fecha</th><th>Turno Pedido</th><th>Asignar Turno Real</th><th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-canal-b"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
