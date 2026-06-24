@@ -4,11 +4,13 @@ import { DB, cargarDatosDesdeSheets, ejecutarPostSheets } from './api.js';
 
 let clienteLogueado = null;
 
+// Exponer funciones globalmente para el entorno
 window.mostrarCarga = mostrarCarga;
 window.ocultarCarga = ocultarCarga;
 window.mostrarToast = mostrarToast;
 window.recargarManejador = () => cargarDatosDesdeSheets(mostrarCarga, ocultarCarga, refrescarTodaLaUI);
 
+// Iniciar carga de datos al abrir la app
 mostrarCarga();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -26,68 +28,101 @@ document.addEventListener('DOMContentLoaded', () => {
 function mostrarCarga() {
     const txt = document.getElementById('texto-carga-divertido');
     const panta = document.getElementById('pantalla-carga');
-    if(txt && FRASES_CARGA) txt.innerText = FRASES_CARGA[Math.floor(Math.random() * FRASES_CARGA.length)];
-    if(panta) panta.classList.add('modal-active');
+    if (txt && FRASES_CARGA) {
+        txt.innerText = FRASES_CARGA[Math.floor(Math.random() * FRASES_CARGA.length)];
+    }
+    if (panta) panta.classList.add('modal-active');
 }
 
 function ocultarCarga() {
     const panta = document.getElementById('pantalla-carga');
-    if(panta) panta.classList.remove('modal-active');
+    if (panta) panta.classList.remove('modal-active');
 }
 
 function refrescarTodaLaUI() {
     renderizarOfertasPublicas();
     renderizarVitrinaProductosPublica();
     
-    if(document.getElementById('seccion-admin').classList.contains('view-active')) {
+    if (document.getElementById('seccion-admin').classList.contains('view-active')) {
         renderizarAdminTodo();
     }
-    if(clienteLogueado) {
+    if (clienteLogueado) {
+        // Actualizar datos del cliente logueado por si hubo cambios en el backend
+        const actualizado = DB.clientes.find(c => c.Cliente_ID == clienteLogueado.Cliente_ID);
+        if (actualizado) clienteLogueado = actualizado;
         renderizarEspacioPrivadoCliente();
     }
 }
 
-// FORMULARIOS DE CREACIÓN DESDE EL PANEL DE ADMIN
+// ==========================================
+// FORMULARIOS DE CREACIÓN (PANEL ADMIN)
+// ==========================================
 function configurarEnviosFormulariosAdmin() {
-    // Crear San
+    
+    // 1. Crear Nuevo San (Corrección de guardado de Monto y Fecha)
     document.getElementById('form-crear-san').onsubmit = (e) => {
         e.preventDefault();
-        ejecutarPostSheets('crearSan', {
+        
+        const datosSan = {
             id: "SAN" + Date.now().toString().slice(-4),
             nombre: document.getElementById('san-nombre').value,
-            monto: document.getElementById('san-monto').value,
+            monto: parseFloat(document.getElementById('san-monto').value),
             fecha: document.getElementById('san-fecha').value,
             turnos: 3
-        }, mostrarCarga, ocultarCarga, window.recargarManejador);
+        };
+
+        ejecutarPostSheets('crearSan', datosSan, mostrarCarga, () => {
+            ocultarCarga();
+            mostrarToast("¡San aperturado con éxito!", "success");
+            window.recargarManejador();
+        });
         e.target.reset();
     };
 
-    // Crear Cliente Manual
+    // 2. Crear Cliente Manualmente
     document.getElementById('form-crear-cliente').onsubmit = (e) => {
         e.preventDefault();
-        ejecutarPostSheets('crearCliente', {
+        
+        const datosCliente = {
             id: "CLI" + Date.now().toString().slice(-4),
             nombre: document.getElementById('cli-nombre').value,
             telefono: document.getElementById('cli-telefono').value,
             contrasena: document.getElementById('cli-pass').value
-        }, mostrarCarga, ocultarCarga, window.recargarManejador);
+        };
+
+        ejecutarPostSheets('crearCliente', datosCliente, mostrarCarga, () => {
+            ocultarCarga();
+            mostrarToast("Cliente registrado en la base de datos", "success");
+            window.recargarManejador();
+        });
         e.target.reset();
     };
 
-    // Crear Producto
+    // 3. Crear y Publicar Producto
     document.getElementById('form-crear-producto').onsubmit = (e) => {
         e.preventDefault();
-        ejecutarPostSheets('crearProducto', {
+        
+        const datosProducto = {
             id: "PROD" + Date.now().toString().slice(-4),
             nombre: document.getElementById('prod-nombre').value,
-            precio: document.getElementById('prod-precio').value,
+            precio: parseFloat(document.getElementById('prod-precio').value),
             imagen: document.getElementById('prod-imagen').value || "https://placehold.co/150"
-        }, mostrarCarga, ocultarCarga, window.recargarManejador);
+        };
+
+        ejecutarPostSheets('crearProducto', datosProducto, mostrarCarga, () => {
+            ocultarCarga();
+            mostrarToast("Producto agregado a la vitrina", "success");
+            window.recargarManejador();
+        });
         e.target.reset();
     };
 }
 
+// ==========================================
+// NAVEGACIÓN Y AUTENTICACIÓN
+// ==========================================
 function inicializarNavegacionEstructural() {
+    // Ingreso con llave de seguridad al panel de Edimar
     document.getElementById('btn-llave-admin').onclick = () => {
         const pass = prompt("Clave de la Directiva:");
         if (pass === ADMIN_CONFIG.CLAVE_ACCESO) {
@@ -95,8 +130,8 @@ function inicializarNavegacionEstructural() {
             document.getElementById('seccion-admin').classList.add('view-active');
             renderizarAdminTodo();
             document.querySelector('.tab-trigger[data-tab="sanes"]').click();
-            mostrarToast("Sesión de Edimar activa", "success");
-        } else if(pass !== null) {
+            mostrarToast("Sesión de Administración activa", "success");
+        } else if (pass !== null) {
             mostrarToast("Contraseña incorrecta", "error");
         }
     };
@@ -112,7 +147,7 @@ function inicializarNavegacionEstructural() {
         clienteLogueado = null;
         document.getElementById('cliente-vista-privada').classList.add('oculto');
         document.getElementById('cliente-vista-publica').style.display = "block";
-        mostrarToast("Sesión cliente cerrada", "info");
+        mostrarToast("Sesión de cliente cerrada", "info");
     };
 }
 
@@ -130,12 +165,12 @@ function inicializarTabsAdmin() {
 
 function abrirModalLogin() {
     const modal = document.getElementById('modal-premium');
-    document.getElementById('modal-titulo').innerText = "Área de Clientes";
+    document.getElementById('modal-titulo').innerText = "Área Privada de Clientes";
     let opciones = (DB.clientes || []).map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
     
     document.getElementById('modal-cuerpo').innerHTML = `
         <form id="form-autenticar" class="premium-form">
-            <div class="form-group"><label>Usuario</label><select id="login-id">${opciones}</select></div>
+            <div class="form-group"><label>Selecciona tu Usuario</label><select id="login-id">${opciones}</select></div>
             <div class="form-group"><label>Contraseña</label><input type="password" id="login-pass" required></div>
             <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Entrar</button>
         </form>
@@ -148,23 +183,27 @@ function abrirModalLogin() {
         const pass = document.getElementById('login-pass').value;
         const c = DB.clientes.find(cli => cli.Cliente_ID == id && String(cli.Contrasena) === String(pass));
 
-        if(c) {
+        if (c) {
             clienteLogueado = c;
             modal.classList.remove('modal-active');
             document.getElementById('cliente-vista-publica').style.display = "none";
             document.getElementById('cliente-vista-privada').classList.remove('oculto');
             document.getElementById('txt-bienvenida-cliente').innerText = `Hola, ${c.Nombre_Completo}`;
             renderizarEspacioPrivadoCliente();
-            mostrarToast("Bienvenido", "success");
+            mostrarToast("Sesión iniciada correctamente", "success");
         } else {
             mostrarToast("Contraseña incorrecta", "error");
         }
     };
 }
 
+// ==========================================
+// RENDERS DE LA VISTA PÚBLICA / CLIENTE
+// ==========================================
 function renderizarOfertasPublicas() {
     const cont = document.getElementById('contenedor-ofertas-publicas');
-    if(!cont || !DB.sanes) return;
+    if (!cont || !DB.sanes) return;
+    
     cont.innerHTML = DB.sanes.map(san => {
         const ocupados = (DB.registrosTurnos || []).filter(r => r.San_ID == san.San_ID).length;
         const lleno = ocupados >= parseInt(san.Total_Turnos || 3);
@@ -187,7 +226,7 @@ function renderizarOfertasPublicas() {
 
 function renderizarVitrinaProductosPublica() {
     const cont = document.getElementById('contenedor-productos-cliente');
-    if(!cont || !DB.productos) return;
+    if (!cont || !DB.productos) return;
     cont.innerHTML = DB.productos.map(p => `
         <div class="glass-card text-center">
             <img src="${p.Imagen_URL}" style="width:100%; max-height:140px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
@@ -203,20 +242,26 @@ function abrirModalInscripcionPublico(sanId, nombreSan) {
     document.getElementById('modal-cuerpo').innerHTML = `
         <form id="form-solicitar-nuevo" class="premium-form">
             <div class="form-group"><label>Nombre Completo</label><input type="text" id="sol-nombre" required></div>
-            <div class="form-group"><label>WhatsApp</label><input type="text" id="sol-telef" required></div>
+            <div class="form-group"><label>WhatsApp / Teléfono</label><input type="text" id="sol-telef" required></div>
             <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Enviar Solicitud</button>
         </form>
     `;
     modal.classList.add('modal-active');
+    
     document.getElementById('form-solicitar-nuevo').onsubmit = (e) => {
         e.preventDefault();
         modal.classList.remove('modal-active');
+        
         ejecutarPostSheets('solicitarNuevo', {
             id: "REQ" + Date.now().toString().slice(-4),
             nombre: document.getElementById('sol-nombre').value,
             telefono: document.getElementById('sol-telef').value,
             sanId: sanId
-        }, mostrarCarga, ocultarCarga, window.recargarManejador);
+        }, mostrarCarga, () => {
+            ocultarCarga();
+            mostrarToast("Solicitud enviada a revisión", "success");
+            window.recargarManejador();
+        });
     };
 }
 
@@ -224,8 +269,8 @@ function renderizarEspacioPrivadoCliente() {
     const misPuestos = (DB.registrosTurnos || []).filter(r => r.Cliente_ID == clienteLogueado.Cliente_ID);
     const tabla = document.getElementById('tabla-puestos-inscritos');
     
-    if(misPuestos.length === 0) {
-        tabla.innerHTML = `<p style="color:var(--texto-secundario);">No tienes puestos confirmados.</p>`;
+    if (misPuestos.length === 0) {
+        tabla.innerHTML = `<p style="color:var(--texto-secundario);">No tienes puestos confirmados en este ciclo.</p>`;
     } else {
         let filas = misPuestos.map(p => {
             const s = DB.sanes.find(x => x.San_ID == p.San_ID) || { Nombre_San: '-' };
@@ -239,20 +284,30 @@ function renderizarEspacioPrivadoCliente() {
     misPuestos.filter(p => p.Estado_Pago !== 'pagado').forEach(cuota => {
         const s = DB.sanes.find(x => x.San_ID == cuota.San_ID) || { Nombre_San: '-', Monto_Cuota: 0 };
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td><b>${s.Nombre_San}</b></td><td style="color:var(--oro-brillante); font-weight:bold;">$${s.Monto_Cuota}</td><td><span style="color:#ef4444;">Fijada</span></td><td><button class="btn-primary btn-subir" style="padding:4px 8px; font-size:0.8rem;">Subir Recibo</button></td>`;
+        tr.innerHTML = `
+            <td><b>${s.Nombre_San}</b></td>
+            <td style="color:var(--oro-brillante); font-weight:bold;">$${s.Monto_Cuota}</td>
+            <td><span style="color:#ef4444;">Fijada</span></td>
+            <td><button class="btn-primary btn-subir" style="padding:4px 8px; font-size:0.8rem;">Subir Recibo</button></td>
+        `;
         tr.querySelector('.btn-subir').onclick = () => {
-            const ref = prompt("Ingresa el número de referencia:");
-            if(ref) {
-                ejecutarPostSheets('registrarPago', { registroId: cuota.Registro_ID, nuevoEstado: 'pendiente', comprobante: ref }, mostrarCarga, ocultarCarga, window.recargarManejador);
+            const ref = prompt("Ingresa el número de referencia del pago:");
+            if (ref) {
+                ejecutarPostSheets('registrarPago', { registroId: cuota.Registro_ID, nuevoEstado: 'pendiente', comprobante: ref }, mostrarCarga, () => {
+                    mostrarToast("Comprobante enviado a Edimar", "success");
+                    window.recargarManejador();
+                });
             }
         };
         listaPagar.appendChild(tr);
     });
 }
 
-// RENDERIZADO GLOBAL DEL CONTROL DE EDIMAR (TABLAS DE BORRADO Y GESTIÓN)
+// ==========================================
+// RENDERS GENERALES DEL PANEL DE ADMIN
+// ==========================================
 function renderizarAdminTodo() {
-    // Matriz de pagos
+    // 1. Matriz General de Control de Pagos y Estados
     const tbodyPagos = document.getElementById('tbody-matriz-pagos');
     tbodyPagos.innerHTML = (DB.registrosTurnos || []).map(reg => {
         const san = DB.sanes.find(s => s.San_ID == reg.San_ID) || { Nombre_San: 'Desconocido' };
@@ -265,7 +320,7 @@ function renderizarAdminTodo() {
                 <td><span class="badge-estado ${reg.Estado_Pago}">${reg.Estado_Pago}</span></td>
                 <td><span style="font-size:0.85rem;">${reg.Comprobante_Pago || 'Ninguno'}</span></td>
                 <td>
-                    <select class="sel-est-adm" data-id="${reg.Registro_ID}" title="Estado">
+                    <select class="sel-est-adm" data-id="${reg.Registro_ID}" title="Cambiar Estado">
                         <option value="pendiente" ${reg.Estado_Pago==='pendiente'?'selected':''}>Pendiente</option>
                         <option value="pagado" ${reg.Estado_Pago==='pagado'?'selected':''}>Pagado</option>
                         <option value="atrasado" ${reg.Estado_Pago==='atrasado'?'selected':''}>Atrasado</option>
@@ -277,11 +332,14 @@ function renderizarAdminTodo() {
 
     tbodyPagos.querySelectorAll('.sel-est-adm').forEach(s => {
         s.onchange = (e) => {
-            ejecutarPostSheets('actualizarEstadoPago', { registroId: s.getAttribute('data-id'), estado: e.target.value }, mostrarCarga, ocultarCarga, window.recargarManejador);
+            ejecutarPostSheets('actualizarEstadoPago', { registroId: s.getAttribute('data-id'), estado: e.target.value }, mostrarCarga, () => {
+                mostrarToast("Estado de pago modificado", "success");
+                window.recargarManejador();
+            });
         };
     });
 
-    // Gestión Borrar Sanes
+    // 2. Tabla para Eliminar Sanes
     document.getElementById('tbody-lista-sanes-eliminar').innerHTML = (DB.sanes || []).map(s => `
         <tr>
             <td>${s.San_ID}</td>
@@ -293,13 +351,16 @@ function renderizarAdminTodo() {
     `).join('');
     document.querySelectorAll('.btn-del-san').forEach(b => {
         b.onclick = () => {
-            if(confirm("¿Seguro que deseas eliminar este San?")) {
-                ejecutarPostSheets('eliminarSan', { sanId: b.getAttribute('data-id') }, mostrarCarga, ocultarCarga, window.recargarManejador);
+            if (confirm("¿Estás seguro de que deseas eliminar este San por completo?")) {
+                ejecutarPostSheets('eliminarSan', { sanId: b.getAttribute('data-id') }, mostrarCarga, () => {
+                    mostrarToast("San eliminado", "info");
+                    window.recargarManejador();
+                });
             }
         };
     });
 
-    // Directorio de Clientes y Borrar
+    // 3. Directorio de Clientes y Borrado
     document.getElementById('tbody-lista-clientes').innerHTML = (DB.clientes || []).map(c => `
         <tr>
             <td>${c.Cliente_ID}</td>
@@ -310,13 +371,16 @@ function renderizarAdminTodo() {
     `).join('');
     document.querySelectorAll('.btn-del-cli').forEach(b => {
         b.onclick = () => {
-            if(confirm("¿Eliminar este cliente del directorio?")) {
-                ejecutarPostSheets('eliminarCliente', { clienteId: b.getAttribute('data-id') }, mostrarCarga, ocultarCarga, window.recargarManejador);
+            if (confirm("¿Eliminar este cliente de la base de datos de EDISAN?")) {
+                ejecutarPostSheets('eliminarCliente', { clienteId: b.getAttribute('data-id') }, mostrarCarga, () => {
+                    mostrarToast("Cliente dado de baja", "info");
+                    window.recargarManejador();
+                });
             }
         };
     });
 
-    // Inventario de Productos y Borrar
+    // 4. Inventario de Productos Comerciales y Borrado
     document.getElementById('tbody-lista-productos').innerHTML = (DB.productos || []).map(p => `
         <tr>
             <td>${p.Producto_ID}</td>
@@ -327,13 +391,16 @@ function renderizarAdminTodo() {
     `).join('');
     document.querySelectorAll('.btn-del-prod').forEach(b => {
         b.onclick = () => {
-            if(confirm("¿Eliminar este producto de la vitrina?")) {
-                ejecutarPostSheets('eliminarProducto', { productoId: b.getAttribute('data-id') }, mostrarCarga, ocultarCarga, window.recargarManejador);
+            if (confirm("¿Retirar este producto de la vitrina?")) {
+                ejecutarPostSheets('eliminarProducto', { productoId: b.getAttribute('data-id') }, mostrarCarga, () => {
+                    mostrarToast("Producto eliminado del stock", "info");
+                    window.recargarManejador();
+                });
             }
         };
     });
 
-    // Rellenar selectores del asignador manual
+    // Actualizar Selectores del Asignador Manual de Turnos
     document.getElementById('admin-select-cliente').innerHTML = (DB.clientes || []).map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
     document.getElementById('admin-select-san').innerHTML = (DB.sanes || []).map(s => `<option value="${s.San_ID}">${s.Nombre_San}</option>`).join('');
 
@@ -341,46 +408,93 @@ function renderizarAdminTodo() {
         const cId = document.getElementById('admin-select-cliente').value;
         const sId = document.getElementById('admin-select-san').value;
         const tNum = parseInt(document.getElementById('admin-input-turno').value);
-        ejecutarPostSheets('asignarTurnoManual', { id: "REG" + Date.now().toString().slice(-4), clienteId: cId, sanId: sId, turno: tNum }, mostrarCarga, ocultarCarga, window.recargarManejador);
+        
+        ejecutarPostSheets('asignarTurnoManual', { id: "REG" + Date.now().toString().slice(-4), clienteId: cId, sanId: sId, turno: tNum }, mostrarCarga, () => {
+            mostrarToast("Turno asignado de forma manual", "success");
+            window.recargarManejador();
+        });
     };
 
     renderizarTablasSolicitudes();
 }
 
+// ==========================================
+// SUB-MÓDULO: CONTROL DE SOLICITUDES DE ACCESO
+// ==========================================
 function renderizarTablasSolicitudes() {
+    
+    // 1. Nuevos Clientes (Aprobación crítica corregida con refresco forzado)
     document.getElementById('tbody-solicitudes-nuevos').innerHTML = (DB.solicitudesNuevos || []).map(sol => {
         const san = DB.sanes.find(s => s.San_ID == sol.San_ID) || { Nombre_San: '-' };
-        return `<tr><td><b>${sol.Nombre_Completo}</b></td><td>${sol.Telefono}</td><td>${san.Nombre_San}</td><td><button class="btn-primary btn-ap-n" data-id="${sol.Solicitud_ID}" data-nom="${sol.Nombre_Completo}" data-tel="${sol.Telefono}" data-san="${sol.San_ID}" style="padding:4px 8px; font-size:0.8rem;">Aprobar</button></td></tr>`;
+        return `
+            <tr>
+                <td><b>${sol.Nombre_Completo}</b></td>
+                <td>${sol.Telefono}</td>
+                <td>${san.Nombre_San}</td>
+                <td><button class="btn-primary btn-ap-n" data-id="${sol.Solicitud_ID}" data-nom="${sol.Nombre_Completo}" data-tel="${sol.Telefono}" data-san="${sol.San_ID}" style="padding:4px 8px; font-size:0.8rem;">Aprobar</button></td>
+            </tr>
+        `;
     }).join('');
 
     document.getElementById('tbody-solicitudes-nuevos').querySelectorAll('.btn-ap-n').forEach(b => {
         b.onclick = () => {
-            const pass = prompt(`Contraseña para ${b.getAttribute('data-nom')}:`, "EDISAN" + Math.floor(1000+Math.random()*9000));
-            if(pass) {
-                ejecutarPostSheets('procesarAprobacionNuevo', { solicitudId: b.getAttribute('data-id'), nombre: b.getAttribute('data-nom'), telefono: b.getAttribute('data-tel'), sanId: b.getAttribute('data-san'), contrasena: pass }, mostrarCarga, ocultarCarga, window.recargarManejador);
+            const pass = prompt(`Crea una contraseña de acceso para ${b.getAttribute('data-nom')}:`, "EDISAN" + Math.floor(1000 + Math.random() * 9000));
+            if (pass) {
+                const payload = {
+                    solicitudId: b.getAttribute('data-id'),
+                    nombre: b.getAttribute('data-nom'),
+                    telefono: b.getAttribute('data-tel'),
+                    sanId: b.getAttribute('data-san'),
+                    contrasena: pass
+                };
+
+                mostrarCarga();
+                ejecutarPostSheets('procesarAprobacionNuevo', payload, mostrarCarga, () => {
+                    ocultarCarga();
+                    mostrarToast(`Cliente ${payload.nombre} aprobado y guardado`, "success");
+                    
+                    // Sincronización de retardo para asentar los datos en Sheets antes de la lectura
+                    setTimeout(() => {
+                        window.recargarManejador();
+                    }, 800);
+                });
             }
         };
     });
 
+    // 2. Solicitudes de Clientes ya Existentes que quieren entrar a un nuevo San
     document.getElementById('tbody-solicitudes-inscritos').innerHTML = (DB.solicitudesInscritos || []).map(sol => {
         const c = DB.clientes.find(x => x.Cliente_ID == sol.Cliente_ID) || { Nombre_Completo: '-' };
         const s = DB.sanes.find(x => x.San_ID == sol.San_ID) || { Nombre_San: '-' };
-        return `<tr><td><b>${c.Nombre_Completo}</b></td><td>${s.Nombre_San}</td><td><button class="btn-primary btn-ap-i" data-id="${sol.Solicitud_ID}" data-cli="${sol.Cliente_ID}" data-san="${sol.San_ID}" style="padding:4px 8px; font-size:0.8rem;">Conceder</button></td></tr>`;
+        return `
+            <tr>
+                <td><b>${c.Nombre_Completo}</b></td>
+                <td>${s.Nombre_San}</td>
+                <td><button class="btn-primary btn-ap-i" data-id="${sol.Solicitud_ID}" data-cli="${sol.Cliente_ID}" data-san="${sol.San_ID}" style="padding:4px 8px; font-size:0.8rem;">Conceder Cupo</button></td>
+            </tr>
+        `;
     }).join('');
 
     document.getElementById('tbody-solicitudes-inscritos').querySelectorAll('.btn-ap-i').forEach(b => {
         b.onclick = () => {
-            ejecutarPostSheets('procesarAprobacionInscrito', { solicitudId: b.getAttribute('data-id'), clienteId: b.getAttribute('data-cli'), sanId: b.getAttribute('data-san') }, mostrarCarga, ocultarCarga, window.recargarManejador);
+            ejecutarPostSheets('procesarAprobacionInscrito', { 
+                solicitudId: b.getAttribute('data-id'), 
+                clienteId: b.getAttribute('data-cli'), 
+                sanId: b.getAttribute('data-san') 
+            }, mostrarCarga, () => {
+                mostrarToast("Cupo asignado en el grupo", "success");
+                setTimeout(() => { window.recargarManejador(); }, 800);
+            });
         };
     });
 }
 
 function mostrarToast(mensaje, tipo = "success") {
     const cont = document.getElementById('toast-container');
-    if(!cont) return;
+    if (!cont) return;
     const toast = document.createElement('div');
     toast.className = `toast ${tipo}`;
-    toast.style.cssText = "background:rgba(15,10,32,0.95); border-left:4px solid "+(tipo==='success'?'#22c55e':'#ef4444')+"; color:#fff; padding:12px 18px; border-radius:8px; font-size:0.85rem; box-shadow:0 8px 24px rgba(0,0,0,0.4);";
+    toast.style.cssText = "background:rgba(15,10,32,0.95); border-left:4px solid " + (tipo === 'success' ? '#22c55e' : '#ef4444') + "; color:#fff; padding:12px 18px; border-radius:8px; font-size:0.85rem; box-shadow:0 8px 24px rgba(0,0,0,0.4); font-weight:500; min-width:220px; text-align:center;";
     toast.innerText = mensaje;
     cont.appendChild(toast);
     setTimeout(() => { toast.remove(); }, 3500);
