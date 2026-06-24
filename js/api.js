@@ -1,6 +1,7 @@
 // js/api.js
 import { API_CONFIG } from './config.js';
 
+// Base de datos reactiva local
 export let DB = { 
     sanes: [], 
     clientes: [], 
@@ -14,8 +15,11 @@ export function fijarDB(nuevaDB) {
     DB = nuevaDB;
 }
 
+// Verifica de forma automática si hay cuotas vencidas antes de pintar la UI
 export function verificarFechasVencidas() {
     const hoy = new Date();
+    if (!DB.registrosTurnos) return;
+    
     DB.registrosTurnos.forEach(reg => {
         if (reg.Estado_Pago === 'pendiente' && reg.Fecha_Limite) {
             const limite = new Date(reg.Fecha_Limite);
@@ -24,6 +28,7 @@ export function verificarFechasVencidas() {
     });
 }
 
+// Petición GET unificada
 export async function cargarDatosDesdeSheets(mostrarCarga, ocultarCarga, postSincronizacion) {
     mostrarCarga();
     try {
@@ -35,16 +40,17 @@ export async function cargarDatosDesdeSheets(mostrarCarga, ocultarCarga, postSin
             verificarFechasVencidas();
             postSincronizacion();
         } else {
-            window.mostrarToast("Error en la estructura del servidor", "error");
+            window.mostrarToast("Estructura de datos inválida", "error");
         }
     } catch (e) { 
-        window.mostrarToast("Error de sincronización con la nube", "error"); 
-        console.error(e);
+        window.mostrarToast("Error de conexión con la nube", "error"); 
+        console.error("Error en la sincronización:", e);
     } finally { 
         ocultarCarga(); 
     }
 }
 
+// Petición POST unificada para registrar acciones con seguridad
 export async function ejecutarPostSheets(accion, payload, mostrarCarga, ocultarCarga, callbackRecarga) {
     mostrarCarga();
     try {
@@ -54,10 +60,12 @@ export async function ejecutarPostSheets(accion, payload, mostrarCarga, ocultarC
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: accion, payload: payload })
         });
-        window.mostrarToast("Cambio registrado de forma segura", "success");
-        setTimeout(callbackRecarga, 1200);
+        window.mostrarToast("Cambio registrado exitosamente", "success");
+        // Pequeño delay de cortesía para dejar que Sheets procese la fila
+        setTimeout(callbackRecarga, 1500);
     } catch (e) { 
-        window.mostrarToast("Fallo al escribir en la base de datos", "error"); 
+        window.mostrarToast("Error al escribir en la base de datos", "error"); 
+        console.error("Error en ejecución de comando:", e);
         ocultarCarga(); 
     }
 }

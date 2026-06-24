@@ -1,145 +1,202 @@
 // js/ui-admin.js
 import { DB, ejecutarPostSheets } from './api.js';
 
+// 1. INICIALIZADOR DE PESTAÑAS (TABS) ADMINISTRATIVAS
 export function inicializarTabsAdmin() {
-    const tabs = ['sanes', 'clientes', 'puestos', 'solicitudes', 'productos'];
-    tabs.forEach(t => {
-        const botonTab = document.getElementById(`tab-admin-${t}`);
-        if(botonTab) {
-            botonTab.onclick = (e) => {
-                tabs.forEach(x => {
-                    document.getElementById(`sub-panel-${x}`).classList.add('oculto');
-                    document.getElementById(`tab-admin-${x}`).className = 'btn-secondary';
-                });
-                document.getElementById(`sub-panel-${t}`).classList.remove('oculto');
-                e.currentTarget.className = 'btn-primary';
-            };
-        }
+    const triggers = document.querySelectorAll('.tab-trigger');
+    triggers.forEach(btn => {
+        btn.onclick = () => {
+            triggers.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content-admin').forEach(c => c.classList.add('oculto'));
+            
+            btn.classList.add('active');
+            const tabId = btn.getAttribute('data-tab');
+            const target = document.getElementById(`tab-${tabId}`);
+            if (target) target.classList.remove('oculto');
+        };
     });
 }
 
+// 2. ORQUESTADOR PRINCIPAL DEL PANEL DE LA PATRONA
 export function renderizarAdminTodo() {
-    // Selects dinámicos
-    const selSan = document.getElementById('sel-puesto-san');
-    const selCli = document.getElementById('sel-puesto-cliente');
-    if(selSan) selSan.innerHTML = DB.sanes.map(s => `<option value="${s.San_ID}">${s.Nombre_San}</option>`).join('');
-    if(selCli) selCli.innerHTML = DB.clientes.map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
+    renderizarMatrizPagos();
+    renderizarSolicitudesNuevos();
+    renderizarSolicitudesInscritos();
+    renderizarAsignadorTurnos();
+}
 
-    if(selSan) {
-        selSan.onchange = (e) => actualizarDesplegableTurnos(e.target.value);
-        if(DB.sanes.length > 0) actualizarDesplegableTurnos(DB.sanes[0].San_ID);
+// 3. MATRIZ GLOBAL DE CONTROL DE PAGOS (ACCESIBILIDAD CORREGIDA)
+function renderizarMatrizPagos() {
+    const tbody = document.getElementById('tbody-matriz-pagos');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!DB.registrosTurnos || DB.registrosTurnos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--texto-secundario);">No hay turnos registrados en el sistema.</td></tr>`;
+        return;
     }
 
-    // Listado de Sanes
-    document.getElementById('lista-admin-sanes-tabla').innerHTML = DB.sanes.map(s => {
-        const o = DB.registrosTurnos.filter(r => r.San_ID == s.San_ID).length;
-        return `<tr><td><b>${s.Nombre_San}</b></td><td>$${s.Monto_Cuota}</td><td>${s.Ciclo}</td><td>${o}/${s.Total_Turnos}</td><td><button class="btn-danger btn-del-san" data-id="${s.San_ID}">Eliminar</button></td></tr>`;
-    }).join('');
+    DB.registrosTurnos.forEach(reg => {
+        const san = DB.sanes.find(s => s.San_ID == reg.San_ID) || { Nombre_San: 'Desconocido' };
+        const cli = DB.clientes.find(c => c.Cliente_ID == reg.Cliente_ID) || { Nombre_Completo: 'Desconocido' };
+        
+        const compHtml = reg.Comprobante_Pago ? 
+            `<a href="${reg.Comprobante_Pago}" target="_blank" class="link-premium" style="font-size:0.85rem;" title="Ver comprobante de pago de ${cli.Nombre_Completo}">Ver Recibo</a>` 
+            : '<span style="color:var(--texto-secundario); font-size:0.85rem;">Ninguno</span>';
 
-    // Listado de Clientes
-    document.getElementById('lista-admin-clientes-tabla').innerHTML = DB.clientes.map(c => `
-        <tr><td>${c.Cliente_ID}</td><td><b>${c.Nombre_Completo}</b></td><td><code>${c.Contrasena}</code></td><td><button class="btn-danger btn-del-cliente" data-id="${c.Cliente_ID}">Eliminar</button></td></tr>
-    `).join('');
-
-    // Listado de Productos
-    document.getElementById('tabla-admin-productos').innerHTML = DB.productos.map(p => `
-        <tr><td><img src="${p.Imagen_URL}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;"></td><td><b>${p.Nombre}</b></td><td>$${p.Precio}</td><td>${p.Stock} unds</td><td><button class="btn-danger btn-del-prod" data-id="${p.Producto_ID}">Eliminar</button></td></tr>
-    `).join('');
-
-    // Matriz de Control de Pagos Global
-    const tablaPagos = document.getElementById('tabla-admin-pagos-global');
-    tablaPagos.innerHTML = DB.registrosTurnos.map(reg => {
-        const san = DB.sanes.find(s => s.San_ID == reg.San_ID) || { Nombre_San: '-' };
-        const cli = DB.clientes.find(c => c.Cliente_ID == reg.Cliente_ID) || { Nombre_Completo: '-' };
-        let compHtml = reg.Comprobante ? `<button class="btn-secondary btn-ver-comp" data-link="${reg.Comprobante}" data-id="${reg.Registro_ID}">Ver Recibo</button>` : '<i>Ninguno</i>';
-
-        return `<tr>
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
             <td><b>${san.Nombre_San}</b></td>
             <td>${cli.Nombre_Completo}</td>
             <td>Turno ${reg.Numero_Turno}</td>
-            <td><span class="badge-estado ${reg.Estado_Pago}">${reg.Estado_Pago}</span></td>
+            <td><span class="badge-estado ${reg.Estado_Pago}">${reg.Estado_Pago.toUpperCase()}</span></td>
             <td>${compHtml}</td>
             <td>
-                <select class="sel-cambiar-estado" data-id="${reg.Registro_ID}" title="Cambiar estado de pago para el cliente ${cli.Nombre_Completo}">
-                    <option value="pendiente" ${reg.Estado_Pago==='pendiente'?'selected':''}>Pendiente</option>
-                    <option value="pagado" ${reg.Estado_Pago==='pagado'?'selected':''}>Pagado</option>
-                    <option value="atrasado" ${reg.Estado_Pago==='atrasado'?'selected':''}>Atrasado</option>
+                <select class="sel-cambiar-estado select-premium" data-id="${reg.Registro_ID}" title="Cambiar estado de pago para ${cli.Nombre_Completo} en ${san.Nombre_San}">
+                    <option value="pendiente" ${reg.Estado_Pago === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                    <option value="pagado" ${reg.Estado_Pago === 'pagado' ? 'selected' : ''}>Pagado</option>
+                    <option value="atrasado" ${reg.Estado_Pago === 'atrasado' ? 'selected' : ''}>Atrasado</option>
                 </select>
             </td>
-        </tr>`;
-    }).join('');
+        `;
 
-    // Listas de esperas
-    document.getElementById('tabla-espera-nuevos').innerHTML = DB.solicitudesNuevos.map(sn => `
-        <tr><td><b>${sn.Nombre_Completo}</b></td><td>${sn.Telefono}</td><td><button class="btn-primary btn-apr-nuevo" data-id="${sn.Solicitud_ID}" data-nombre="${sn.Nombre_Completo}" data-tel="${sn.Telefono}">Aceptar</button></td></tr>
-    `).join('');
+        // Evento inmediato para guardar cambios de estado desde el selector
+        tr.querySelector('.sel-cambiar-estado').onchange = (e) => {
+            const nuevoEstado = e.target.value;
+            ejecutarPostSheets('actualizarEstadoPago', {
+                registroId: reg.Registro_ID,
+                estado: nuevoEstado
+            }, window.mostrarCarga, window.ocultarCarga, window.recargarManejador);
+        };
 
-    document.getElementById('tabla-espera-inscritos').innerHTML = DB.solicitudesInscritos.map(si => {
-        const c = DB.clientes.find(x => x.Cliente_ID == si.Cliente_ID) || { Nombre_Completo: '-' };
-        return `<tr><td><b>${c.Nombre_Completo}</b></td><td><button class="btn-primary btn-apr-inscrito" data-id="${si.Propuesta_ID}">Aceptar</button></td></tr>`;
-    }).join('');
-
-    conectarEventosAdmin(tablaPagos);
+        tbody.appendChild(tr);
+    });
 }
 
-function actualizarDesplegableTurnos(sanId) {
-    const selectTurnos = document.getElementById('num-puesto-turno');
-    if (!selectTurnos) return;
-    const sanSeleccionado = DB.sanes.find(s => s.San_ID == sanId);
-    if(!sanSeleccionado) return;
+// 4. TABLA DE SOLICITUDES PARA NUEVOS CLIENTES (Asignación de claves)
+function renderizarSolicitudesNuevos() {
+    const tbody = document.getElementById('tbody-solicitudes-nuevos');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-    const turnosOcupados = DB.registrosTurnos.filter(r => r.San_ID == sanId).map(r => parseInt(r.Numero_Turno));
-    let opcionesHtml = '';
-    for (let i = 1; i <= parseInt(sanSeleccionado.Total_Turnos); i++) {
-        opcionesHtml += `<option value="${i}" ${turnosOcupados.includes(i)?'disabled':''}>Turno ${i} ${turnosOcupados.includes(i)?'(Ocupado 🚫)':'(Libre)'}</option>`;
+    if (!DB.solicitudesNuevos || DB.solicitudesNuevos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--texto-secundario);">No hay solicitudes de nuevos clientes de momento.</td></tr>`;
+        return;
     }
-    selectTurnos.innerHTML = opcionesHtml;
+
+    DB.solicitudesNuevos.forEach(sol => {
+        const san = DB.sanes.find(s => s.San_ID == sol.San_ID) || { Nombre_San: '-' };
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><b>${sol.Nombre_Completo}</b></td>
+            <td>${sol.Telefono}</td>
+            <td>Interés en: ${san.Nombre_San}</td>
+            <td>
+                <button class="btn-primary btn-aprobar-nuevo" style="padding:4px 12px; font-size:0.8rem; background:linear-gradient(135deg, #22c55e, #16a34a);" title="Aprobar e ingresar al sistema a ${sol.Nombre_Completo}">
+                    Aprobar con Clave
+                </button>
+            </td>
+        `;
+
+        tr.querySelector('.btn-aprobar-nuevo').onclick = () => {
+            const clavePropuesta = prompt(`Asigna una contraseña privada para ${sol.Nombre_Completo}:`, "EDISAN" + Math.floor(1000 + Math.random() * 9000));
+            if (clavePropuesta) {
+                ejecutarPostSheets('procesarAprobacionNuevo', {
+                    solicitudId: sol.Solicitud_ID,
+                    nombre: sol.Nombre_Completo,
+                    telefono: sol.Telefono,
+                    sanId: sol.San_ID,
+                    contrasena: clavePropuesta
+                }, window.mostrarCarga, window.ocultarCarga, window.recargarManejador);
+            }
+        };
+
+        tbody.appendChild(tr);
+    });
 }
 
-function conectarEventosAdmin(tablaPagos) {
-    document.querySelectorAll('.btn-del-san').forEach(b => b.onclick = (e) => {
-        if(confirm("¿Eliminar este San?")) ejecutarPostSheets('eliminarSan', { sanId: e.target.dataset.id }, window.mostrarCarga, window.ocultarCarga, window.recargarManejador);
-    });
+// 5. TABLA DE PROPUESTAS DE CLIENTES YA INSCRITOS
+function renderizarSolicitudesInscritos() {
+    const tbody = document.getElementById('tbody-solicitudes-inscritos');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
-    document.querySelectorAll('.btn-del-cliente').forEach(b => b.onclick = (e) => {
-        if(confirm("¿Remover cliente?")) ejecutarPostSheets('eliminarCliente', { clienteId: e.target.dataset.id }, window.mostrarCarga, window.ocultarCarga, window.recargarManejador);
-    });
+    if (!DB.solicitudesInscritos || DB.solicitudesInscritos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--texto-secundario);">No hay solicitudes de expansión pendientes.</td></tr>`;
+        return;
+    }
 
-    document.querySelectorAll('.btn-del-prod').forEach(b => b.onclick = (e) => {
-        if(confirm("¿Remover producto?")) ejecutarPostSheets('eliminarProducto', { productoId: e.target.dataset.id }, window.mostrarCarga, window.ocultarCarga, window.recargarManejador);
-    });
+    DB.solicitudesInscritos.forEach(sol => {
+        const cli = DB.clientes.find(c => c.Cliente_ID == sol.Cliente_ID) || { Nombre_Completo: 'Desconocido' };
+        const san = DB.sanes.find(s => s.San_ID == sol.San_ID) || { Nombre_San: 'Desconocido' };
 
-    tablaPagos.querySelectorAll('.sel-cambiar-estado').forEach(sel => {
-        sel.onchange = (e) => {
-            const r = DB.registrosTurnos.find(x => x.Registro_ID == e.target.dataset.id);
-            ejecutarPostSheets('registrarPago', { registroId: e.target.dataset.id, nuevoEstado: e.target.value, comprobante: r.Comprobante || '' }, window.mostrarCarga, window.ocultarCarga, window.recargarManejador);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><b>${cli.Nombre_Completo}</b></td>
+            <td>Desea entrar a: ${san.Nombre_San}</td>
+            <td>
+                <button class="btn-primary btn-aprobar-inscrito" style="padding:4px 12px; font-size:0.8rem;" title="Aprobar cupo en ${san.Nombre_San} para ${cli.Nombre_Completo}">
+                    Conceder Cupo
+                </button>
+            </td>
+        `;
+
+        tr.querySelector('.btn-aprobar-inscrito').onclick = () => {
+            ejecutarPostSheets('procesarAprobacionInscrito', {
+                solicitudId: sol.Solicitud_ID,
+                clienteId: sol.Cliente_ID,
+                sanId: sol.San_ID
+            }, window.mostrarCarga, window.ocultarCarga, window.recargarManejador);
         };
-    });
 
-    tablaPagos.querySelectorAll('.btn-ver-comp').forEach(btn => {
-        btn.onclick = (e) => {
-            const modal = document.getElementById('modal-premium');
-            document.getElementById('modal-titulo').innerText = "Validar Recibo";
-            document.getElementById('modal-cuerpo').innerHTML = `
-                <div style="text-align:center; display:flex; flex-direction:column; gap:10px;">
-                    <p>Referencia/Link: <code>${e.target.dataset.link}</code></p>
-                    <button class="btn-danger" id="rej-comp">Rechazar Comprobante</button>
-                </div>
-            `;
-            modal.classList.add('modal-active');
-            document.getElementById('rej-comp').onclick = () => {
-                modal.classList.remove('modal-active');
-                ejecutarPostSheets('eliminarComprobante', { registroId: e.target.dataset.id }, window.mostrarCarga, window.ocultarCarga, window.recargarManejador);
-            };
-        };
+        tbody.appendChild(tr);
     });
+}
 
-    document.querySelectorAll('.btn-apr-nuevo').forEach(b => b.onclick = async (e) => {
-        const d = e.target.dataset;
-        const clave = Math.floor(1000 + Math.random() * 9000).toString();
-        window.mostrarCarga();
-        await ejecutarPostSheets('crearCliente', { id: "C"+Date.now().toString().slice(-3), nombre: d.nombre, telefono: d.tel, contrasena: clave }, () => {}, () => {}, () => {});
-        await ejecutarPostSheets('resolverSolicitudNuevo', { solicitudId: d.id }, window.mostrarCarga, window.ocultarCarga, window.recargarManejador);
-        alert(`Aprobado. Clave asignada: ${clave}`);
-    });
+// 6. ASIGNADOR MANUAL DE PUESTOS Y TURNOS (Control estricto de capacidad)
+function renderizarAsignadorTurnos() {
+    const selectClientes = document.getElementById('admin-select-cliente');
+    const selectSanes = document.getElementById('admin-select-san');
+    const inputTurno = document.getElementById('admin-input-turno');
+
+    if (!selectClientes || !selectSanes || !inputTurno) return;
+
+    // Poblar listas
+    selectClientes.innerHTML = DB.clientes.map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
+    selectSanes.innerHTML = DB.sanes.map(s => `<option value="${s.San_ID}">${s.Nombre_San}</option>`).join('');
+
+    const btnAsignar = document.getElementById('btn-admin-asignar-manual');
+    btnAsignar.onclick = () => {
+        const clienteId = selectClientes.value;
+        const sanId = selectSanes.value;
+        const turnoNum = parseInt(inputTurno.value);
+
+        if (!clienteId || !sanId || !turnoNum) {
+            window.mostrarToast("Por favor completa todos los campos del asignador", "error");
+            return;
+        }
+
+        const sanSeleccionado = DB.sanes.find(s => s.San_ID == sanId);
+        const ocupadosActualmente = DB.registrosTurnos.filter(r => r.San_ID == sanId).length;
+
+        // Validación estricta para evitar sobrepasar la capacidad máxima configurada
+        if (ocupadosActualmente >= parseInt(sanSeleccionado.Total_Turnos)) {
+            alert(`¡Error! El grupo ${sanSeleccionado.Nombre_San} ya alcanzó su capacidad máxima de ${sanSeleccionado.Total_Turnos} puestos.`);
+            return;
+        }
+
+        // Validación de turno duplicado en el mismo San
+        const turnoDuplicado = DB.registrosTurnos.some(r => r.San_ID == sanId && r.Numero_Turno == turnoNum);
+        if (turnoDuplicado) {
+            alert(`El Turno ${turnoNum} ya está asignado en este San. Escoge otro número.`);
+            return;
+        }
+
+        ejecutarPostSheets('asignarTurnoManual', {
+            id: "REG" + Date.now().toString().slice(-4),
+            clienteId: clienteId,
+            sanId: sanId,
+            turno: turnoNum
+        }, window.mostrarCarga, window.ocultarCarga, window.recargarManejador);
+    };
 }
