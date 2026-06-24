@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN DE CONEXIÓN API (VERCEL -> GOOGLE)
 // ==========================================
-const API_URL = "TU_URL_DE_IMPLEMENTACION_DE_GOOGLE_APPS_SCRIPT_AQUI"; // Termina en /exec
+const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec"; // Termina en /exec
 
 let datosLocales = { sanes: [], productos: [] };
 let clienteSesion = null;
