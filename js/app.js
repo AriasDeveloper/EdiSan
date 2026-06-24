@@ -448,15 +448,11 @@ function renderizarTablasSolicitudes() {
                     contrasena: pass
                 };
 
-                mostrarCarga();
+                // Pasamos 'mostrarCarga' correctamente como segundo parámetro
                 ejecutarPostSheets('procesarAprobacionNuevo', payload, mostrarCarga, () => {
                     ocultarCarga();
                     mostrarToast(`Cliente ${payload.nombre} aprobado y guardado`, "success");
-                    
-                    // Sincronización de retardo para asentar los datos en Sheets antes de la lectura
-                    setTimeout(() => {
-                        window.recargarManejador();
-                    }, 800);
+                    setTimeout(() => { window.recargarManejador(); }, 800);
                 });
             }
         };
