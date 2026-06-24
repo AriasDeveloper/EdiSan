@@ -86,3 +86,35 @@ body {
 .premium-spinner { width: 45px; height: 45px; border: 3px solid rgba(255,255,255,0.03); border-radius: 50%; border-top-color: var(--morado-brillante); border-right-color: var(--oro-brillante); animation: spin 0.8s linear infinite; margin: 0 auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .text-center { text-align: center; }
+
+/* DISEÑO PREMIUM PARA EL CALENDARIO (INPUT DATE) */
+input[type="date"] {
+    position: relative;
+    color-scheme: dark; /* Fuerza al navegador a usar el calendario oscuro nativo */
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #fff !important;
+    border: 1px solid var(--borde-cristal) !important;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input[type="date"]:focus {
+    border-color: var(--morado-brillante) !important;
+    box-shadow: 0 0 12px rgba(138, 43, 226, 0.3);
+}
+
+/* Customizar el icono del calendario para que combine con el morado */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' fill='%23a855f7'%3E%3Cpath d='M152 24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H64C28.7 64 0 92.7 0 128v16 48V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V192 144 128c0-35.3-28.7-64-64-64H344V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H152V24zM48 192H400V448c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V192z'/%3E%3C/svg%3E");
+    cursor: pointer;
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    transform: scale(1.3);
+}
