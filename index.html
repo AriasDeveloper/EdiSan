@@ -4,309 +4,171 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EDISAN - Gestión Financiera Premium</title>
-    <!-- Enlace a tus estilos CSS (Asegúrate de que la ruta coincida) -->
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Iconos opcionales (FontAwesome o similares si los usas) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <!-- 1. PANTALLA DE CARGA FULL-SCREEN CON EFECTO GLASSMORPHISM -->
-    <div id="pantalla-carga" class="modal-blur" title="Cargando datos del sistema">
+    <!-- PANTALLA DE CARGA FULL-SCREEN -->
+    <div id="pantalla-carga" class="modal-blur modal-active" title="Cargando datos de EDISAN">
         <div class="loader-container text-center">
             <div class="premium-spinner"></div>
-            <p id="texto-carga-divertido" style="margin-top: 20px; color: #fff; font-weight: 500; font-size: 1.1rem; letter-spacing: 0.5px;">
-                Sincronizando con la base de datos...
+            <p id="texto-carga-divertido" style="margin-top: 20px; color: #fff; font-weight: 500;">
+                Sincronizando con la directiva...
             </p>
         </div>
     </div>
 
-    <!-- 2. CONTENEDOR FLOTANTE PARA NOTIFICACIONES (TOASTS) -->
+    <!-- CONTENEDOR DE TOASTS -->
     <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
 
-    <!-- 3. VENTANA MODAL PREMIUM GLOBAL (Para Login, Registros y Recibos) -->
+    <!-- VENTANA MODAL GLOBAL -->
     <div id="modal-premium" class="modal-blur" title="Ventana emergente interactiva">
         <div class="glass-card modal-content animate-fade">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--borde-cristal); padding-bottom: 10px;">
-                <h3 id="modal-titulo" style="color: #fff; margin: 0;">Título del Modal</h3>
-                <button id="btn-cerrar-modal" class="btn-close" title="Cerrar esta ventana" style="background: none; border: none; color: var(--texto-secundario); font-size: 1.3rem; cursor: pointer;">&times;</button>
+                <h3 id="modal-titulo" style="color: #fff; margin: 0;"></h3>
+                <button id="btn-cerrar-modal" class="btn-close" style="background:none; border:none; color:var(--texto-secundario); font-size:1.5rem; cursor:pointer;" title="Cerrar ventana">&times;</button>
             </div>
-            <div id="modal-cuerpo">
-                <!-- Se rellena dinámicamente desde JavaScript -->
-            </div>
+            <div id="modal-cuerpo"></div>
         </div>
     </div>
 
-    <!-- ================================================================= -->
-    <!-- ZONA CLIENTE (VISTA PÚBLICA Y PRIVADA)                             -->
-    <!-- ================================================================= -->
+    <!-- VISTA GENERAL CLIENTE -->
     <section id="seccion-cliente" class="view-active">
-        
-        <!-- ENCABEZADO PRINCIPAL -->
         <header class="premium-header">
             <div class="header-container">
                 <h1 class="logo-text">EDI<span style="color: var(--morado-brillante);">SAN</span></h1>
-                <nav class="nav-actions">
-                    <!-- Botón discreto para el login de la Patrona -->
-                    <button id="btn-llave-admin" class="btn-icon-only" title="Acceso de Administración Privado">
+                <nav>
+                    <button id="btn-llave-admin" class="btn-icon-only" title="Acceso Administrativo">
                         <i class="fa-solid fa-key"></i>
                     </button>
                 </nav>
             </div>
         </header>
 
-        <!-- SUB-VISTA A: CLIENTE PÚBLICO (No logueado) -->
+        <!-- SUBVISTA: PÚBLICA -->
         <div id="cliente-vista-publica" class="animate-fade">
-            <!-- Hero de Bienvenida -->
-            <div class="hero-section text-center">
+            <div class="hero-section">
                 <h2>Billeteras Inteligentes y Sanes Rotativos</h2>
-                <p style="color: var(--texto-secundario); max-width: 600px; margin: 10px auto 25px auto;">
-                    Únete a los grupos de ahorro mutuo supervisados y gestionados con la máxima transparencia y un diseño de vanguardia.
-                </p>
-                <button id="btn-ir-a-login" class="btn-primary" title="Iniciar sesión en mi cuenta de ahorros">
-                    <i class="fa-solid fa-user-lock" style="margin-right: 8px;"></i> Ingresar a mi Espacio Cliente
+                <p style="color: var(--texto-secundario); margin-bottom: 20px;">Ahorros programados bajo la gestión premium de la Patrona.</p>
+                <button id="btn-ir-a-login" class="btn-primary" title="Entrar a mi espacio privado">
+                    <i class="fa-solid fa-user-lock"></i> Ingresar a mi Cuenta
                 </button>
             </div>
 
-            <!-- Catálogo de Sanes Activos Disponibles -->
             <main class="main-container">
-                <h3 class="section-title"><i class="fa-solid fa-layer-group" style="color: var(--morado-brillante);"></i> Grupos Disponibles actualmente</h3>
-                <div id="contenedor-ofertas-publicas" class="premium-grid">
-                    <!-- Inyección dinámica desde ui-cliente.js -->
-                </div>
+                <h3 class="section-title"><i class="fa-solid fa-layer-group" style="color: var(--morado-brillante);"></i> Grupos Disponibles</h3>
+                <div id="contenedor-ofertas-publicas" class="premium-grid"></div>
 
-                <!-- Vitrina de Productos Comercializable -->
-                <h3 class="section-title" style="margin-top: 50px;"><i class="fa-solid fa-store" style="color: var(--oro-brillante);"></i> Vitrina de Exhibición Especial</h3>
-                <div id="contenedor-productos-cliente" class="premium-grid">
-                    <!-- Inyección dinámica desde ui-cliente.js -->
-                </div>
+                <h3 class="section-title" style="margin-top: 40px;"><i class="fa-solid fa-store" style="color: var(--oro-brillante);"></i> Vitrina Comercial</h3>
+                <div id="contenedor-productos-cliente" class="premium-grid"></div>
             </main>
         </div>
 
-        <!-- SUB-VISTA B: CLIENTE PRIVADO (Logueado exitosamente) -->
+        <!-- SUBVISTA: PRIVADA CLIENTE LOGUEADO -->
         <div id="cliente-vista-privada" class="oculto animate-fade">
-            <div class="hero-section" style="padding: 30px 20px;">
+            <div class="hero-section" style="padding: 25px 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
-                    <h2 id="txt-bienvenida-cliente" style="margin: 0;">Hola, Usuario</h2>
-                    <button id="btn-logout-cliente" class="btn-secondary" title="Cerrar mi sesión actual">
-                        <i class="fa-solid fa-right-from-bracket"></i> Salir
-                    </button>
+                    <h2 id="txt-bienvenida-cliente" style="margin: 0;"></h2>
+                    <button id="btn-logout-cliente" class="btn-secondary" title="Cerrar Sesión"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
                 </div>
             </div>
 
-            <main class="main-container" style="display: flex; flex-direction: column; gap: 40px;">
-                <!-- Bloque superior: Mis puestos asignados -->
+            <main class="main-container" style="display: flex; flex-direction: column; gap: 30px;">
                 <div class="glass-card">
-                    <h3 style="margin-top: 0; color: #fff;"><i class="fa-solid fa-id-card-clip" style="color: var(--morado-brillante); margin-right: 8px;"></i> Estado de mis Puestos Confirmados</h3>
-                    <div id="tabla-puestos-inscritos">
-                        <!-- Tabla inyectada dinámicamente -->
-                    </div>
+                    <h3 style="color:#fff; margin-bottom:15px;"><i class="fa-solid fa-id-card-clip" style="color:var(--morado-brillante);"></i> Mis Puestos Confirmados</h3>
+                    <div id="tabla-puestos-inscritos"></div>
                 </div>
 
-                <!-- Bloque intermedio: Pagos Pendientes / Atrasados -->
                 <div class="glass-card">
-                    <h3 style="margin-top: 0; color: #fff;"><i class="fa-solid fa-money-bill-wave" style="color: #ef4444; margin-right: 8px;"></i> Cuotas y Compromisos de Pago por Registrar</h3>
+                    <h3 style="color:#fff; margin-bottom:15px;"><i class="fa-solid fa-money-bill-wave" style="color:#ef4444;"></i> Cuotas Pendientes por Registrar</h3>
                     <table class="premium-table">
                         <thead>
-                            <tr>
-                                <th>Grupo (San)</th>
-                                <th>Monto Cuota</th>
-                                <th>Fecha Límite</th>
-                                <th>Acción</th>
-                            </tr>
+                            <tr><th>Grupo</th><th>Monto</th><th>Límite</th><th>Acción</th></tr>
                         </thead>
-                        <tbody id="lista-cuotas-pagar">
-                            <!-- Inyección dinámica -->
-                        </tbody>
+                        <tbody id="lista-cuotas-pagar"></tbody>
                     </table>
                 </div>
 
-                <!-- Bloque: Proponerse a otros Sanes desde la cuenta -->
-                <div>
-                    <h3 class="section-title"><i class="fa-solid fa-circle-plus" style="color: var(--morado-brillante);"></i> Solicitar Entrada a otros Grupos Financieros</h3>
-                    <div id="contenedor-ofertas-privadas" class="premium-grid">
-                        <!-- Inyección dinámica -->
-                    </div>
-                </div>
-
-                <!-- Vitrina de Productos Exclusiva -->
-                <div>
-                    <h3 class="section-title"><i class="fa-solid fa-gift" style="color: var(--oro-brillante);"></i> Catálogo Especial para Clientes Activos</h3>
-                    <div id="contenedor-productos-cliente-privado" class="premium-grid">
-                        <!-- Inyección dinámica -->
-                    </div>
-                </div>
+                <h3 class="section-title"><i class="fa-solid fa-circle-plus" style="color:var(--morado-brillante);"></i> Solicitar Entrada a otros Grupos</h3>
+                <div id="contenedor-ofertas-privadas" class="premium-grid"></div>
             </main>
         </div>
     </section>
 
-    <!-- ================================================================= -->
-    <!-- ZONA ADMINISTRACIÓN (LA PATRONA EDIMAR)                           -->
-    <!-- ================================================================= -->
+    <!-- VISTA GENERAL ADMINISTRADOR -->
     <section id="seccion-admin" class="oculto">
-        <header class="premium-header" style="background: linear-gradient(135deg, #12092e 0%, #080417 100%); border-bottom: 1px solid rgba(168, 85, 247, 0.3);">
+        <header class="premium-header" style="border-bottom: 1px solid var(--morado-brillante);">
             <div class="header-container">
-                <h2 style="font-size: 1.3rem; margin: 0; color: #fff;"><i class="fa-solid fa-user-shield" style="color: var(--oro-brillante); margin-right: 8px;"></i> Consola Administrativa: Edimar</h2>
-                <button id="btn-cerrar-admin" class="btn-secondary" title="Salir del panel de administración y volver al inicio">Volver al Inicio</button>
+                <h2 style="color: #fff; font-size:1.2rem;"><i class="fa-solid fa-user-shield" style="color: var(--oro-brillante);"></i> Consola Administrativa - Edimar</h2>
+                <button id="btn-cerrar-admin" class="btn-secondary" title="Cerrar Consola">Volver a Clientes</button>
             </div>
         </header>
 
-        <!-- Barra de Navegación de Pestañas del Admin -->
-        <div class="admin-tabs-bar-container">
-            <div class="admin-tabs-bar" style="max-width: 1200px; margin: 20px auto; padding: 0 20px; display: flex; gap: 10px;">
-                <button class="tab-trigger active" data-tab="sanes" title="Ver control de grupos y matriz de pagos"><i class="fa-solid fa-wallet"></i> Pagos y Grupos</button>
-                <button class="tab-trigger" data-tab="puestos" title="Asignar puestos manualmente"><i class="fa-solid fa-user-plus"></i> Asignador Manual</button>
-                <button class="tab-trigger" data-tab="solicitudes" title="Ver solicitudes de nuevos clientes e inscritos"><i class="fa-solid fa-bell"></i> Solicitudes Recibidas</button>
-            </div>
+        <div class="admin-tabs-bar" style="max-width: 1200px; margin: 20px auto; padding: 0 20px; display: flex; gap: 10px;">
+            <button class="tab-trigger active" data-tab="sanes" title="Matriz de pagos"><i class="fa-solid fa-wallet"></i> Pagos y Grupos</button>
+            <button class="tab-trigger" data-tab="puestos" title="Asignador manual"><i class="fa-solid fa-user-plus"></i> Asignador Manual</button>
+            <button class="tab-trigger" data-tab="solicitudes" title="Bandeja de entrada"><i class="fa-solid fa-bell"></i> Solicitudes</button>
         </div>
 
-        <main class="main-container" style="padding-top: 0;">
-            
-            <!-- CONTENIDO PESTAÑA 1: CONTROL DE PAGOS GLOBAL -->
-<!-- CONTENIDO PESTAÑA 1: CONTROL DE PAGOS GLOBAL Y CREACIÓN -->
-        <div id="tab-sanes" class="tab-content-admin animate-fade">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 30px;">
-                
-                <!-- Formulario para Crear un Nuevo San -->
+        <main class="main-container" style="padding-top:0;">
+            <!-- TAB 1: MATRIZ DE PAGOS GLOBAL -->
+            <div id="tab-sanes" class="tab-content-admin animate-fade">
                 <div class="glass-card">
-                    <h3 style="margin-top: 0; color: #fff; margin-bottom: 15px;"><i class="fa-solid fa-folder-plus" style="color: var(--morado-brillante); margin-right: 8px;"></i> Crear Nuevo Grupo (San)</h3>
-                    <form id="form-crear-san" class="premium-form" title="Formulario de creación de nuevos sanes">
-                        <div class="form-group">
-                            <label for="san-nombre">Nombre del San</label>
-                            <input type="text" id="san-nombre" name="san-nombre" placeholder="Ej. San Oro Julio" title="Nombre identificador del grupo" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="san-monto">Monto de la Cuota ($)</label>
-                            <input type="number" id="san-monto" name="san-monto" min="1" placeholder="Ej. 20" title="Monto en dólares por turno" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="san-turnos">Total de Turnos (Capacidad)</label>
-                            <input type="number" id="san-turnos" name="san-turnos" min="2" max="3" value="3" title="Número máximo de participantes configurados" readonly>
-                            <small style="color: var(--texto-secundario); font-size: 0.78rem; margin-top: 2px;">Capacidad limitada estrictamente a 3 puestos por configuración del sistema.</small>
-                        </div>
-                        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
-                            Aperturar Grupo en Sistema
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Resumen de Caja y Métricas Rápidas -->
-                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
-                    <div>
-                        <h3 style="margin-top: 0; color: #fff; margin-bottom: 15px;"><i class="fa-solid fa-chart-pie" style="color: var(--oro-brillante); margin-right: 8px;"></i> Estado General de Ahorros</h3>
-                        <p style="color: var(--texto-secundario); font-size: 0.9rem;">Panel de auditoría rápida para la administración de Edimar.</p>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                        <div style="background: rgba(34, 197, 94, 0.08); padding: 15px; border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.2);">
-                            <span style="font-size: 0.8rem; color: var(--exito); text-transform: uppercase; font-weight: 700;">Al Día</span>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: #fff; margin-top: 5px;">EDISAN</div>
-                        </div>
-                        <div style="background: rgba(239, 68, 68, 0.08); padding: 15px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2);">
-                            <span style="font-size: 0.8rem; color: var(--peligro); text-transform: uppercase; font-weight: 700;">Revisar</span>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: #fff; margin-top: 5px;">Control</div>
-                        </div>
+                    <h3 style="color:#fff; margin-bottom:15px;"><i class="fa-solid fa-table-list" style="color: var(--morado-brillante);"></i> Matriz de Control de Cuotas Global</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="premium-table">
+                            <thead>
+                                <tr><th>Grupo</th><th>Cliente</th><th>Turno</th><th>Estado</th><th>Recibo</th><th>Acción</th></tr>
+                            </thead>
+                            <tbody id="tbody-matriz-pagos"></tbody>
+                        </table>
                     </div>
                 </div>
-
             </div>
 
-            <!-- Matriz de Pagos Integrada en la Vista Principal de Sanes -->
-            <div class="glass-card">
-                <h3 style="margin-top: 0; color: #fff;"><i class="fa-solid fa-table-list" style="color: var(--morado-brillante); margin-right: 8px;"></i> Matriz de Control de Cuotas Global</h3>
-                <p style="font-size: 0.85rem; color: var(--texto-secundario); margin-bottom: 15px;">Modifica el estado de los turnos aquí. Los cambios se guardan directamente en las hojas de cálculo.</p>
-                <div style="overflow-x: auto;">
-                    <table class="premium-table">
-                        <thead>
-                            <tr>
-                                <th>Grupo (San)</th>
-                                <th>Cliente</th>
-                                <th>Turno</th>
-                                <th>Estado Actual</th>
-                                <th>Comprobante</th>
-                                <th>Acción (Cambiar Estado)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody-matriz-pagos">
-                            <!-- Rellenado dinámico desde ui-admin.js -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-            <!-- CONTENIDO PESTAÑA 2: ASIGNADOR MANUAL DE PUESTOS -->
+            <!-- TAB 2: ASIGNADOR MANUAL -->
             <div id="tab-puestos" class="tab-content-admin oculto animate-fade">
-                <div class="glass-card" style="max-width: 600px; margin: 0 auto;">
-                    <h3 style="margin-top: 0; color: #fff;"><i class="fa-solid fa-user-pen" style="color: var(--oro-brillante);"></i> Registro y Apertura Manual de Turnos</h3>
-                    <p style="font-size: 0.85rem; color: var(--texto-secundario); margin-bottom: 20px;">Permite ingresar un cliente a un San específico controlando que el número de turno no se repita y respetando el límite máximo.</p>
-                    
+                <div class="glass-card" style="max-width: 550px; margin: 0 auto;">
+                    <h3 style="color:#fff; margin-bottom:20px;"><i class="fa-solid fa-user-pen" style="color: var(--oro-brillante);"></i> Inyectar Turno Manual</h3>
                     <div class="premium-form">
                         <div class="form-group">
-                            <label for="admin-select-cliente">1. Seleccionar Cliente Beneficiario</label>
-                            <select id="admin-select-cliente" name="admin-select-cliente" title="Selecciona un cliente de la base de datos"></select>
+                            <label for="admin-select-cliente">Seleccionar Cliente</label>
+                            <select id="admin-select-cliente" title="Selecciona un cliente"></select>
                         </div>
                         <div class="form-group">
-                            <label for="admin-select-san">2. Seleccionar Grupo Destino (San)</label>
-                            <select id="admin-select-san" name="admin-select-san" title="Selecciona el San al que se unirá"></select>
+                            <label for="admin-select-san">Seleccionar Grupo (San)</label>
+                            <select id="admin-select-san" title="Selecciona un grupo"></select>
                         </div>
                         <div class="form-group">
-                            <label for="admin-input-turno">3. Número de Turno Elegido</label>
-                            <input type="number" id="admin-input-turno" name="admin-input-turno" min="1" max="50" placeholder="Ej. 5" title="Escribe el número de turno de la cuota" required>
+                            <label for="admin-input-turno">Número de Turno</label>
+                            <input type="number" id="admin-input-turno" min="1" max="3" placeholder="Ej. 2" title="Escribe el turno a asignar">
                         </div>
-                        <button id="btn-admin-asignar-manual" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 15px;" title="Ejecutar el registro del turno">
-                            Confirmar e Inyectar Puesto
-                        </button>
+                        <button id="btn-admin-asignar-manual" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Confirmar Asignación</button>
                     </div>
                 </div>
             </div>
 
-            <!-- CONTENIDO PESTAÑA 3: BANDEJA DE SOLICITUDES DE APROBACIÓN -->
-            <div id="tab-solicitudes" class="tab-content-admin oculto animate-fade" style="display: flex; flex-direction: column; gap: 30px;">
-                
-                <!-- Nuevos Usuarios Externos -->
+            <!-- TAB 3: BANDEJA DE SOLICITUDES -->
+            <div id="tab-solicitudes" class="tab-content-admin oculto animate-fade" style="display:flex; flex-direction:column; gap:25px;">
                 <div class="glass-card">
-                    <h3 style="margin-top: 0; color: #fff;"><i class="fa-solid fa-user-clock" style="color: #22c55e;"></i> Solicitudes de Nuevos Clientes (Por registrar)</h3>
-                    <div style="overflow-x: auto;">
-                        <table class="premium-table">
-                            <thead>
-                                <tr>
-                                    <th>Nombre del Solicitante</th>
-                                    <th>WhatsApp / Teléfono</th>
-                                    <th>Grupo de Interés</th>
-                                    <th>Acción Directiva</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-solicitudes-nuevos">
-                                <!-- Rellenado dinámico -->
-                            </tbody>
-                        </table>
-                    </div>
+                    <h3 style="color:#fff;"><i class="fa-solid fa-user-clock" style="color: #22c55e;"></i> Nuevos Clientes Solicitando Registro</h3>
+                    <table class="premium-table">
+                        <thead><tr><th>Nombre</th><th>Teléfono</th><th>Grupo Interés</th><th>Acción</th></tr></thead>
+                        <tbody id="tbody-solicitudes-nuevos"></tbody>
+                    </table>
                 </div>
-
-                <!-- Clientes Internos Solicitando Expansión -->
                 <div class="glass-card">
-                    <h3 style="margin-top: 0; color: #fff;"><i class="fa-solid fa-folder-plus" style="color: var(--morado-brillante);"></i> Clientes Existentes Solicitando Nuevos Cupos</h3>
-                    <div style="overflow-x: auto;">
-                        <table class="premium-table">
-                            <thead>
-                                <tr>
-                                    <th>Nombre del Cliente</th>
-                                    <th>Grupo Adicional Solicitado</th>
-                                    <th>Acción Directiva</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-solicitudes-inscritos">
-                                <!-- Rellenado dinámico -->
-                            </tbody>
-                        </table>
-                    </div>
+                    <h3 style="color:#fff;"><i class="fa-solid fa-folder-plus" style="color: var(--morado-brillante);"></i> Solicitudes de Expansión de Clientes Inscritos</h3>
+                    <table class="premium-table">
+                        <thead><tr><th>Cliente</th><th>Grupo Solicitado</th><th>Acción</th></tr></thead>
+                        <tbody id="tbody-solicitudes-inscritos"></tbody>
+                    </table>
                 </div>
-
             </div>
         </main>
     </section>
 
-    <!-- INSERCIÓN UNIFICADA DEL ORQUESTADOR JAVASCRIPT COMO MÓDULO -->
     <script type="module" src="js/app.js"></script>
 </body>
 </html>
