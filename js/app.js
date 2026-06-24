@@ -1,7 +1,7 @@
 // js/app.js
 import { API_CONFIG, ADMIN_CONFIG, FRASES_CARGA } from './config.js';
 
-// Estructura de datos global sincronizada con Sheets (Incluye productos)
+// Estructura de datos global sincronizada con Sheets
 let DB = { 
     sanes: [], 
     clientes: [], 
@@ -53,7 +53,7 @@ async function cargarDatosDesdeSheets() {
             // Cambiar automáticamente estados vencidos localmente
             verificarFechasVencidas();
 
-            // Renderizar vistas del cliente y catálogo
+            // Renderizar vistas del cliente y catálogo público
             renderizarOfertasPublicas();
             renderizarProductosVitrinas();
             
@@ -123,6 +123,10 @@ function inicializarNavegacionSecreta() {
             seccionCliente.classList.remove('view-active');
             seccionAdmin.classList.add('view-active');
             renderizarAdminTodo(); 
+            
+            // CORRECCIÓN: Forzar la activación visual de la primera sub-pestaña al entrar
+            document.getElementById('tab-admin-sanes').click();
+            
             mostrarToast("Acceso verificado. ¡Hola Patrona!", "success");
         } else if (pass !== null) {
             mostrarToast("Clave incorrecta", "error");
@@ -205,7 +209,6 @@ function renderizarOfertasPublicas() {
         const ocupados = DB.registrosTurnos.filter(r => r.San_ID == san.San_ID).length;
         const lleno = ocupados >= parseInt(san.Total_Turnos);
 
-        // Renderizado opcional de imagen superior en la tarjeta
         const imagenHtml = san.Imagen_URL ? `
             <div style="width:100%; height:140px; border-radius:10px; background-image: url('${san.Imagen_URL}'); background-size:cover; background-position:center; margin-bottom:12px;"></div>
         ` : '';
@@ -318,22 +321,25 @@ function renderizarEspacioPrivadoCliente() {
         });
     }
 
+    // CORRECCIÓN: Mostrar Sanes Disponibles dentro del Panel Privado del Cliente
     const contenedorPrivado = document.getElementById('contenedor-ofertas-privadas');
     contenedorPrivado.innerHTML = '';
     
     const sanesDisponibles = DB.sanes.filter(san => !misPuestos.some(m => m.San_ID == san.San_ID));
     if(sanesDisponibles.length === 0) {
-        contenedorPrivado.innerHTML = `<p style="color:var(--texto-secundario); padding:10px;">Estás participando en todos los grupos disponibles.</p>`;
+        contenedorPrivado.innerHTML = `<p style="color:var(--texto-secundario); padding:10px; grid-column: 1/-1; text-align:center;">Estás participando en todos los grupos disponibles.</p>`;
     } else {
         sanesDisponibles.forEach(san => {
             const ocupados = DB.registrosTurnos.filter(r => r.San_ID == san.San_ID).length;
             const completo = ocupados >= parseInt(san.Total_Turnos);
+            const imagenHtml = san.Imagen_URL ? `<div style="width:100%; height:140px; border-radius:10px; background-image: url('${san.Imagen_URL}'); background-size:cover; background-position:center; margin-bottom:12px;"></div>` : '';
             
             const div = document.createElement('div');
             div.className = 'glass-card';
             div.innerHTML = `
+                ${imagenHtml}
                 <h4>${san.Nombre_San}</h4>
-                <p style="font-size:0.9rem; margin:5px 0;">Cuota: <b>$${san.Monto_Cuota}</b> (${san.Ciclo})</p>
+                <p style="font-size:0.9rem; margin:5px 0; color:var(--texto-secundario);">Cuota: <b>$${san.Monto_Cuota}</b> (${san.Ciclo})</p>
                 <button class="btn-primary btn-proponer" style="width:100%; margin-top:8px; justify-content:center;" ${completo ? 'disabled' : ''}>
                     ${completo ? 'Lleno' : 'Solicitar Entrada'}
                 </button>
@@ -355,6 +361,37 @@ function renderizarEspacioPrivadoCliente() {
             }
             contenedorPrivado.appendChild(div);
         });
+    }
+
+    // CORRECCIÓN: Insertar y pintar la Vitrina de Productos abajo en el área privada
+    let seccionProductosPrivada = document.getElementById('productos-cliente-privado');
+    if (!seccionProductosPrivada) {
+        seccionProductosPrivada = document.createElement('div');
+        seccionProductosPrivada.id = 'productos-cliente-privado';
+        seccionProductosPrivada.innerHTML = `
+            <h3 class="premium-title" style="margin-top: 4rem;">🛍️ Catálogo de Productos Disponibles</h3>
+            <div id="contenedor-productos-cliente-privado" class="grid-premium"></div>
+        `;
+        document.getElementById('cliente-vista-privada').appendChild(seccionProductosPrivada);
+    }
+    
+    const contenedorProductosPrivados = document.getElementById('contenedor-productos-cliente-privado');
+    if (DB.productos.length === 0) {
+        contenedorProductosPrivados.innerHTML = `<p style="color:var(--texto-secundario); grid-column: 1/-1; text-align:center;">No hay productos exhibidos actualmente.</p>`;
+    } else {
+        contenedorProductosPrivados.innerHTML = DB.productos.map(p => `
+            <div class="glass-card animate-fade" style="text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <img src="${p.Imagen_URL}" style="width:100%; height:160px; object-fit:cover; border-radius:10px; border: 1px solid var(--borde-cristal);">
+                    <h4 style="margin-top:12px; color:#fff; font-size:1.1rem;">${p.Nombre}</h4>
+                    <p style="font-size:0.85rem; color:var(--texto-secundario); margin:6px 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.Descripcion}</p>
+                </div>
+                <div>
+                    <div style="color:var(--oro-brillante); font-weight:bold; font-size:1.3rem; margin:10px 0;">$${p.Precio}</div>
+                    <button class="btn-primary" style="width:100%; justify-content:center;" onclick="alert('Ponte en contacto directo con la Patrona (Edimar) para adquirir este producto.')">Adquirir Producto</button>
+                </div>
+            </div>
+        `).join('');
     }
 }
 
@@ -383,7 +420,6 @@ function abrirModalSubirComprobante(registroId) {
 // INTERFAZ CONTROL DEL ADMINISTRADOR (LA PATRONA)
 // ==========================================================================
 function renderizarAdminTodo() {
-    // Rellenar selectores para puestos
     document.getElementById('sel-puesto-san').innerHTML = DB.sanes.map(s => `<option value="${s.San_ID}">${s.Nombre_San} (${s.Ciclo})</option>`).join('');
     document.getElementById('sel-puesto-cliente').innerHTML = DB.clientes.map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
 
@@ -501,22 +537,18 @@ function actualizarDesplegableTurnos(sanId) {
 }
 
 function conectarEventosPanelAdmin(tablaPagos) {
-    // Eliminar San
     document.querySelectorAll('.btn-del-san').forEach(b => b.onclick = (e) => {
         if(confirm("¿Eliminar este grupo de ahorro?")) ejecutarPostSheets('eliminarSan', { sanId: e.target.dataset.id });
     });
 
-    // Eliminar Cliente permanentemente
     document.querySelectorAll('.btn-del-cliente').forEach(b => b.onclick = (e) => {
         if(confirm("¿Remover a este cliente? Se revocará su acceso.")) ejecutarPostSheets('eliminarCliente', { clienteId: e.target.dataset.id });
     });
 
-    // Eliminar Producto del Inventario
     document.querySelectorAll('.btn-del-prod').forEach(b => b.onclick = (e) => {
         if(confirm("¿Eliminar este producto del catálogo?")) ejecutarPostSheets('eliminarProducto', { productoId: e.target.dataset.id });
     });
 
-    // Ver y rechazar recibos
     tablaPagos.querySelectorAll('.btn-ver-comp').forEach(btn => {
         btn.onclick = (e) => {
             const link = e.target.dataset.link;
@@ -543,7 +575,6 @@ function conectarEventosPanelAdmin(tablaPagos) {
         };
     });
 
-    // Cambiar estados desde el select directo
     tablaPagos.querySelectorAll('.sel-cambiar-estado').forEach(sel => {
         sel.onchange = (e) => {
             const r = DB.registrosTurnos.find(x => x.Registro_ID == e.target.dataset.id);
@@ -555,11 +586,9 @@ function conectarEventosPanelAdmin(tablaPagos) {
         };
     });
 
-    // Rechazar solicitudes de listas de espera
     document.querySelectorAll('.btn-rec-nuevo').forEach(b => b.onclick = (e) => ejecutarPostSheets('resolverSolicitudNuevo', { solicitudId: e.target.dataset.id }));
     document.querySelectorAll('.btn-rec-inscrito').forEach(b => b.onclick = (e) => ejecutarPostSheets('resolverPropuestaInscrito', { propuestaId: e.target.dataset.id }));
 
-    // Aceptar Nuevo Solicitante
     document.querySelectorAll('.btn-apr-nuevo').forEach(b => b.onclick = async (e) => {
         const d = e.target.dataset;
         const nuevoClienteId = "C" + Date.now().toString().slice(-3);
@@ -573,7 +602,6 @@ function conectarEventosPanelAdmin(tablaPagos) {
         setTimeout(cargarDatosDesdeSheets, 500);
     });
 
-    // Aceptar Propuesta de Usuario Registrado
     document.querySelectorAll('.btn-apr-inscrito').forEach(b => b.onclick = async (e) => {
         mostrarCarga();
         await fetch(API_CONFIG.URL_APPS_SCRIPT, { method: 'POST', body: JSON.stringify({ action: 'resolverPropuestaInscrito', payload: { propuestaId: e.target.dataset.id } })});
@@ -586,7 +614,6 @@ function conectarEventosPanelAdmin(tablaPagos) {
 // SUBMIT Y PROCESAMIENTO DE FORMULARIOS DIRECTOS
 // ==========================================================================
 function inicializarFormularios() {
-    // Formulario Crear San (Captura Imagen_URL opcional)
     document.getElementById('form-crear-san').onsubmit = (e) => {
         e.preventDefault();
         ejecutarPostSheets('crearSan', {
@@ -602,7 +629,6 @@ function inicializarFormularios() {
         e.target.reset();
     };
 
-    // Formulario Crear Cliente Manual
     document.getElementById('form-crear-cliente').onsubmit = (e) => {
         e.preventDefault();
         ejecutarPostSheets('crearCliente', {
@@ -614,7 +640,6 @@ function inicializarFormularios() {
         e.target.reset();
     };
 
-    // Formulario Crear Producto (Catálogo)
     const formProducto = document.getElementById('form-crear-producto');
     if (formProducto) {
         formProducto.onsubmit = (e) => {
@@ -631,7 +656,6 @@ function inicializarFormularios() {
         };
     }
 
-    // Asignación de Puesto Manual (Hereda la fecha del San)
     document.getElementById('btn-guardar-puesto').onclick = () => {
         const sanId = document.getElementById('sel-puesto-san').value;
         const turno = document.getElementById('num-puesto-turno').value;
@@ -644,7 +668,7 @@ function inicializarFormularios() {
         const sanSeleccionado = DB.sanes.find(s => s.San_ID == sanId);
         const fechaDelSan = sanSeleccionado.Fecha_Inicio ? sanSeleccionado.Fecha_Inicio.split('T')[0] : "2026-01-01";
 
-        ejecutarPostSheets('asignarPuesto', {
+        ejecutarPostSheets('assignarPuesto', {
             id: "R" + Date.now().toString().slice(-4),
             sanId: sanId,
             clienteId: document.getElementById('sel-puesto-cliente').value,
