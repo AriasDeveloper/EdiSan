@@ -1,0 +1,302 @@
+<style>
+  :root {
+    --bg-deep: #090514;
+    --primary-neon: #8b5cf6;
+    --accent-glow: #d946ef;
+    --glass-bg: rgba(25, 18, 46, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  body {
+    background-color: var(--bg-deep);
+    color: var(--text-main);
+    overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  /* 🌌 Halos Dinámicos en el Fondo (Glows) */
+  .glow-container {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .glow-sphere {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(140px);
+    opacity: 0.35;
+    mix-blend-mode: screen;
+  }
+
+  .glow-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--primary-neon);
+    top: -10%;
+    left: -10%;
+    animation: floatingGlow 18s infinite alternate;
+  }
+
+  .glow-2 {
+    width: 500px;
+    height: 500px;
+    background: var(--accent-glow);
+    bottom: -15%;
+    right: -10%;
+    animation: floatingGlow 22s infinite alternate-reverse;
+  }
+
+  .glow-3 {
+    width: 350px;
+    height: 350px;
+    background: #3b82f6;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: floatingGlow 25s infinite linear;
+  }
+
+  @keyframes floatingGlow {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(40px, -60px) scale(1.2); }
+    100% { transform: translate(-30px, 30px) scale(0.9); }
+  }
+
+  /* ✨ Estilo Glassmorphism General */
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+
+  .glass-card:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateY(-4px);
+  }
+
+  /* Layout principal */
+  header {
+    padding: 30px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 30%, var(--accent-glow));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    margin-bottom: 24px;
+    position: relative;
+    display: inline-block;
+  }
+
+  .section-title::after {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 4px;
+    background: var(--primary-neon);
+    bottom: -8px;
+    left: 0;
+    border-radius: 2px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+  }
+
+  /* 🛑 Loader Completo de la Patrona */
+  #loader-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(6, 3, 14, 0.85);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    transition: opacity 0.4s ease;
+  }
+
+  .spinner {
+    width: 64px;
+    height: 64px;
+    border: 5px solid rgba(139, 92, 246, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary-neon);
+    border-bottom-color: var(--accent-glow);
+    animation: spin 1s infinite linear;
+    margin-bottom: 24px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  #loader-text {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    text-align: center;
+    max-width: 450px;
+    font-style: italic;
+    text-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+  }
+
+  /* Formularios e Inputs */
+  input, select {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--primary-neon);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+  }
+
+  .btn {
+    background: linear-gradient(135deg, var(--primary-neon), var(--accent-glow));
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-align: center;
+  }
+
+  .btn:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 0 20px rgba(217, 70, 239, 0.4);
+  }
+
+  .btn:disabled {
+    background: #374151;
+    color: #9ca3af;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* Modales Estilo Cristal */
+  .modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(15px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 15px; right: 20px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+  }
+
+  /* Elementos de la Vitrina */
+  .badge {
+    position: absolute;
+    top: 15px; right: 15px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid rgba(10, 185, 129, 0.3);
+  }
+
+  .badge.full {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  /* Pie de página y Botonera Oculta */
+  footer {
+    margin-top: 100px;
+    padding: 30px;
+    text-align: center;
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .admin-trigger {
+    opacity: 0.15;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.3s;
+  }
+
+  .admin-trigger:hover {
+    opacity: 0.8;
+    color: var(--accent-glow);
+  }
+</style>

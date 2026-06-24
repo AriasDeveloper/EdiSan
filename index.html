@@ -1,145 +1,122 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDISAN — Gestión Premium de Sanes</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link rel="stylesheet" href="css/styles.css">
+  <base target="_top">
+  <?!= include('styles'); ?>
 </head>
 <body>
 
-    <div class="glow-container">
-        <div class="glow-sphere glow-1"></div>
-        <div class="glow-sphere glow-2"></div>
-        <div class="glow-sphere glow-3"></div>
+  <div class="glow-container">
+    <div class="glow-sphere glow-1"></div>
+    <div class="glow-sphere glow-2"></div>
+    <div class="glow-sphere glow-3"></div>
+  </div>
+
+  <div id="loader-screen">
+    <div class="spinner"></div>
+    <div id="loader-text">Verificando los libros contables con la aprobación de La Patrona Edimar...</div>
+  </div>
+
+  <header>
+    <div class="logo">EDISAN</div>
+    <div id="session-controls">
+      <button class="btn" onclick="openModal('login-modal')" style="padding: 8px 16px;">Mi Cuenta Privada</button>
     </div>
+  </header>
 
-    <div id="loading-screen" class="loading-fullscreen">
-        <div class="loading-glass">
-            <div class="premium-spinner"></div>
-            <p id="loading-phrase" class="loading-text">Sincronizando con los libros de La Patrona...</p>
-        </div>
+  <div class="container">
+    
+    <section id="dashboard-section" style="display: none; margin-bottom: 60px;">
+      <div class="glass-card" style="margin-bottom: 30px; border-color: var(--primary-neon);">
+        <h2 id="welcome-msg" style="margin-bottom: 10px;">Bienvenido</h2>
+        <p style="color: var(--text-muted);">Gestiona tus cuotas y sube tus soportes de pago móviles.</p>
+        <button class="btn" onclick="logout()" style="width: auto; margin-top: 15px; padding: 6px 15px; background: #374151;">Cerrar Sesión</button>
+      </div>
+
+      <h3 class="section-title">Mis Cupos y Control de Pagos</h3>
+      <div id="mis-turnos-grid" class="grid"></div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Sanes Disponibles</h2>
+      <div id="sanes-container" class="grid"></div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Vitrina Comercial Exclusiva</h2>
+      <div id="productos-container" class="grid"></div>
+    </section>
+
+  </div>
+
+  <div id="login-modal" class="modal">
+    <div class="glass-card modal-content">
+      <span class="close-btn" onclick="closeModal('login-modal')">&times;</span>
+      <h3>Acceso a Cuenta Privada</h3><br>
+      <input type="text" id="login-phone" placeholder="Número de Teléfono">
+      <input type="password" id="login-pass" placeholder="Contraseña de 4 dígitos">
+      <button class="btn" onclick="handleLogin()">Ingresar Seguro</button>
     </div>
+  </div>
 
-    <div class="app-container">
-        
-        <header class="main-header">
-            <div class="logo-area">
-                <span class="logo-icon"><i class="ph-fill ph-crown"></i></span>
-                <h1>EDISAN</h1>
-            </div>
-            <nav class="main-nav">
-                <button class="nav-btn active" onclick="switchTab('sanes-tab')"><i class="ph ph-hand-coins"></i> Sanes</button>
-                <button class="nav-btn" onclick="switchTab('productos-tab')"><i class="ph ph-storefront"></i> Vitrina</button>
-                <button class="nav-btn btn-private" onclick="switchTab('cuenta-tab')"><i class="ph ph-user-gear"></i> Cuenta Privada</button>
-            </nav>
-        </header>
+  <div id="solicitud-modal" class="modal">
+    <div class="glass-card modal-content">
+      <span class="close-btn" onclick="closeModal('solicitud-modal')">&times;</span>
+      <h3 id="solicitud-title">Inscripción al San</h3><br>
+      <input type="hidden" id="solicitud-san-id">
+      
+      <div id="campos-externos">
+        <label>Nombre Completo</label>
+        <input type="text" id="sol-nombre" placeholder="Ej. Juan Pérez">
+        <label>Número de Teléfono</label>
+        <input type="tel" id="sol-telefono" placeholder="Ej. 04141234567">
+      </div>
 
-        <main class="content-wrapper">
-
-            <section id="sanes-tab" class="tab-content active">
-                <div class="section-title">
-                    <h2>Sanes Disponibles</h2>
-                    <p>Asegura tu turno en los grupos activos supervisados por Edimar.</p>
-                </div>
-                <div id="sanes-container" class="cards-grid">
-                    </div>
-            </section>
-
-            <section id="productos-tab" class="tab-content">
-                <div class="section-title">
-                    <h2>Vitrina de Productos</h2>
-                    <p>Adquiere tus artículos de contado con despacho express vía WhatsApp.</p>
-                </div>
-                <div id="productos-container" class="cards-grid">
-                    </div>
-            </section>
-
-            <section id="cuenta-tab" class="tab-content">
-                <div id="login-box" class="auth-card">
-                    <i class="ph ph-lock-keyhole auth-icon"></i>
-                    <h3>Ingresar a tu Cuenta</h3>
-                    <p>Introduce tus credenciales autorizadas por la administración.</p>
-                    <form id="login-form" onsubmit="handleLogin(event)">
-                        <div class="input-group">
-                            <i class="ph ph-phone"></i>
-                            <input type="tel" id="login-telefono" placeholder="Número de Teléfono" required>
-                        </div>
-                        <div class="input-group">
-                            <i class="ph ph-password"></i>
-                            <input type="password" id="login-pass" placeholder="Contraseña de 4 dígitos" required>
-                        </div>
-                        <button type="submit" class="btn-primary">Acceder de Forma Segura</button>
-                    </form>
-                </div>
-
-                <div id="client-dashboard" class="dashboard-layout hidden">
-                    <div class="welcome-box">
-                        <div>
-                            <h3 id="client-name">Bienvenido, Usuario</h3>
-                            <p id="client-id" class="text-muted">ID: CLI0000</p>
-                        </div>
-                        <button class="btn-secondary-sm" onclick="handleLogout()"><i class="ph ph-sign-out"></i> Salir</button>
-                    </div>
-                    
-                    <div class="section-title-sm">
-                        <h4><i class="ph ph-chart-line-up"></i> El Estado de Mis Turnos</h4>
-                    </div>
-                    <div id="mis-turnos-container" class="dashboard-grid">
-                        </div>
-                </div>
-            </section>
-
-        </main>
-
-        <footer class="main-footer">
-            <p>© 2026 EDISAN. Todos los derechos reservados.</p>
-            <button class="btn-admin-trigger" onclick="openAdminModal()"><i class="ph ph-shield-star"></i> Admin</button>
-        </footer>
-
+      <label>Turno Deseado</label>
+      <input type="number" id="sol-turno" placeholder="Número de turno que deseas asegurar" min="1">
+      
+      <button class="btn" onclick="enviarSolicitudCanalizado()">Confirmar Registro de Solicitud</button>
     </div>
+  </div>
 
-    <div id="admin-auth-modal" class="modal-overlay">
-        <div class="modal-glass">
-            <div class="modal-header">
-                <h3><i class="ph ph-shield-check"></i> Acceso de Personal</h3>
-                <button class="close-modal-btn" onclick="closeAdminModal()"><i class="ph ph-x"></i></button>
-            </div>
-            <p>Se requiere clave de administrador para gestionar las solicitudes.</p>
-            <div class="input-group">
-                <i class="ph ph-key"></i>
-                <input type="password" id="admin-password-input" placeholder="Introduce la clave de administración">
-            </div>
-            <button class="btn-primary" onclick="validateAdminAccess()">Verificar Identidad</button>
-        </div>
+  <div id="pago-modal" class="modal">
+    <div class="glass-card modal-content">
+      <span class="close-btn" onclick="closeModal('pago-modal')">&times;</span>
+      <h3>Reportar Pago Móvil / Transferencia</h3><br>
+      <input type="hidden" id="pago-registro-id">
+      <label>Referencia Bancaria (Últimos 6 u 8 dígitos)</label>
+      <input type="text" id="pago-referencia" placeholder="Introduzca el código numérico">
+      <button class="btn" onclick="enviarReportePago()">Enviar a Revisión de la Patrona</button>
     </div>
+  </div>
 
-    <div id="admin-panel-modal" class="modal-overlay full-modal">
-        <div class="modal-glass full-glass">
-            <div class="modal-header">
-                <h2><i class="ph ph-crown"></i> Panel de Control — La Patrona Edimar</h2>
-                <button class="close-modal-btn" onclick="closeAdminPanel()"><i class="ph ph-x"></i></button>
-            </div>
-            
-            <div class="admin-grid-sections">
-                <div class="admin-section-box">
-                    <h3><i class="ph ph-user-plus"></i> Solicitudes de Clientes Nuevos</h3>
-                    <div id="admin-nuevos-list" class="admin-table-wrapper">
-                        </div>
-                </div>
-
-                <div class="admin-section-box">
-                    <h3><i class="ph ph-users-three"></i> Propuestas de Clientes Registrados</h3>
-                    <div id="admin-inscritos-list" class="admin-table-wrapper">
-                        </div>
-                </div>
-            </div>
-        </div>
+  <div id="admin-auth-modal" class="modal">
+    <div class="glass-card modal-content">
+      <span class="close-btn" onclick="closeModal('admin-auth-modal')">&times;</span>
+      <h3>Panel de Control Operativo</h3><br>
+      <input type="password" id="admin-pass" placeholder="Inserte Clave Maestra de Edimar">
+      <button class="btn" onclick="autenticarAdmin()">Acceder al Libro General</button>
     </div>
+  </div>
 
+  <div id="admin-panel-modal" class="modal" style="align-items: flex-start; overflow-y: auto; padding-top: 50px;">
+    <div class="glass-card modal-content" style="max-width: 900px; width: 95%;">
+      <span class="close-btn" onclick="closeModal('admin-panel-modal')">&times;</span>
+      <h2>Panel Operativo de La Patrona Edimar</h2><br>
+      
+      <h4 style="color: var(--accent-glow); margin-bottom: 10px;">Canal A: Solicitudes de Clientes Nuevos</h4>
+      <div id="admin-nuevos-tbl" style="overflow-x:auto; margin-bottom:30px;"></div>
+
+      <h4 style="color: var(--accent-glow); margin-bottom: 10px;">Canal B: Propuestas de Clientes Inscritos</h4>
+      <div id="admin-inscritos-tbl" style="overflow-x:auto;"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 EDISAN Platform - Premium Design.</p>
+    <a class="admin-trigger" onclick="openModal('admin-auth-modal')">🔒 Acceso Administrativo Autorizado</a>
+  </footer>
+
+  <?!= include('app'); ?>
 </body>
 </html>

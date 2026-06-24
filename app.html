@@ -1,0 +1,324 @@
+<script>
+  // Variables de Estado de Sesión en el Cliente
+  let sessionCliente = null;
+
+  const FRASES_EDIMAR = [
+    "Consultando la base de datos... Todo pasa por los ojos de La Patrona Edimar.",
+    "Calculando ciclos y vencimientos escalonados en tiempo real...",
+    "Validando saldos. Recuerda: cuentas claras conservan la amistad con La Patrona.",
+    "Esmerilando la interfaz glassmorphism premium para ti...",
+    "Procesando solicitudes seguras en el libro de contabilidad de EDISAN..."
+  ];
+
+  // Ejecución inicial automática
+  window.addEventListener('DOMContentLoaded', () => {
+    rotarLoaderFrases();
+    cargarVitrina();
+  });
+
+  function rotarLoaderFrases() {
+    const txtElement = document.getElementById('loader-text');
+    setInterval(() => {
+      if (txtElement) {
+        const index = Math.floor(Math.random() * FRASES_EDIMAR.length);
+        txtElement.innerText = FRASES_EDIMAR[index];
+      }
+    }, 3000);
+  }
+
+  function toggleLoader(show) {
+    const loader = document.getElementById('loader-screen');
+    loader.style.opacity = show ? '1' : '0';
+    loader.style.pointerEvents = show ? 'all' : 'none';
+  }
+
+  function openModal(id) {
+    document.getElementById(id).style.display = 'flex';
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  // 🌐 Carga Asíncrona Eficiente desde Google Sheets
+  function cargarVitrina() {
+    toggleLoader(true);
+    google.script.run
+      .withSuccessHandler(data => {
+        if(data.success) {
+          renderSanes(data.sanes);
+          renderProductos(data.productos);
+        }
+        toggleLoader(false);
+      })
+      .withFailureHandler(() => toggleLoader(false))
+      .getVitrinaData();
+  }
+
+  function renderSanes(sanes) {
+    const container = document.getElementById('sanes-container');
+    container.innerHTML = '';
+    sanes.forEach(san => {
+      const isFull = san.Estado === 'Lleno' || san.Cupos_Ocupados >= san.Total_Turnos;
+      const card = document.createElement('div');
+      card.className = 'glass-card';
+      card.style.position = 'relative';
+      
+      card.innerHTML = `
+        <span class="badge ${isFull ? 'full' : ''}">${isFull ? 'Lleno' : 'Activo'}</span>
+        <div style="width:100%; height:150px; background: url('${san.Imagen_URL || 'https://via.placeholder.com/300x150'}') center/cover; border-radius:14px; margin-bottom:15px;"></div>
+        <h3 style="margin-bottom:8px;">${san.Nombre_San}</h3>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:6px;">Cuota: <strong style="color:white;">$${san.Monto_Cuota}</strong> | Ciclo: ${san.Ciclo}</p>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:16px;">Cupos Asegurados: ${san.Cupos_Ocupados} / ${san.Total_Turnos}</p>
+        <button class="btn" ${isFull ? 'disabled' : ''} onclick="prepararSolicitud('${san.San_ID}', '${san.Nombre_San}')">
+          ${isFull ? 'Grupo Completo' : 'Inscribirme / Proponer Turno'}
+        </button>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function renderProductos(productos) {
+    const container = document.getElementById('productos-container');
+    container.innerHTML = '';
+    productos.forEach(prod => {
+      if(prod.Estado !== 'Activo') return;
+      const card = document.createElement('div');
+      card.className = 'glass-card';
+      card.innerHTML = `
+        <div style="width:100%; height:160px; background: url('${prod.Imagen_URL || 'https://via.placeholder.com/300x160'}') center/cover; border-radius:14px; margin-bottom:15px;"></div>
+        <h3>${prod.Nombre}</h3>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin:8px 0; min-height:40px;">${prod.Descripcion}</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
+          <span style="font-size:1.3rem; font-weight:bold; color:var(--accent-glow);">$${prod.Precio}</span>
+          <button class="btn" style="width:auto; padding:10px 20px;" onclick="comprarExpress('${prod.Nombre}', '${prod.Precio}')">Comprar</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  // 🛍️ Compra Express de Contado por WhatsApp
+  function comprarExpress(nombre, precio) {
+    const telefonoSoporte = "584140000000"; // Reemplazar por número de venta configurado
+    const mensaje = encodeURIComponent(`Hola EDISAN, deseo adquirir el siguiente artículo de contado de la vitrina:\n\n*Producto:* ${nombre}\n*Precio:* $${precio}\n\nQuedo atento para coordinar la entrega.`);
+    window.open(`https://wa.me/${telefonoSoporte}?text=${mensaje}`, '_blank');
+  }
+
+  // 👥 Gestión Selectiva de Solicitudes (Doble Canal)
+  function prepararSolicitud(sanId, nombreSan) {
+    document.getElementById('solicitud-san-id').value = sanId;
+    document.getElementById('solicitud-title').innerText = `Inscripción: ${nombreSan}`;
+    
+    if (sessionCliente) {
+      // Canal B: Cliente ya Autenticado (Ocultar datos de contacto redundantes)
+      document.getElementById('campos-externos').style.display = 'none';
+    } else {
+      // Canal A: Aspirante Externo Nuevo
+      document.getElementById('campos-externos').style.display = 'block';
+    }
+    openModal('solicitud-modal');
+  }
+
+  function enviarSolicitudCanalizado() {
+    const sanId = document.getElementById('solicitud-san-id').value;
+    const turnoDeseado = document.getElementById('sol-turno').value;
+    
+    if(!turnoDeseado) return alert("Por favor indica el número de turno");
+
+    toggleLoader(true);
+    closeModal('solicitud-modal');
+
+    if (sessionCliente) {
+      // Canal B: Cliente Inscrito Existente
+      google.script.run
+        .withSuccessHandler(res => {
+          toggleLoader(false);
+          alert(res.message);
+        })
+        .registrarSolicitudInscrito(sessionCliente.id, sanId, turnoDeseado);
+    } else {
+      // Canal A: Cliente Completamente Nuevo
+      const nombre = document.getElementById('sol-nombre').value;
+      const telefono = document.getElementById('sol-telefono').value;
+      if(!nombre || !telefono) {
+        toggleLoader(false);
+        return alert("Debes llenar todos tus datos de contacto para la posterior aprobación.");
+      }
+
+      google.script.run
+        .withSuccessHandler(res => {
+          toggleLoader(false);
+          alert(res.message);
+        })
+        .registrarSolicitudNueva(nombre, telefono, sanId, turnoDeseado);
+    }
+  }
+
+  // 🔐 Cuenta Privada (Gestión de Dashboard)
+  function handleLogin() {
+    const t = document.getElementById('login-phone').value;
+    const c = document.getElementById('login-pass').value;
+    if(!t || !c) return alert("Complete los datos requeridos");
+
+    toggleLoader(true);
+    google.script.run
+      .withSuccessHandler(res => {
+        if(res.success) {
+          sessionCliente = res.cliente;
+          document.getElementById('session-controls').innerHTML = `<span style="color:var(--accent-glow); font-weight:600;">🔒 Perfil: ${res.cliente.nombre}</span>`;
+          document.getElementById('welcome-msg').innerText = `Hola, ${res.cliente.nombre}`;
+          document.getElementById('dashboard-section').style.display = 'block';
+          closeModal('login-modal');
+          cargarDashboardCliente();
+        } else {
+          toggleLoader(false);
+          alert(res.message);
+        }
+      })
+      .loginCliente(t, c);
+  }
+
+  function cargarDashboardCliente() {
+    google.script.run
+      .withSuccessHandler(res => {
+        if (res.success) {
+          const grid = document.getElementById('mis-turnos-grid');
+          grid.innerHTML = '';
+          if(res.data.length === 0) {
+            grid.innerHTML = '<p style="color:var(--text-muted);">No posees turnos asignados actualmente.</p>';
+          }
+          res.data.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'glass-card';
+            card.innerHTML = `
+              <h4>${t.nombreSan}</h4>
+              <p style="margin: 8px 0; font-size:0.9rem; color:var(--text-muted);">Turno Asignado: <strong style="color:white;">#${t.turno}</strong></p>
+              <p style="margin: 4px 0; font-size:0.9rem; color:var(--text-muted);">Monto: $${t.monto}</p>
+              <p style="margin: 4px 0; font-size:0.9rem; color:var(--text-muted);">Límite de Cobro: <strong style="color:var(--accent-glow);">${t.fechaLimite}</strong></p>
+              <p style="margin: 10px 0; font-size:0.9rem;">Estado: <span style="color:${t.estadoPago==='Pagado'?'#10b981':'#f59e0b'}">${t.estadoPago}</span></p>
+              ${t.estadoPago === 'Pendiente' ? `<button class="btn" style="padding:6px; font-size:0.85rem;" onclick="abrirReportarPago('${t.registroId}')">Reportar Pago</button>` : `<small style="color:var(--text-muted)">Comprobante: ${t.comprobante || 'Ninguno'}</small>`}
+            `;
+            grid.appendChild(card);
+          });
+        }
+        toggleLoader(false);
+      })
+      .getClienteDashboard(sessionCliente.id);
+  }
+
+  function abrirReportarPago(registroId) {
+    document.getElementById('pago-registro-id').value = registroId;
+    openModal('pago-modal');
+  }
+
+  function enviarReportePago() {
+    const id = document.getElementById('pago-registro-id').value;
+    const ref = document.getElementById('pago-referencia').value;
+    if(!ref) return alert("Inserte el número de referencia de la transacción bancaria.");
+
+    toggleLoader(true);
+    closeModal('pago-modal');
+    google.script.run
+      .withSuccessHandler(res => {
+        if(res.success) {
+          alert("Pago reportado con éxito. En espera de la revisión de Edimar.");
+          cargarDashboardCliente();
+        } else {
+          toggleLoader(false);
+          alert("Error al guardar reporte.");
+        }
+      })
+      .reportarPago(id, ref);
+  }
+
+  function logout() {
+    sessionCliente = null;
+    location.reload();
+  }
+
+  // 👑 Panel Administrativo de Edimar (La Patrona)
+  function autenticarAdmin() {
+    const pass = document.getElementById('admin-pass').value;
+    toggleLoader(true);
+    google.script.run
+      .withSuccessHandler(isValid => {
+        if(isValid) {
+          closeModal('admin-auth-modal');
+          abrirPanelControlOficial();
+        } else {
+          toggleLoader(false);
+          alert("Clave maestra denegada. Acceso restringido.");
+        }
+      })
+      .verificarAdminClave(pass);
+  }
+
+  function abrirPanelControlOficial() {
+    google.script.run
+      .withSuccessHandler(data => {
+        renderTblNuevos(data.nuevos);
+        renderTblInscritos(data.inscritos);
+        toggleLoader(false);
+        openModal('admin-panel-modal');
+      })
+      .getAdminPanelData();
+  }
+
+  function renderTblNuevos(lista) {
+    const container = document.getElementById('admin-nuevos-tbl');
+    if(lista.length === 0) { container.innerHTML = '<p>No hay solicitudes del canal de nuevos aspirantes.</p>'; return; }
+    
+    let html = `<table width="100%" border="1" cellpadding="8" style="border-collapse:collapse; border-color:var(--glass-border);">
+      <tr><th>Nombre</th><th>Teléfono</th><th>San ID</th><th>Turno Deseado</th><th>Acción</th></tr>`;
+    lista.forEach(x => {
+      html += `<tr>
+        <td>${x.Nombre_Completo}</td>
+        <td>${x.Telefono}</td>
+        <td>${x.San_ID}</td>
+        <td><input type="number" value="${x.Turno_Deseado}" id="t-nuevo-${x.Solicitud_ID}" style="width:70px; margin:0; padding:4px;"></td>
+        <td><button class="btn" style="padding:4px 10px; font-size:0.8rem;" onclick="aprobarAccion('nuevo','${x.Solicitud_ID}')">Aprobar e Inyectar</button></td>
+      </tr>`;
+    });
+    html += '</table>';
+    container.innerHTML = html;
+  }
+
+  function renderTblInscritos(lista) {
+    const container = document.getElementById('admin-inscritos-tbl');
+    if(lista.length === 0) { container.innerHTML = '<p>No hay propuestas de ampliación de cupos de clientes registrados.</p>'; return; }
+
+    let html = `<table width="100%" border="1" cellpadding="8" style="border-collapse:collapse; border-color:var(--glass-border);">
+      <tr><th>Cliente ID</th><th>San ID</th><th>Turno Deseado</th><th>Acción</th></tr>`;
+    lista.forEach(x => {
+      html += `<tr>
+        <td>${x.Cliente_ID}</td>
+        <td>${x.San_ID}</td>
+        <td><input type="number" value="${x.Turno_Deseado}" id="t-inscrito-${x.Propuesta_ID}" style="width:70px; margin:0; padding:4px;"></td>
+        <td><button class="btn" style="padding:4px 10px; font-size:0.8rem; background:linear-gradient(135deg, #3b82f6, var(--primary-neon));" onclick="aprobarAccion('inscrito','${x.Propuesta_ID}')">Aprobar Cupo</button></td>
+      </tr>`;
+    });
+    html += '</table>';
+    container.innerHTML = html;
+  }
+
+  function aprobarAccion(tipo, id) {
+    const inputElement = document.getElementById(`t-${tipo}-${id}`);
+    const turnoFinal = inputElement.value;
+    
+    toggleLoader(true);
+    closeModal('admin-panel-modal');
+    
+    google.script.run
+      .withSuccessHandler(res => {
+        if(res.success) {
+          alert("Operación completada. Libros oficiales actualizados y ciclos de cobro escalonados calculados.");
+          cargarVitrina();
+        } else {
+          toggleLoader(false);
+          alert("Error: " + res.error);
+        }
+      })
+      .procesarAprobacion(tipo, id, turnoFinal);
+  }
+</script>
