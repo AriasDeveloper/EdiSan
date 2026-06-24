@@ -4,14 +4,10 @@ import { DB, cargarDatosDesdeSheets, ejecutarPostSheets } from './api.js';
 
 let clienteLogueado = null;
 
-// Exponer funciones globalmente para el entorno
 window.mostrarCarga = mostrarCarga;
 window.ocultarCarga = ocultarCarga;
 window.mostrarToast = mostrarToast;
 window.recargarManejador = () => cargarDatosDesdeSheets(mostrarCarga, ocultarCarga, refrescarTodaLaUI);
-
-// Iniciar carga de datos al abrir la app
-mostrarCarga();
 
 document.addEventListener('DOMContentLoaded', () => {
     inicializarNavegacionEstructural();
@@ -47,19 +43,14 @@ function refrescarTodaLaUI() {
         renderizarAdminTodo();
     }
     if (clienteLogueado) {
-        // Actualizar datos del cliente logueado por si hubo cambios en el backend
         const actualizado = DB.clientes.find(c => c.Cliente_ID == clienteLogueado.Cliente_ID);
         if (actualizado) clienteLogueado = actualizado;
         renderizarEspacioPrivadoCliente();
     }
 }
 
-// ==========================================
-// FORMULARIOS DE CREACIÓN (PANEL ADMIN)
-// ==========================================
 function configurarEnviosFormulariosAdmin() {
-    
-    // 1. Crear Nuevo San (Corrección de guardado de Monto y Fecha)
+    // Crear Nuevo San con Imagen o Icono Opcional
     document.getElementById('form-crear-san').onsubmit = (e) => {
         e.preventDefault();
         
@@ -68,6 +59,7 @@ function configurarEnviosFormulariosAdmin() {
             nombre: document.getElementById('san-nombre').value,
             monto: parseFloat(document.getElementById('san-monto').value),
             fecha: document.getElementById('san-fecha').value,
+            imagen: document.getElementById('san-imagen').value, // Captura de campo imagen
             turnos: 3
         };
 
@@ -79,50 +71,42 @@ function configurarEnviosFormulariosAdmin() {
         e.target.reset();
     };
 
-    // 2. Crear Cliente Manualmente
+    // Crear Cliente Manualmente
     document.getElementById('form-crear-cliente').onsubmit = (e) => {
         e.preventDefault();
-        
         const datosCliente = {
             id: "CLI" + Date.now().toString().slice(-4),
             nombre: document.getElementById('cli-nombre').value,
             telefono: document.getElementById('cli-telefono').value,
             contrasena: document.getElementById('cli-pass').value
         };
-
         ejecutarPostSheets('crearCliente', datosCliente, mostrarCarga, () => {
             ocultarCarga();
-            mostrarToast("Cliente registrado en la base de datos", "success");
+            mostrarToast("Cliente registrado", "success");
             window.recargarManejador();
         });
         e.target.reset();
     };
 
-    // 3. Crear y Publicar Producto
+    // Crear Producto
     document.getElementById('form-crear-producto').onsubmit = (e) => {
         e.preventDefault();
-        
         const datosProducto = {
             id: "PROD" + Date.now().toString().slice(-4),
             nombre: document.getElementById('prod-nombre').value,
             precio: parseFloat(document.getElementById('prod-precio').value),
             imagen: document.getElementById('prod-imagen').value || "https://placehold.co/150"
         };
-
         ejecutarPostSheets('crearProducto', datosProducto, mostrarCarga, () => {
             ocultarCarga();
-            mostrarToast("Producto agregado a la vitrina", "success");
+            mostrarToast("Producto agregado", "success");
             window.recargarManejador();
         });
         e.target.reset();
     };
 }
 
-// ==========================================
-// NAVEGACIÓN Y AUTENTICACIÓN
-// ==========================================
 function inicializarNavegacionEstructural() {
-    // Ingreso con llave de seguridad al panel de Edimar
     document.getElementById('btn-llave-admin').onclick = () => {
         const pass = prompt("Clave de la Directiva:");
         if (pass === ADMIN_CONFIG.CLAVE_ACCESO) {
@@ -170,7 +154,7 @@ function abrirModalLogin() {
     
     document.getElementById('modal-cuerpo').innerHTML = `
         <form id="form-autenticar" class="premium-form">
-            <div class="form-group"><label>Selecciona tu Usuario</label><select id="login-id">${opciones}</select></div>
+            <div class="form-group"><label>Usuario</label><select id="login-id">${opciones}</select></div>
             <div class="form-group"><label>Contraseña</label><input type="password" id="login-pass" required></div>
             <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Entrar</button>
         </form>
@@ -197,9 +181,7 @@ function abrirModalLogin() {
     };
 }
 
-// ==========================================
-// RENDERS DE LA VISTA PÚBLICA / CLIENTE
-// ==========================================
+// Render Dinámico con Visualizador de Imagen o Constructor de Icono
 function renderizarOfertasPublicas() {
     const cont = document.getElementById('contenedor-ofertas-publicas');
     if (!cont || !DB.sanes) return;
@@ -207,9 +189,24 @@ function renderizarOfertasPublicas() {
     cont.innerHTML = DB.sanes.map(san => {
         const ocupados = (DB.registrosTurnos || []).filter(r => r.San_ID == san.San_ID).length;
         const lleno = ocupados >= parseInt(san.Total_Turnos || 3);
+        
+        // LÓGICA DE MULTIMEDIA: Imagen vs Icono Dinámico
+        let visualizadorContenido = "";
+        if (san.Imagen_URL && san.Imagen_URL.trim() !== "") {
+            visualizadorContenido = `<img src="${san.Imagen_URL}" class="san-card-img" alt="${san.Nombre_San}">`;
+        } else {
+            const iniciales = san.Nombre_San.slice(0, 2).toUpperCase();
+            visualizadorContenido = `
+                <div class="san-card-icon-placeholder">
+                    <span>${iniciales}</span>
+                </div>
+            `;
+        }
+
         return `
             <div class="glass-card">
-                <h4 style="color:var(--morado-brillante); font-size:1.1rem;">${san.Nombre_San}</h4>
+                ${visualizadorContenido}
+                <h4 style="color:var(--morado-brillante); font-size:1.1rem; margin-top:10px;">${san.Nombre_San}</h4>
                 <p style="font-size:0.85rem; color:var(--texto-secundario);">Cuota: <b>$${san.Monto_Cuota}</b></p>
                 <p style="font-size:0.85rem; color:var(--texto-secundario); margin-bottom:12px;">Puestos: ${ocupados} / ${san.Total_Turnos || 3}</p>
                 <button class="btn-primary btn-ins" data-id="${san.San_ID}" data-nom="${san.Nombre_San}" style="width:100%; justify-content:center;" ${lleno ? 'disabled':''}>
@@ -270,7 +267,7 @@ function renderizarEspacioPrivadoCliente() {
     const tabla = document.getElementById('tabla-puestos-inscritos');
     
     if (misPuestos.length === 0) {
-        tabla.innerHTML = `<p style="color:var(--texto-secundario);">No tienes puestos confirmados en este ciclo.</p>`;
+        tabla.innerHTML = `<p style="color:var(--texto-secundario);">No tienes puestos confirmados.</p>`;
     } else {
         let filas = misPuestos.map(p => {
             const s = DB.sanes.find(x => x.San_ID == p.San_ID) || { Nombre_San: '-' };
@@ -294,7 +291,7 @@ function renderizarEspacioPrivadoCliente() {
             const ref = prompt("Ingresa el número de referencia del pago:");
             if (ref) {
                 ejecutarPostSheets('registrarPago', { registroId: cuota.Registro_ID, nuevoEstado: 'pendiente', comprobante: ref }, mostrarCarga, () => {
-                    mostrarToast("Comprobante enviado a Edimar", "success");
+                    mostrarToast("Comprobante enviado", "success");
                     window.recargarManejador();
                 });
             }
@@ -303,11 +300,7 @@ function renderizarEspacioPrivadoCliente() {
     });
 }
 
-// ==========================================
-// RENDERS GENERALES DEL PANEL DE ADMIN
-// ==========================================
 function renderizarAdminTodo() {
-    // 1. Matriz General de Control de Pagos y Estados
     const tbodyPagos = document.getElementById('tbody-matriz-pagos');
     tbodyPagos.innerHTML = (DB.registrosTurnos || []).map(reg => {
         const san = DB.sanes.find(s => s.San_ID == reg.San_ID) || { Nombre_San: 'Desconocido' };
@@ -320,7 +313,7 @@ function renderizarAdminTodo() {
                 <td><span class="badge-estado ${reg.Estado_Pago}">${reg.Estado_Pago}</span></td>
                 <td><span style="font-size:0.85rem;">${reg.Comprobante_Pago || 'Ninguno'}</span></td>
                 <td>
-                    <select class="sel-est-adm" data-id="${reg.Registro_ID}" title="Cambiar Estado">
+                    <select class="sel-est-adm" data-id="${reg.Registro_ID}">
                         <option value="pendiente" ${reg.Estado_Pago==='pendiente'?'selected':''}>Pendiente</option>
                         <option value="pagado" ${reg.Estado_Pago==='pagado'?'selected':''}>Pagado</option>
                         <option value="atrasado" ${reg.Estado_Pago==='atrasado'?'selected':''}>Atrasado</option>
@@ -333,13 +326,12 @@ function renderizarAdminTodo() {
     tbodyPagos.querySelectorAll('.sel-est-adm').forEach(s => {
         s.onchange = (e) => {
             ejecutarPostSheets('actualizarEstadoPago', { registroId: s.getAttribute('data-id'), estado: e.target.value }, mostrarCarga, () => {
-                mostrarToast("Estado de pago modificado", "success");
+                mostrarToast("Estado modificado", "success");
                 window.recargarManejador();
             });
         };
     });
 
-    // 2. Tabla para Eliminar Sanes
     document.getElementById('tbody-lista-sanes-eliminar').innerHTML = (DB.sanes || []).map(s => `
         <tr>
             <td>${s.San_ID}</td>
@@ -349,9 +341,10 @@ function renderizarAdminTodo() {
             <td><button class="btn-secondary btn-del-san" data-id="${s.San_ID}" style="color:#ef4444;"><i class="fa-solid fa-trash"></i></button></td>
         </tr>
     `).join('');
+    
     document.querySelectorAll('.btn-del-san').forEach(b => {
         b.onclick = () => {
-            if (confirm("¿Estás seguro de que deseas eliminar este San por completo?")) {
+            if (confirm("¿Eliminar este San?")) {
                 ejecutarPostSheets('eliminarSan', { sanId: b.getAttribute('data-id') }, mostrarCarga, () => {
                     mostrarToast("San eliminado", "info");
                     window.recargarManejador();
@@ -360,7 +353,6 @@ function renderizarAdminTodo() {
         };
     });
 
-    // 3. Directorio de Clientes y Borrado
     document.getElementById('tbody-lista-clientes').innerHTML = (DB.clientes || []).map(c => `
         <tr>
             <td>${c.Cliente_ID}</td>
@@ -369,9 +361,10 @@ function renderizarAdminTodo() {
             <td><button class="btn-secondary btn-del-cli" data-id="${c.Cliente_ID}" style="color:#ef4444;"><i class="fa-solid fa-user-minus"></i></button></td>
         </tr>
     `).join('');
+
     document.querySelectorAll('.btn-del-cli').forEach(b => {
         b.onclick = () => {
-            if (confirm("¿Eliminar este cliente de la base de datos de EDISAN?")) {
+            if (confirm("¿Eliminar este cliente?")) {
                 ejecutarPostSheets('eliminarCliente', { clienteId: b.getAttribute('data-id') }, mostrarCarga, () => {
                     mostrarToast("Cliente dado de baja", "info");
                     window.recargarManejador();
@@ -380,50 +373,7 @@ function renderizarAdminTodo() {
         };
     });
 
-    // 4. Inventario de Productos Comerciales y Borrado
-    document.getElementById('tbody-lista-productos').innerHTML = (DB.productos || []).map(p => `
-        <tr>
-            <td>${p.Producto_ID}</td>
-            <td><b>${p.Nombre_Producto}</b></td>
-            <td>$${p.Precio_Venta}</td>
-            <td><button class="btn-secondary btn-del-prod" data-id="${p.Producto_ID}" style="color:#ef4444;"><i class="fa-solid fa-eraser"></i></button></td>
-        </tr>
-    `).join('');
-    document.querySelectorAll('.btn-del-prod').forEach(b => {
-        b.onclick = () => {
-            if (confirm("¿Retirar este producto de la vitrina?")) {
-                ejecutarPostSheets('eliminarProducto', { productoId: b.getAttribute('data-id') }, mostrarCarga, () => {
-                    mostrarToast("Producto eliminado del stock", "info");
-                    window.recargarManejador();
-                });
-            }
-        };
-    });
-
-    // Actualizar Selectores del Asignador Manual de Turnos
-    document.getElementById('admin-select-cliente').innerHTML = (DB.clientes || []).map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
-    document.getElementById('admin-select-san').innerHTML = (DB.sanes || []).map(s => `<option value="${s.San_ID}">${s.Nombre_San}</option>`).join('');
-
-    document.getElementById('btn-admin-asignar-manual').onclick = () => {
-        const cId = document.getElementById('admin-select-cliente').value;
-        const sId = document.getElementById('admin-select-san').value;
-        const tNum = parseInt(document.getElementById('admin-input-turno').value);
-        
-        ejecutarPostSheets('asignarTurnoManual', { id: "REG" + Date.now().toString().slice(-4), clienteId: cId, sanId: sId, turno: tNum }, mostrarCarga, () => {
-            mostrarToast("Turno asignado de forma manual", "success");
-            window.recargarManejador();
-        });
-    };
-
-    renderizarTablasSolicitudes();
-}
-
-// ==========================================
-// SUB-MÓDULO: CONTROL DE SOLICITUDES DE ACCESO
-// ==========================================
-function renderizarTablasSolicitudes() {
-    
-    // 1. Nuevos Clientes (Aprobación crítica corregida con refresco forzado)
+    // Listado de solicitudes pendientes
     document.getElementById('tbody-solicitudes-nuevos').innerHTML = (DB.solicitudesNuevos || []).map(sol => {
         const san = DB.sanes.find(s => s.San_ID == sol.San_ID) || { Nombre_San: '-' };
         return `
@@ -438,49 +388,20 @@ function renderizarTablasSolicitudes() {
 
     document.getElementById('tbody-solicitudes-nuevos').querySelectorAll('.btn-ap-n').forEach(b => {
         b.onclick = () => {
-            const pass = prompt(`Crea una contraseña de acceso para ${b.getAttribute('data-nom')}:`, "EDISAN" + Math.floor(1000 + Math.random() * 9000));
+            const pass = prompt(`Contraseña para ${b.getAttribute('data-nom')}:`, "EDISAN" + Math.floor(1000 + Math.random() * 9000));
             if (pass) {
-                const payload = {
+                ejecutarPostSheets('procesarAprobacionNuevo', {
                     solicitudId: b.getAttribute('data-id'),
                     nombre: b.getAttribute('data-nom'),
                     telefono: b.getAttribute('data-tel'),
                     sanId: b.getAttribute('data-san'),
                     contrasena: pass
-                };
-
-                // Pasamos 'mostrarCarga' correctamente como segundo parámetro
-                ejecutarPostSheets('procesarAprobacionNuevo', payload, mostrarCarga, () => {
+                }, mostrarCarga, () => {
                     ocultarCarga();
-                    mostrarToast(`Cliente ${payload.nombre} aprobado y guardado`, "success");
+                    mostrarToast(`Cliente registrado`, "success");
                     setTimeout(() => { window.recargarManejador(); }, 800);
                 });
             }
-        };
-    });
-
-    // 2. Solicitudes de Clientes ya Existentes que quieren entrar a un nuevo San
-    document.getElementById('tbody-solicitudes-inscritos').innerHTML = (DB.solicitudesInscritos || []).map(sol => {
-        const c = DB.clientes.find(x => x.Cliente_ID == sol.Cliente_ID) || { Nombre_Completo: '-' };
-        const s = DB.sanes.find(x => x.San_ID == sol.San_ID) || { Nombre_San: '-' };
-        return `
-            <tr>
-                <td><b>${c.Nombre_Completo}</b></td>
-                <td>${s.Nombre_San}</td>
-                <td><button class="btn-primary btn-ap-i" data-id="${sol.Solicitud_ID}" data-cli="${sol.Cliente_ID}" data-san="${sol.San_ID}" style="padding:4px 8px; font-size:0.8rem;">Conceder Cupo</button></td>
-            </tr>
-        `;
-    }).join('');
-
-    document.getElementById('tbody-solicitudes-inscritos').querySelectorAll('.btn-ap-i').forEach(b => {
-        b.onclick = () => {
-            ejecutarPostSheets('procesarAprobacionInscrito', { 
-                solicitudId: b.getAttribute('data-id'), 
-                clienteId: b.getAttribute('data-cli'), 
-                sanId: b.getAttribute('data-san') 
-            }, mostrarCarga, () => {
-                mostrarToast("Cupo asignado en el grupo", "success");
-                setTimeout(() => { window.recargarManejador(); }, 800);
-            });
         };
     });
 }
@@ -490,7 +411,7 @@ function mostrarToast(mensaje, tipo = "success") {
     if (!cont) return;
     const toast = document.createElement('div');
     toast.className = `toast ${tipo}`;
-    toast.style.cssText = "background:rgba(15,10,32,0.95); border-left:4px solid " + (tipo === 'success' ? '#22c55e' : '#ef4444') + "; color:#fff; padding:12px 18px; border-radius:8px; font-size:0.85rem; box-shadow:0 8px 24px rgba(0,0,0,0.4); font-weight:500; min-width:220px; text-align:center;";
+    toast.style.cssText = `background:rgba(15,10,32,0.95); border-left:4px solid ${tipo==='success'?'#22c55e':'#ef4444'}; color:#fff; padding:12px 18px; border-radius:8px; font-size:0.85rem; box-shadow:0 8px 24px rgba(0,0,0,0.4); font-weight:500; min-width:220px; text-align:center;`;
     toast.innerText = mensaje;
     cont.appendChild(toast);
     setTimeout(() => { toast.remove(); }, 3500);

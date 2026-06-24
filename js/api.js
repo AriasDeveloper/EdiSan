@@ -1,7 +1,6 @@
 // js/api.js
 import { ADMIN_CONFIG } from './config.js';
 
-// Objeto global donde se almacena la base de datos local temporal
 export const DB = {
     clientes: [],
     sanes: [],
@@ -11,107 +10,67 @@ export const DB = {
     productos: []
 };
 
-/**
- * Carga todos los datos desde el script de Google Sheets controlando redirecciones CORS
- */
 export async function cargarDatosDesdeSheets(fnMostrarCarga, fnOcultarCarga, fnRefrescarUI) {
     if (fnMostrarCarga) fnMostrarCarga();
     
     try {
-        // Usamos redirect: "follow" para obligar al navegador a seguir el salto de URL seguro de Google
-        const opciones = {
+        const respuesta = await fetch(ADMIN_CONFIG.URL_API, {
             method: 'GET',
             mode: 'cors',
-            redirect: 'follow',
-            headers: {
-                'Accept': 'application/json'
-            }
-        };
-
-        const respuesta = await fetch(ADMIN_CONFIG.URL_API, opciones);
+            redirect: 'follow'
+        });
         
-        if (!respuesta.ok) {
-            throw new Error(`Error de respuesta del servidor: ${respuesta.status}`);
-        }
+        if (!respuesta.ok) throw new Error(`HTTP Código ${respuesta.status}`);
         
-        const datos = await respuesta.json();
+        const textoPlano = await respuesta.text();
+        const datos = JSON.parse(textoPlano);
         
-        if (datos && datos.status === "error") {
-            console.error("Error devuelto por el backend de Google:", datos.message);
-            if (window.mostrarToast) window.mostrarToast(datos.message, "error");
-            return;
-        }
-
-        if (datos) {
-            // Sincronización exacta con las propiedades del nuevo doGet
+        if (datos && datos.status === "success") {
             DB.clientes = datos.clientes || [];
             DB.sanes = datos.sanes || [];
             DB.registrosTurnos = datos.registros || []; 
             DB.solicitudesNuevos = datos.solicitudesNuevos || [];
             DB.solicitudesInscritos = datos.solicitudesInscritos || [];
             DB.productos = datos.productos || [];
-            
-            console.log("EDISAN DB Sincronizada con éxito:", DB);
+            console.log("EDISAN Database sincronizada.");
+        } else {
+            throw new Error(datos.message || "Estructura de datos corrupta");
         }
         
     } catch (error) {
-        console.error("Falla de lectura o bloqueo CORS:", error);
-        if (window.mostrarToast) {
-            window.mostrarToast("Falla de conexión con la base de datos", "error");
-        }
+        console.error("Error crítico de sincronización:", error);
+        if (window.mostrarToast) window.mostrarToast("Falla de conexión con la base de datos", "error");
     } finally {
         if (fnOcultarCarga) fnOcultarCarga();
         if (fnRefrescarUI) fnRefrescarUI();
     }
 }
 
-/**
- * Envía las acciones de creación, actualización y borrado hacia el backend Code.gs
- */
 export async function ejecutarPostSheets(accion, datosPayload, fnMostrarCarga, fnCallbackExito) {
     if (fnMostrarCarga) fnMostrarCarga();
     
     try {
-        const opciones = {
+        const respuesta = await fetch(ADMIN_CONFIG.URL_API, {
             method: 'POST',
             mode: 'cors',
-            redirect: 'follow', // Vital también para que los envíos no se queden colgados
-            headers: {
-                'Content-Type': 'text/plain' 
-            },
-            body: JSON.stringify({
-                action: accion,
-                data: datosPayload
-            })
-        };
+            redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: accion, data: datosPayload })
+        });
         
-        const respuesta = await fetch(ADMIN_CONFIG.URL_API, opciones);
-        
-        if (!respuesta.ok) {
-            throw new Error(`Error en el servidor: ${respuesta.status}`);
-        }
+        if (!respuesta.ok) throw new Error(`HTTP Error ${respuesta.status}`);
         
         const resultado = await respuesta.json();
         
         if (resultado.status === 'success') {
-            if (fnCallbackExito) {
-                fnCallbackExito(resultado);
-            } else if (window.recargarManejador) {
-                window.recargarManejador();
-            }
+            if (fnCallbackExito) fnCallbackExito(resultado);
         } else {
-            console.error("El backend retornó un error controlado:", resultado.message);
-            if (window.mostrarToast) {
-                window.mostrarToast(resultado.message || "No se pudo procesar la solicitud", "error");
-            }
+            if (window.mostrarToast) window.mostrarToast(resultado.message || "Error procesando orden", "error");
             if (window.ocultarCarga) window.ocultarCarga();
         }
-        
     } catch (error) {
-        console.error(`Falla al ejecutar la acción [${accion}]:`, error);
-        if (window.mostrarToast) {
-            window.mostrarToast("Error de comunicación. Intente de nuevo.", "error");
-        }
+        console.error("Error enviando datos:", error);
+        if (window.mostrarToast) window.mostrarToast("Falla de red al guardar datos", "error");
         if (window.ocultarCarga) window.ocultarCarga();
     }
 }
