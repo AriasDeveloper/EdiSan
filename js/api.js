@@ -12,37 +12,50 @@ export const DB = {
 };
 
 /**
- * Carga todos los datos desde el script de Google Sheets y los mapea al objeto DB
- * respetando de forma estricta las columnas de tu documento.
+ * Carga todos los datos desde el script de Google Sheets controlando redirecciones CORS
  */
 export async function cargarDatosDesdeSheets(fnMostrarCarga, fnOcultarCarga, fnRefrescarUI) {
     if (fnMostrarCarga) fnMostrarCarga();
     
     try {
-        // Hacemos una petición GET a tu Web App de Google Apps Script
-        const respuesta = await fetch(ADMIN_CONFIG.URL_API);
+        // Usamos redirect: "follow" para obligar al navegador a seguir el salto de URL seguro de Google
+        const opciones = {
+            method: 'GET',
+            mode: 'cors',
+            redirect: 'follow',
+            headers: {
+                'Accept': 'application/json'
+            }
+        };
+
+        const respuesta = await fetch(ADMIN_CONFIG.URL_API, opciones);
         
         if (!respuesta.ok) {
-            throw new Error(`Error de red: ${respuesta.status}`);
+            throw new Error(`Error de respuesta del servidor: ${respuesta.status}`);
         }
         
-        // Si tu Apps Script solo responde a POST para sincronizar datos masivos, 
-        // aquí puedes usar una estructura adaptada. Asumiendo que tu backend actual 
-        // devuelve un JSON estructurado con todas las pestañas al consultar:
         const datos = await respuesta.json();
         
+        if (datos && datos.status === "error") {
+            console.error("Error devuelto por el backend de Google:", datos.message);
+            if (window.mostrarToast) window.mostrarToast(datos.message, "error");
+            return;
+        }
+
         if (datos) {
-            // ASIGNACIÓN Y CONTROL DE VALORES SEGÚN TU EXCEL REAL
+            // Sincronización exacta con las propiedades del nuevo doGet
             DB.clientes = datos.clientes || [];
             DB.sanes = datos.sanes || [];
-            DB.registrosTurnos = datos.registros || []; // Mapeado a tu pestaña "Registros"
+            DB.registrosTurnos = datos.registros || []; 
             DB.solicitudesNuevos = datos.solicitudesNuevos || [];
             DB.solicitudesInscritos = datos.solicitudesInscritos || [];
             DB.productos = datos.productos || [];
+            
+            console.log("EDISAN DB Sincronizada con éxito:", DB);
         }
         
     } catch (error) {
-        console.error("Falla crítica al sincronizar con Google Sheets:", error);
+        console.error("Falla de lectura o bloqueo CORS:", error);
         if (window.mostrarToast) {
             window.mostrarToast("Falla de conexión con la base de datos", "error");
         }
@@ -62,8 +75,9 @@ export async function ejecutarPostSheets(accion, datosPayload, fnMostrarCarga, f
         const opciones = {
             method: 'POST',
             mode: 'cors',
+            redirect: 'follow', // Vital también para que los envíos no se queden colgados
             headers: {
-                'Content-Type': 'text/plain' // Se usa text/plain para evitar bloqueos de CORS preflight con Apps Script
+                'Content-Type': 'text/plain' 
             },
             body: JSON.stringify({
                 action: accion,
