@@ -1,13 +1,14 @@
 // js/app.js
 import { API_CONFIG, ADMIN_CONFIG, FRASES_CARGA } from './config.js';
 
-// Estructura de datos global sincronizada con Sheets
+// Estructura de datos global sincronizada con Sheets (Incluye productos)
 let DB = { 
     sanes: [], 
     clientes: [], 
     registrosTurnos: [], 
     solicitudesNuevos: [], 
-    solicitudesInscritos: [] 
+    solicitudesInscritos: [],
+    productos: [] 
 };
 let clienteLogueado = null;
 
@@ -20,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modal-premium').classList.remove('modal-active');
     };
     
-    // Carga inicial de datos
+    // Carga inicial de datos desde la nube
     cargarDatosDesdeSheets();
 });
 
@@ -49,10 +50,12 @@ async function cargarDatosDesdeSheets() {
         if (resultado.status === "success") {
             DB = resultado.data;
             
-            // Punto 5: Cambiar automáticamente estados vencidos localmente
+            // Cambiar automáticamente estados vencidos localmente
             verificarFechasVencidas();
 
+            // Renderizar vistas del cliente y catálogo
             renderizarOfertasPublicas();
+            renderizarProductosVitrinas();
             
             // Si el administrador está viendo el panel, refrescamos sus datos
             if (document.getElementById('seccion-admin').classList.contains('view-active')) {
@@ -61,7 +64,6 @@ async function cargarDatosDesdeSheets() {
             
             // Si el cliente está logueado, actualizamos su espacio privado
             if (clienteLogueado) {
-                // Actualizar los datos del objeto cliente por si cambiaron en el backend
                 clienteLogueado = DB.clientes.find(c => c.Cliente_ID === clienteLogueado.Cliente_ID) || clienteLogueado;
                 renderizarEspacioPrivadoCliente();
             }
@@ -81,12 +83,12 @@ async function ejecutarPostSheets(accion, payload) {
     try {
         await fetch(API_CONFIG.URL_APPS_SCRIPT, {
             method: 'POST',
-            mode: 'no-cors', // Evita bloqueos CORS en entornos Apps Script residenciales
+            mode: 'no-cors', 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: accion, payload: payload })
         });
         mostrarToast("Cambio registrado de forma segura", "success");
-        // Forzar recarga tras un breve delay para que impacte en Sheets
+        // Recarga tras un breve delay para que impacte en Sheets
         setTimeout(cargarDatosDesdeSheets, 1200);
     } catch (e) { 
         mostrarToast("Fallo al escribir en la base de datos", "error"); 
@@ -107,7 +109,7 @@ function verificarFechasVencidas() {
 }
 
 // ==========================================================================
-// CONTROL DE ACCESOS Y NAVEGACIÓN
+// CONTROL DE ACCESOS Y NAVEGACIÓN SECRETA
 // ==========================================================================
 function inicializarNavegacionSecreta() {
     const btnLlaveAdmin = document.getElementById('btn-llave-admin');
@@ -179,7 +181,7 @@ function abrirModalLoginCliente() {
 }
 
 function inicializarTabsAdmin() {
-    const tabs = ['sanes', 'clientes', 'puestos', 'solicitudes'];
+    const tabs = ['sanes', 'clientes', 'puestos', 'solicitudes', 'productos'];
     tabs.forEach(t => {
         document.getElementById(`tab-admin-${t}`).onclick = (e) => {
             tabs.forEach(x => {
@@ -193,7 +195,7 @@ function inicializarTabsAdmin() {
 }
 
 // ==========================================================================
-// RENDERIZADO INTERFAZ CLIENTES (PÚBLICA Y PRIVADA)
+// RENDERIZADO INTERFAZ CLIENTES (CON IMÁGENES Y PRODUCTOS)
 // ==========================================================================
 function renderizarOfertasPublicas() {
     const contenedor = document.getElementById('contenedor-ofertas-publicas');
@@ -203,9 +205,15 @@ function renderizarOfertasPublicas() {
         const ocupados = DB.registrosTurnos.filter(r => r.San_ID == san.San_ID).length;
         const lleno = ocupados >= parseInt(san.Total_Turnos);
 
+        // Renderizado opcional de imagen superior en la tarjeta
+        const imagenHtml = san.Imagen_URL ? `
+            <div style="width:100%; height:140px; border-radius:10px; background-image: url('${san.Imagen_URL}'); background-size:cover; background-position:center; margin-bottom:12px;"></div>
+        ` : '';
+
         const div = document.createElement('div');
         div.className = 'glass-card';
         div.innerHTML = `
+            ${imagenHtml}
             <h4 style="color:var(--morado-brillante); font-size:1.15rem;">${san.Nombre_San}</h4>
             <p style="font-size:0.85rem; color:var(--texto-secundario); margin-bottom: 8px;">Ciclo de pago: ${san.Ciclo || 'Mensual'}</p>
             <div style="margin: 12px 0; font-size:0.9rem; line-height:1.5;">
@@ -222,6 +230,30 @@ function renderizarOfertasPublicas() {
         };
         contenedor.appendChild(div);
     });
+}
+
+function renderizarProductosVitrinas() {
+    const contenedorCliente = document.getElementById('contenedor-productos-cliente');
+    if (!contenedorCliente) return;
+
+    if (DB.productos.length === 0) {
+        contenedorCliente.innerHTML = `<p style="color:var(--texto-secundario); grid-column: 1/-1; text-align:center;">No hay productos exhibidos actualmente.</p>`;
+        return;
+    }
+
+    contenedorCliente.innerHTML = DB.productos.map(p => `
+        <div class="glass-card animate-fade" style="text-align: center; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <img src="${p.Imagen_URL}" style="width:100%; height:160px; object-fit:cover; border-radius:10px; border: 1px solid var(--borde-cristal);">
+                <h4 style="margin-top:12px; color:#fff; font-size:1.1rem;">${p.Nombre}</h4>
+                <p style="font-size:0.85rem; color:var(--texto-secundario); margin:6px 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.Descripcion}</p>
+            </div>
+            <div>
+                <div style="color:var(--oro-brillante); font-weight:bold; font-size:1.3rem; margin:10px 0;">$${p.Precio}</div>
+                <button class="btn-primary" style="width:100%; justify-content:center;" onclick="alert('Ponte en contacto directo con la Patrona (Edimar) para adquirir este producto.')">Adquirir Producto</button>
+            </div>
+        </div>
+    `).join('');
 }
 
 function abrirModalInscripcionPublico(sanId, nombreSan) {
@@ -253,7 +285,6 @@ function renderizarEspacioPrivadoCliente() {
     const tablaPuestos = document.getElementById('tabla-puestos-inscritos');
     const misPuestos = DB.registrosTurnos.filter(r => r.Cliente_ID == clienteLogueado.Cliente_ID);
     
-    // 1. Mostrar puestos que posee
     if(misPuestos.length === 0) {
         tablaPuestos.innerHTML = `<p style="color:var(--texto-secundario);">No tienes puestos asignados en ningún San activo.</p>`;
     } else {
@@ -264,7 +295,6 @@ function renderizarEspacioPrivadoCliente() {
         tablaPuestos.innerHTML = `<table class="premium-table"><thead><tr><th>San</th><th>Turno</th><th>Tu Estado</th></tr></thead><tbody>${rows}</tbody></table>`;
     }
 
-    // 2. Mostrar cuotas por pagar
     const listaPagar = document.getElementById('lista-cuotas-pagar');
     listaPagar.innerHTML = '';
     
@@ -288,14 +318,12 @@ function renderizarEspacioPrivadoCliente() {
         });
     }
 
-    // 3. Ofrecer Sanes donde NO participe aún (Con confirmación de clave)
     const contenedorPrivado = document.getElementById('contenedor-ofertas-privadas');
     contenedorPrivado.innerHTML = '';
     
     const sanesDisponibles = DB.sanes.filter(san => !misPuestos.some(m => m.San_ID == san.San_ID));
-    
     if(sanesDisponibles.length === 0) {
-        contenedorPrivado.innerHTML = `<p style="color:var(--texto-secundario); padding:10px;">Estás postulado o participas en todos los grupos disponibles.</p>`;
+        contenedorPrivado.innerHTML = `<p style="color:var(--texto-secundario); padding:10px;">Estás participando en todos los grupos disponibles.</p>`;
     } else {
         sanesDisponibles.forEach(san => {
             const ocupados = DB.registrosTurnos.filter(r => r.San_ID == san.San_ID).length;
@@ -313,7 +341,7 @@ function renderizarEspacioPrivadoCliente() {
             
             if(!completo) {
                 div.querySelector('.btn-proponer').onclick = () => {
-                    const passConfirmacion = prompt("Para confirmar y enviar la propuesta a la patrona, introduce tu contraseña de cuenta:");
+                    const passConfirmacion = prompt("Introduce tu contraseña de cuenta para enviar la propuesta a la patrona:");
                     if (passConfirmacion === String(clienteLogueado.Contrasena)) {
                         ejecutarPostSheets('propuestaInscrito', {
                             id: "PROP" + Date.now().toString().slice(-4),
@@ -355,15 +383,14 @@ function abrirModalSubirComprobante(registroId) {
 // INTERFAZ CONTROL DEL ADMINISTRADOR (LA PATRONA)
 // ==========================================================================
 function renderizarAdminTodo() {
-    // Rellenar selects iniciales
+    // Rellenar selectores para puestos
     document.getElementById('sel-puesto-san').innerHTML = DB.sanes.map(s => `<option value="${s.San_ID}">${s.Nombre_San} (${s.Ciclo})</option>`).join('');
     document.getElementById('sel-puesto-cliente').innerHTML = DB.clientes.map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
 
-    // Listener para turnos dinámicos en base al San elegido
     document.getElementById('sel-puesto-san').onchange = (e) => actualizarDesplegableTurnos(e.target.value);
     if(DB.sanes.length > 0) actualizarDesplegableTurnos(DB.sanes[0].San_ID);
 
-    // Tabla de Sanes
+    // Tabla de Sanes Activos
     document.getElementById('lista-admin-sanes-tabla').innerHTML = DB.sanes.map(s => {
         const o = DB.registrosTurnos.filter(r => r.San_ID == s.San_ID).length;
         return `<tr>
@@ -375,7 +402,7 @@ function renderizarAdminTodo() {
         </tr>`;
     }).join('');
 
-    // Tabla de Clientes con eliminación activada
+    // Tabla de Clientes Activos
     document.getElementById('lista-admin-clientes-tabla').innerHTML = DB.clientes.map(c => `
         <tr>
             <td>${c.Cliente_ID}</td>
@@ -384,6 +411,20 @@ function renderizarAdminTodo() {
             <td><button class="btn-danger btn-del-cliente" data-id="${c.Cliente_ID}" style="padding:3px 8px; font-size:0.8rem;">Eliminar</button></td>
         </tr>
     `).join('');
+
+    // Tabla de Productos en el Inventario Admin
+    const tablaAdminProd = document.getElementById('tabla-admin-productos');
+    if(tablaAdminProd) {
+        tablaAdminProd.innerHTML = DB.productos.map(p => `
+            <tr>
+                <td><img src="${p.Imagen_URL}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; border:1px solid var(--borde-cristal);"></td>
+                <td><b>${p.Nombre}</b><br><small style="color:gray;">${p.Descripcion}</small></td>
+                <td style="color:var(--oro-brillante); font-weight:bold;">$${p.Precio}</td>
+                <td>${p.Stock} unds</td>
+                <td><button class="btn-danger btn-del-prod" data-id="${p.Producto_ID}" style="padding:3px 8px; font-size:0.8rem;">Eliminar</button></td>
+            </tr>
+        `).join('');
+    }
 
     // Matriz de pagos global
     const tablaPagos = document.getElementById('tabla-admin-pagos-global');
@@ -401,7 +442,7 @@ function renderizarAdminTodo() {
             <td><span class="badge-estado ${reg.Estado_Pago}">${reg.Estado_Pago}</span></td>
             <td>${compHtml}</td>
             <td>
-                <select class="sel-cambiar-estado" data-id="${reg.Registro_ID}" style="padding:2px 5px; font-size:0.85rem; background:#000; color:#fff;">
+                <select class="sel-cambiar-estado" data-id="${reg.Registro_ID}" style="padding:2px 5px; font-size:0.85rem; background:#000; color:#fff; border:1px solid var(--borde-cristal); border-radius:4px;">
                     <option value="pendiente" ${reg.Estado_Pago==='pendiente'?'selected':''}>Pendiente</option>
                     <option value="pagado" ${reg.Estado_Pago==='pagado'?'selected':''}>Pagado</option>
                     <option value="atrasado" ${reg.Estado_Pago==='atrasado'?'selected':''}>Atrasado</option>
@@ -410,7 +451,7 @@ function renderizarAdminTodo() {
         </tr>`;
     }).join('');
 
-    // Lista de Espera: Nuevos Clientes
+    // Listas de Espera
     document.getElementById('tabla-espera-nuevos').innerHTML = DB.solicitudesNuevos.map(sn => {
         const s = DB.sanes.find(x => x.San_ID == sn.San_ID) || { Nombre_San: '-' };
         return `<tr>
@@ -424,7 +465,6 @@ function renderizarAdminTodo() {
         </tr>`;
     }).join('');
 
-    // Lista de Espera: Propuestas de Miembros Existentes
     document.getElementById('tabla-espera-inscritos').innerHTML = DB.solicitudesInscritos.map(si => {
         const c = DB.clientes.find(x => x.Cliente_ID == si.Cliente_ID) || { Nombre_Completo: '-' };
         const s = DB.sanes.find(x => x.San_ID == si.San_ID) || { Nombre_San: '-' };
@@ -438,7 +478,6 @@ function renderizarAdminTodo() {
         </tr>`;
     }).join('');
 
-    // Activar eventos interactivos en los elementos recién inyectados
     conectarEventosPanelAdmin(tablaPagos);
 }
 
@@ -467,12 +506,17 @@ function conectarEventosPanelAdmin(tablaPagos) {
         if(confirm("¿Eliminar este grupo de ahorro?")) ejecutarPostSheets('eliminarSan', { sanId: e.target.dataset.id });
     });
 
-    // Eliminar Cliente
+    // Eliminar Cliente permanentemente
     document.querySelectorAll('.btn-del-cliente').forEach(b => b.onclick = (e) => {
-        if(confirm("¿Remover a este cliente permanentemente? Se revocará su acceso.")) ejecutarPostSheets('eliminarCliente', { clienteId: e.target.dataset.id });
+        if(confirm("¿Remover a este cliente? Se revocará su acceso.")) ejecutarPostSheets('eliminarCliente', { clienteId: e.target.dataset.id });
     });
 
-    // Ver y eliminar recibos enviados
+    // Eliminar Producto del Inventario
+    document.querySelectorAll('.btn-del-prod').forEach(b => b.onclick = (e) => {
+        if(confirm("¿Eliminar este producto del catálogo?")) ejecutarPostSheets('eliminarProducto', { productoId: e.target.dataset.id });
+    });
+
+    // Ver y rechazar recibos
     tablaPagos.querySelectorAll('.btn-ver-comp').forEach(btn => {
         btn.onclick = (e) => {
             const link = e.target.dataset.link;
@@ -491,7 +535,7 @@ function conectarEventosPanelAdmin(tablaPagos) {
             modal.classList.add('modal-active');
             
             document.getElementById('action-eliminar-comprobante').onclick = () => {
-                if(confirm("¿Deseas rechazar este pago? El turno volverá instantáneamente al estado pendiente.")) {
+                if(confirm("¿Deseas rechazar este pago? El estado volverá instantáneamente a pendiente.")) {
                     modal.classList.remove('modal-active');
                     ejecutarPostSheets('eliminarComprobante', { registroId: regId });
                 }
@@ -499,7 +543,7 @@ function conectarEventosPanelAdmin(tablaPagos) {
         };
     });
 
-    // Modificar estados desde el selector rápido
+    // Cambiar estados desde el select directo
     tablaPagos.querySelectorAll('.sel-cambiar-estado').forEach(sel => {
         sel.onchange = (e) => {
             const r = DB.registrosTurnos.find(x => x.Registro_ID == e.target.dataset.id);
@@ -519,15 +563,13 @@ function conectarEventosPanelAdmin(tablaPagos) {
     document.querySelectorAll('.btn-apr-nuevo').forEach(b => b.onclick = async (e) => {
         const d = e.target.dataset;
         const nuevoClienteId = "C" + Date.now().toString().slice(-3);
-        const claveGenerada = Math.floor(1000 + Math.random() * 9000).toString(); // Clave rápida de 4 dígitos
+        const claveGenerada = Math.floor(1000 + Math.random() * 9000).toString();
         
         mostrarCarga();
-        // 1. Guardar cliente
         await fetch(API_CONFIG.URL_APPS_SCRIPT, { method: 'POST', body: JSON.stringify({ action: 'crearCliente', payload: { id: nuevoClienteId, nombre: d.nombre, telefono: d.tel, contrasena: claveGenerada } })});
-        // 2. Quitarlo de lista de espera
         await fetch(API_CONFIG.URL_APPS_SCRIPT, { method: 'POST', body: JSON.stringify({ action: 'resolverSolicitudNuevo', payload: { solicitudId: d.id } })});
         
-        alert(`¡Aprobado!\nCliente: ${d.nombre}\nClave Temporal de Acceso: ${claveGenerada}\n\nYa figura en el directorio general. Recuerda asignarle su turno correspondiente.`);
+        alert(`¡Aprobado!\nCliente: ${d.nombre}\nClave Temporal de Acceso: ${claveGenerada}`);
         setTimeout(cargarDatosDesdeSheets, 500);
     });
 
@@ -535,16 +577,16 @@ function conectarEventosPanelAdmin(tablaPagos) {
     document.querySelectorAll('.btn-apr-inscrito').forEach(b => b.onclick = async (e) => {
         mostrarCarga();
         await fetch(API_CONFIG.URL_APPS_SCRIPT, { method: 'POST', body: JSON.stringify({ action: 'resolverPropuestaInscrito', payload: { propuestaId: e.target.dataset.id } })});
-        alert("Propuesta aceptada en base de datos. Completa su asignación de turno en la pestaña correspondiente.");
+        alert("Propuesta aceptada. Procede a asignarle su puesto correspondiente.");
         setTimeout(cargarDatosDesdeSheets, 500);
     });
 }
 
 // ==========================================================================
-// SUBMIT DE FORMULARIOS DIRECTOS
+// SUBMIT Y PROCESAMIENTO DE FORMULARIOS DIRECTOS
 // ==========================================================================
 function inicializarFormularios() {
-    // Formulario Crear San
+    // Formulario Crear San (Captura Imagen_URL opcional)
     document.getElementById('form-crear-san').onsubmit = (e) => {
         e.preventDefault();
         ejecutarPostSheets('crearSan', {
@@ -554,12 +596,13 @@ function inicializarFormularios() {
             totalTurnos: parseInt(document.getElementById('san-turnos').value),
             estado: "Reclutando",
             ciclo: document.getElementById('san-ciclo').value,
-            fechaInicio: document.getElementById('san-fecha-inicio').value 
+            fechaInicio: document.getElementById('san-fecha-inicio').value,
+            imagenUrl: document.getElementById('san-imagen').value
         });
         e.target.reset();
     };
 
-    // Formulario Crear Cliente Directo
+    // Formulario Crear Cliente Manual
     document.getElementById('form-crear-cliente').onsubmit = (e) => {
         e.preventDefault();
         ejecutarPostSheets('crearCliente', {
@@ -571,7 +614,24 @@ function inicializarFormularios() {
         e.target.reset();
     };
 
-    // Asignación de Puesto Manual
+    // Formulario Crear Producto (Catálogo)
+    const formProducto = document.getElementById('form-crear-producto');
+    if (formProducto) {
+        formProducto.onsubmit = (e) => {
+            e.preventDefault();
+            ejecutarPostSheets('crearProducto', {
+                id: "P" + Date.now().toString().slice(-4),
+                nombre: document.getElementById('prod-nombre').value,
+                descripcion: document.getElementById('prod-desc').value,
+                precio: parseFloat(document.getElementById('prod-precio').value),
+                imagenUrl: document.getElementById('prod-img').value,
+                stock: parseInt(document.getElementById('prod-stock').value)
+            });
+            e.target.reset();
+        };
+    }
+
+    // Asignación de Puesto Manual (Hereda la fecha del San)
     document.getElementById('btn-guardar-puesto').onclick = () => {
         const sanId = document.getElementById('sel-puesto-san').value;
         const turno = document.getElementById('num-puesto-turno').value;
@@ -582,7 +642,6 @@ function inicializarFormularios() {
         }
 
         const sanSeleccionado = DB.sanes.find(s => s.San_ID == sanId);
-        // Punto 2: Hereda automáticamente la fecha configurada en el San
         const fechaDelSan = sanSeleccionado.Fecha_Inicio ? sanSeleccionado.Fecha_Inicio.split('T')[0] : "2026-01-01";
 
         ejecutarPostSheets('asignarPuesto', {
@@ -608,6 +667,7 @@ function mostrarToast(mensaje, tipo = "success") {
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         font-size: 0.9rem;
         backdrop-filter: blur(8px);
+        transition: all 0.3s ease;
     `;
     toast.innerText = mensaje; 
     contenedor.appendChild(toast);
