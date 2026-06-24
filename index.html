@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EDISAN - Gestión Financiera Premium</title>
+    <title>EDISAN - Sistema de Gestión Integral</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -105,51 +105,100 @@
             </div>
         </header>
 
-        <div class="admin-tabs-bar" style="max-width: 1200px; margin: 20px auto; padding: 0 20px; display: flex; gap: 10px;">
-            <button class="tab-trigger active" data-tab="sanes" title="Matriz de pagos"><i class="fa-solid fa-wallet"></i> Pagos y Grupos</button>
-            <button class="tab-trigger" data-tab="puestos" title="Asignador manual"><i class="fa-solid fa-user-plus"></i> Asignador Manual</button>
-            <button class="tab-trigger" data-tab="solicitudes" title="Bandeja de entrada"><i class="fa-solid fa-bell"></i> Solicitudes</button>
+        <div class="admin-tabs-bar" style="max-width: 1200px; margin: 20px auto; padding: 0 20px; display: flex; flex-wrap: wrap; gap: 10px;">
+            <button class="tab-trigger active" data-tab="sanes"><i class="fa-solid fa-wallet"></i> Pagos y Grupos</button>
+            <button class="tab-trigger" data-tab="clientes"><i class="fa-solid fa-users"></i> Control Clientes</button>
+            <button class="tab-trigger" data-tab="productos"><i class="fa-solid fa-box-open"></i> Productos</button>
+            <button class="tab-trigger" data-tab="solicitudes"><i class="fa-solid fa-bell"></i> Solicitudes</button>
         </div>
 
         <main class="main-container" style="padding-top:0;">
-            <!-- TAB 1: MATRIZ DE PAGOS GLOBAL -->
+            
+            <!-- TAB 1: SANES (MATRIZ + CREACIÓN/BORRADO SANES) -->
             <div id="tab-sanes" class="tab-content-admin animate-fade">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                    <div class="glass-card">
+                        <h3 style="color:#fff; margin-bottom:15px; font-size:1rem;"><i class="fa-solid fa-folder-plus"></i> Crear Nuevo San</h3>
+                        <form id="form-crear-san" class="premium-form">
+                            <div class="form-group"><label>Nombre del San</label><input type="text" id="san-nombre" required></div>
+                            <div class="form-group"><label>Cuota ($)</label><input type="number" id="san-monto" required></div>
+                            <div class="form-group"><label>Fecha Inicio</label><input type="date" id="san-fecha" required></div>
+                            <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Aperturar Grupo</button>
+                        </form>
+                    </div>
+                    <div class="glass-card">
+                        <h3 style="color:#fff; margin-bottom:15px; font-size:1rem;"><i class="fa-solid fa-user-plus"></i> Inyección Manual de Turno</h3>
+                        <div class="premium-form">
+                            <div class="form-group"><label>Cliente</label><select id="admin-select-cliente"></select></div>
+                            <div class="form-group"><label>Grupo (San)</label><select id="admin-select-san"></select></div>
+                            <div class="form-group"><label>Turno</label><input type="number" id="admin-input-turno" min="1" max="3" value="1"></div>
+                            <button id="btn-admin-asignar-manual" class="btn-primary" style="width:100%; justify-content:center;">Asignar Manualmente</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card" style="margin-bottom:25px;">
+                    <h3 style="color:#fff; margin-bottom:15px;"><i class="fa-solid fa-table-list"></i> Matriz de Control de Cuotas</h3>
+                    <div style="overflow-x: auto;"><table class="premium-table">
+                        <thead><tr><th>Grupo</th><th>Cliente</th><th>Turno</th><th>Estado</th><th>Recibo</th><th>Acción</th></tr></thead>
+                        <tbody id="tbody-matriz-pagos"></tbody>
+                    </table></div>
+                </div>
+
                 <div class="glass-card">
-                    <h3 style="color:#fff; margin-bottom:15px;"><i class="fa-solid fa-table-list" style="color: var(--morado-brillante);"></i> Matriz de Control de Cuotas Global</h3>
-                    <div style="overflow-x: auto;">
-                        <table class="premium-table">
-                            <thead>
-                                <tr><th>Grupo</th><th>Cliente</th><th>Turno</th><th>Estado</th><th>Recibo</th><th>Acción</th></tr>
-                            </thead>
-                            <tbody id="tbody-matriz-pagos"></tbody>
-                        </table>
+                    <h3 style="color:#fff; margin-bottom:15px; color:#ef4444;"><i class="fa-solid fa-trash-can"></i> Lista de Sanes Activos (Acción de Borrado)</h3>
+                    <div style="overflow-x: auto;"><table class="premium-table">
+                        <thead><tr><th>ID</th><th>Nombre</th><th>Monto</th><th>Fecha Inicio</th><th>Acción</th></tr></thead>
+                        <tbody id="tbody-lista-sanes-eliminar"></tbody>
+                    </table></div>
+                </div>
+            </div>
+
+            <!-- TAB 2: GESTIÓN DE CLIENTES -->
+            <div id="tab-clientes" class="tab-content-admin oculto animate-fade">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                    <div class="glass-card">
+                        <h3 style="color:#fff; margin-bottom:15px; font-size:1rem;"><i class="fa-solid fa-user-plus"></i> Registrar Nuevo Cliente</h3>
+                        <form id="form-crear-cliente" class="premium-form">
+                            <div class="form-group"><label>Nombre Completo</label><input type="text" id="cli-nombre" required></div>
+                            <div class="form-group"><label>WhatsApp / Teléfono</label><input type="text" id="cli-telefono" required></div>
+                            <div class="form-group"><label>Contraseña Acceso</label><input type="text" id="cli-pass" required></div>
+                            <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Dar de Alta Cliente</button>
+                        </form>
+                    </div>
+                    <div class="glass-card">
+                        <h3 style="color:#fff; margin-bottom:15px; font-size:1rem;"><i class="fa-solid fa-users-gear"></i> Directorio Base de Datos</h3>
+                        <div style="overflow-x: auto;"><table class="premium-table">
+                            <thead><tr><th>ID</th><th>Nombre</th><th>Teléfono</th><th>Acciones</th></tr></thead>
+                            <tbody id="tbody-lista-clientes"></tbody>
+                        </table></div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 2: ASIGNADOR MANUAL -->
-            <div id="tab-puestos" class="tab-content-admin oculto animate-fade">
-                <div class="glass-card" style="max-width: 550px; margin: 0 auto;">
-                    <h3 style="color:#fff; margin-bottom:20px;"><i class="fa-solid fa-user-pen" style="color: var(--oro-brillante);"></i> Inyectar Turno Manual</h3>
-                    <div class="premium-form">
-                        <div class="form-group">
-                            <label for="admin-select-cliente">Seleccionar Cliente</label>
-                            <select id="admin-select-cliente" title="Selecciona un cliente"></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="admin-select-san">Seleccionar Grupo (San)</label>
-                            <select id="admin-select-san" title="Selecciona un grupo"></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="admin-input-turno">Número de Turno</label>
-                            <input type="number" id="admin-input-turno" min="1" max="3" placeholder="Ej. 2" title="Escribe el turno a asignar">
-                        </div>
-                        <button id="btn-admin-asignar-manual" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Confirmar Asignación</button>
+            <!-- TAB 3: VITRINA DE PRODUCTOS -->
+            <div id="tab-productos" class="tab-content-admin oculto animate-fade">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                    <div class="glass-card">
+                        <h3 style="color:#fff; margin-bottom:15px; font-size:1rem;"><i class="fa-solid fa-square-plus"></i> Publicar Producto</h3>
+                        <form id="form-crear-producto" class="premium-form">
+                            <div class="form-group"><label>Nombre del Producto</label><input type="text" id="prod-nombre" required></div>
+                            <div class="form-group"><label>Precio de Venta ($)</label><input type="number" id="prod-precio" required></div>
+                            <div class="form-group"><label>Enlace de la Foto / Miniatura</label><input type="text" id="prod-imagen" placeholder="https://..."></div>
+                            <button type="submit" class="btn-primary" style="width:100%; justify-content:center;">Subir a la Vitrina</button>
+                        </form>
+                    </div>
+                    <div class="glass-card">
+                        <h3 style="color:#fff; margin-bottom:15px; font-size:1rem;"><i class="fa-solid fa-tags"></i> Inventario Actual</h3>
+                        <div style="overflow-x: auto;"><table class="premium-table">
+                            <thead><tr><th>ID</th><th>Producto</th><th>Precio</th><th>Acción</th></tr></thead>
+                            <tbody id="tbody-lista-productos"></tbody>
+                        </table></div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 3: BANDEJA DE SOLICITUDES -->
+            <!-- TAB 4: SOLICITUDES -->
             <div id="tab-solicitudes" class="tab-content-admin oculto animate-fade" style="display:flex; flex-direction:column; gap:25px;">
                 <div class="glass-card">
                     <h3 style="color:#fff;"><i class="fa-solid fa-user-clock" style="color: #22c55e;"></i> Nuevos Clientes Solicitando Registro</h3>
@@ -159,7 +208,7 @@
                     </table>
                 </div>
                 <div class="glass-card">
-                    <h3 style="color:#fff;"><i class="fa-solid fa-folder-plus" style="color: var(--morado-brillante);"></i> Solicitudes de Expansión de Clientes Inscritos</h3>
+                    <h3 style="color:#fff;"><i class="fa-solid fa-folder-plus" style="color: var(--morado-brillante);"></i> Solicitudes de Expansión</h3>
                     <table class="premium-table">
                         <thead><tr><th>Cliente</th><th>Grupo Solicitado</th><th>Acción</th></tr></thead>
                         <tbody id="tbody-solicitudes-inscritos"></tbody>
