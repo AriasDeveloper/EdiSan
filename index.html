@@ -163,29 +163,76 @@
         <main class="main-container" style="padding-top: 0;">
             
             <!-- CONTENIDO PESTAÑA 1: CONTROL DE PAGOS GLOBAL -->
-            <div id="tab-sanes" class="tab-content-admin animate-fade">
+<!-- CONTENIDO PESTAÑA 1: CONTROL DE PAGOS GLOBAL Y CREACIÓN -->
+        <div id="tab-sanes" class="tab-content-admin animate-fade">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 30px;">
+                
+                <!-- Formulario para Crear un Nuevo San -->
                 <div class="glass-card">
-                    <h3 style="margin-top: 0; color: #fff;"><i class="fa-solid fa-table-list" style="color: var(--morado-brillante);"></i> Matriz de Control de Cuotas Global</h3>
-                    <p style="font-size: 0.85rem; color: var(--texto-secundario); margin-bottom: 15px;">Cambia el estado de cualquier fila y el sistema actualizará Google Sheets de forma automática.</p>
-                    <div style="overflow-x: auto;">
-                        <table class="premium-table">
-                            <thead>
-                                <tr>
-                                    <th>Grupo (San)</th>
-                                    <th>Cliente</th>
-                                    <th>Turno</th>
-                                    <th>Estado Actual</th>
-                                    <th>Comprobante</th>
-                                    <th>Acción (Cambiar Estado)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbody-matriz-pagos">
-                                <!-- Rellenado dinámico desde ui-admin.js -->
-                            </tbody>
-                        </table>
+                    <h3 style="margin-top: 0; color: #fff; margin-bottom: 15px;"><i class="fa-solid fa-folder-plus" style="color: var(--morado-brillante); margin-right: 8px;"></i> Crear Nuevo Grupo (San)</h3>
+                    <form id="form-crear-san" class="premium-form" title="Formulario de creación de nuevos sanes">
+                        <div class="form-group">
+                            <label for="san-nombre">Nombre del San</label>
+                            <input type="text" id="san-nombre" name="san-nombre" placeholder="Ej. San Oro Julio" title="Nombre identificador del grupo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="san-monto">Monto de la Cuota ($)</label>
+                            <input type="number" id="san-monto" name="san-monto" min="1" placeholder="Ej. 20" title="Monto en dólares por turno" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="san-turnos">Total de Turnos (Capacidad)</label>
+                            <input type="number" id="san-turnos" name="san-turnos" min="2" max="3" value="3" title="Número máximo de participantes configurados" readonly>
+                            <small style="color: var(--texto-secundario); font-size: 0.78rem; margin-top: 2px;">Capacidad limitada estrictamente a 3 puestos por configuración del sistema.</small>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+                            Aperturar Grupo en Sistema
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Resumen de Caja y Métricas Rápidas -->
+                <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="margin-top: 0; color: #fff; margin-bottom: 15px;"><i class="fa-solid fa-chart-pie" style="color: var(--oro-brillante); margin-right: 8px;"></i> Estado General de Ahorros</h3>
+                        <p style="color: var(--texto-secundario); font-size: 0.9rem;">Panel de auditoría rápida para la administración de Edimar.</p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                        <div style="background: rgba(34, 197, 94, 0.08); padding: 15px; border-radius: 12px; border: 1px solid rgba(34, 197, 94, 0.2);">
+                            <span style="font-size: 0.8rem; color: var(--exito); text-transform: uppercase; font-weight: 700;">Al Día</span>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #fff; margin-top: 5px;">EDISAN</div>
+                        </div>
+                        <div style="background: rgba(239, 68, 68, 0.08); padding: 15px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                            <span style="font-size: 0.8rem; color: var(--peligro); text-transform: uppercase; font-weight: 700;">Revisar</span>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #fff; margin-top: 5px;">Control</div>
+                        </div>
                     </div>
                 </div>
+
             </div>
+
+            <!-- Matriz de Pagos Integrada en la Vista Principal de Sanes -->
+            <div class="glass-card">
+                <h3 style="margin-top: 0; color: #fff;"><i class="fa-solid fa-table-list" style="color: var(--morado-brillante); margin-right: 8px;"></i> Matriz de Control de Cuotas Global</h3>
+                <p style="font-size: 0.85rem; color: var(--texto-secundario); margin-bottom: 15px;">Modifica el estado de los turnos aquí. Los cambios se guardan directamente en las hojas de cálculo.</p>
+                <div style="overflow-x: auto;">
+                    <table class="premium-table">
+                        <thead>
+                            <tr>
+                                <th>Grupo (San)</th>
+                                <th>Cliente</th>
+                                <th>Turno</th>
+                                <th>Estado Actual</th>
+                                <th>Comprobante</th>
+                                <th>Acción (Cambiar Estado)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-matriz-pagos">
+                            <!-- Rellenado dinámico desde ui-admin.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
             <!-- CONTENIDO PESTAÑA 2: ASIGNADOR MANUAL DE PUESTOS -->
             <div id="tab-puestos" class="tab-content-admin oculto animate-fade">
