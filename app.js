@@ -326,4 +326,3 @@ async function procesarAprobacion(solicitudId, esNuevo, sanId, nombre, telefono,
 }
 
 function cerrarPanelAdmin() { document.getElementById("panel-admin-abierto").style.display = "none"; }
-</script>
