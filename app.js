@@ -1,5 +1,5 @@
 // CONFIGURACIÓN DE RUTAS DE COMUNICACIÓN ENLACE DIRECTO
-const API_URL = "AQUI_PEGA_TU_NUEVA_URL_DE_GOOGLE_APPS_SCRIPT_EXEC";
+const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
 
 let sesionAdminActiva = false;
 let tipoFormularioActual = 'sanes';
