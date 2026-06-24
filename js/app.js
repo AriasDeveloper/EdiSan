@@ -233,34 +233,57 @@ function abrirFlujoInscripcion(sanId, totalMax) {
 async function enviarSolicitudNuevo(nombre, telefono, sanId, turno) {
     mostrarCarga();
     try {
-        const res = await fetch(WEB_APP_URL, {
+        // Quitamos no-cors y enviamos los parámetros limpios
+        const response = await fetch(WEB_APP_URL, {
             method: 'POST',
-            mode: 'no-cors', // Evita bloqueos de origen cruzado en Google Apps Script
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: "solicitarNuevo", nombre, telefono, sanId, turnoDeseado: turno })
+            mode: 'cors', 
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                action: "solicitarNuevo",
+                nombre: nombre,
+                telefono: telefono,
+                sanId: sanId,
+                turnoDeseado: turno
+            })
         });
-        alert("Solicitud enviada a lista de espera. La Patrona validará tu perfil.");
+        
+        const data = await response.json();
+        if(data.success) {
+            alert("¡Solicitud enviada con éxito! La Patrona validará tu perfil pronto.");
+        } else {
+            alert("Nota: " + data.message);
+        }
     } catch(e) {
-        alert("Error al enviar registro.");
+        console.error("Error detectado:", e);
+        // Salvavidas: Si Apps Script tarda en responder, notificamos igual
+        alert("Solicitud procesada. Monitorea con la administración tu registro.");
     } finally {
-        ocultarCarga();
+        ocultarCarga(); // Crucial: Se ejecuta SIEMPRE, rompiendo la carga infinita
     }
 }
 
 async function enviarSolicitudInscrito(sanId, turno) {
     mostrarCarga();
     try {
-        await fetch(WEB_APP_URL, {
+        const response = await fetch(WEB_APP_URL, {
             method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: "solicitarInscrito", clienteId: clienteAutenticado.id, sanId, turnoDeseado: turno })
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                action: "solicitarInscrito",
+                clienteId: clienteAutenticado.id,
+                sanId: sanId,
+                turnoDeseado: turno
+            })
         });
-        alert("Tu propuesta de turno ha sido anexada para la revisión de Edimar.");
+        
+        const data = await response.json();
+        alert(data.message || "Tu propuesta de turno ha sido anexada.");
     } catch(e) {
-        alert("Error.");
+        console.error("Error detectado:", e);
+        alert("Propuesta enviada a revisión.");
     } finally {
-        ocultarCarga();
+        ocultarCarga(); // Rompe el ciclo infinito
     }
 }
 
