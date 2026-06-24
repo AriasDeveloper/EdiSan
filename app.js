@@ -21,14 +21,26 @@ async function consultarBackend(payload) {
   try {
     const respuesta = await fetch(API_URL, {
       method: "POST",
-      mode: "cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" }, // Evita problemas de preflight CORS en Apps Script
+      // Cambiamos a 'cors' explícito y añadimos la redirección automática
+      mode: "cors", 
+      redirect: "follow", 
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
       body: JSON.stringify(payload)
     });
+    
+    if (!respuesta.ok) {
+      throw new Error(`Error HTTP: ${respuesta.status}`);
+    }
+    
     return await respuesta.json();
   } catch (error) {
     console.error("Error en comunicación:", error);
-    return { success: false, error: "Imposible conectar con los servidores de BaseEdimar." };
+    // Quitamos el loader si falla para que no tranque la pantalla
+    mostrarLoader(false); 
+    alert("Error de conexión con BaseEdimar: Verifique la URL de la API o los permisos.");
+    return { success: false, error: error.toString() };
   }
 }
 
