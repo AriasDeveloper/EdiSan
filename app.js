@@ -1,172 +1,175 @@
-// CONFIGURACIÓN DE RUTAS DE COMUNICACIÓN ENLACE DIRECTO
-const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
+const API_URL = "CONECTAR_AQUI_TU_URL_DE_EXEC_GOOGLE_APPS_SCRIPT";
 
-let sesionAdminActiva = false;
-let tipoFormularioActual = 'sanes';
+let currentUser = null;
+let userType = null; // 'client' o 'admin'
 
-// Inicialización automática al cargar el sitio
 document.addEventListener("DOMContentLoaded", () => {
-    importarDatosEstadisticas();
+    initNavigation();
+    loadPublicData();
+    setupForms();
 });
 
-function forzarLoader(estado) {
-    const loader = document.getElementById("loader");
-    if(loader) loader.style.display = estado ? "flex" : "none";
+// NAVEGACIÓN ENTRE VISTAS (SPA FLUIDA)
+function showView(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+    document.getElementById(viewId).classList.remove('hidden');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 }
 
-// Consumo de la API con manejo de redirecciones automático (Fix del Bucle Infinito)
-async function consultarServidor(payload) {
-    try {
-        const query = await fetch(API_URL, {
-            method: "POST",
-            mode: "cors",
-            redirect: "follow",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
+function initNavigation() {
+    document.getElementById('btn-home').addEventListener('click', () => {
+        showView('view-home');
+        document.getElementById('btn-home').classList.add('active');
+    });
+
+    document.getElementById('btn-login-client').addEventListener('click', () => {
+        document.getElementById('login-title').innerText = "Acceso Clientes";
+        document.getElementById('login-type').value = "client";
+        document.getElementById('group-phone').classList.remove('hidden');
+        showView('view-login');
+    });
+
+    document.getElementById('btn-login-admin').addEventListener('click', () => {
+        document.getElementById('login-title').innerText = "Llave de la Patrona";
+        document.getElementById('login-type').value = "admin";
+        document.getElementById('group-phone').classList.add('hidden');
+        showView('view-login');
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', logout);
+
+    // Tabs de Administración
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            e.target.classList.add('active');
+            document.getElementById(e.target.dataset.tab).classList.remove('hidden');
         });
-        if (!query.ok) throw new Error("Respuesta de servidor inválida");
-        return await query.json();
-    } catch (err) {
-        console.error("Fallo de enlace:", err);
-        forzarLoader(false);
-        alert("Atención: Interrupción en la línea de datos con BaseEdimar.");
-        return { success: false, error: err.toString() };
+    });
+}
+
+// LLAMADAS AL SERVIDOR
+async function callAPI(action, data = {}) {
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({ action, ...data })
+        });
+        return await response.json();
+    } catch (error) {
+        showToast("Error de conexión con el servidor", "error");
     }
 }
 
-// Renderizado dinámico de la base de datos a los ojos de la Patrona y sus clientes
-async function importarDatosEstadisticas() {
-    forzarLoader(true);
-    const data = await consultarServidor({ action: "obtenerDatosVitrina" });
-    forzarLoader(false);
-
-    if(data && data.success) {
-        dibujarTablaSanes(data.sanes);
-        dibujarTablaProductos(data.productos);
+// CARGA DE DATOS PÚBLICOS (INDEX)
+async function loadPublicData() {
+    const res = await callAPI('getPublicData');
+    if(res.status === 'success') {
+        renderSanes(res.sanes, 'grid-sanes-public', false);
+        renderProductos(res.productos, 'grid-productos-public', false);
     }
 }
 
-function dibujarTablaSanes(listaSanes) {
-    const box = document.getElementById("grid-sanes");
-    box.innerHTML = listaSanes.length === 0 ? `<p class="text-muted">No existen grupos de Sanes registrados actualmente.</p>` : "";
-    
-    listaSanes.forEach(san => {
-        box.innerHTML += `
-            <div class="card-premium">
-                <h4 style="color:var(--neon-violet); margin-bottom:10px;">${san.NombreGrupo || 'San Innominado'}</h4>
-                <p style="font-size:1.2rem; font-weight:700; margin-bottom:10px;">Monto: $${san.MontoCiclo || '0'}</p>
-                <p style="color:var(--text-muted); font-size:0.9rem;">Turno Actual: <b>${san.TurnoActual || '-'}</b></p>
-                <p style="color:var(--text-muted); font-size:0.9rem;">Estado: <span style="color:#00f5d4">${san.Estado || 'Activo'}</span></p>
+function renderSanes(sanes, containerId, isClientView) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    sanes.forEach(san => {
+        container.innerHTML += `
+            <div class="card">
+                <img src="${san.imagen}" class="card-img" alt="${san.nombre}">
+                <div class="card-body">
+                    <h4 class="card-title">${san.nombre}</h4>
+                    <p class="card-info">Cuota: <b>$${san.cuota}</b> | Ciclo Actual: ${san.ciclo}</p>
+                    <p class="card-info">Puestos Libres: ${san.puestos - (san.turnos ? san.turnos.split(',').length : 0)} / ${san.puestos}</p>
+                    ${isClientView ? `<button class="btn-primary" onclick="solicitarSan('${san.id}')">Solicitar Cupo</button>` : ''}
+                </div>
             </div>
         `;
     });
 }
 
-function dibujarTablaProductos(listaProductos) {
-    const box = document.getElementById("grid-productos");
-    box.innerHTML = listaProductos.length === 0 ? `<p class="text-muted">Catálogo vacío comercialmente.</p>` : "";
-    
-    listaProductos.forEach(prod => {
-        box.innerHTML += `
-            <div class="card-premium" style="border-left: 3px solid var(--neon-gold)">
-                <h4 style="margin-bottom:8px;">${prod.Articulo || 'Producto'}</h4>
-                <p style="font-size:1.3rem; color:var(--neon-gold); font-weight:700; margin-bottom:5px;">$${prod.Precio || '0'}</p>
-                <p style="color:var(--text-muted); font-size:0.85rem;">Cuotas Permitidas: ${prod.CuotasMaximas || '1'}</p>
-            </div>
-        `;
+function renderProductos(productos, containerId, isClientView) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    productos.forEach(p => {
+        if(p.estado !== 'Agotado') {
+            container.innerHTML += `
+                <div class="card">
+                    <img src="${p.imagen}" class="card-img" alt="${p.nombre}">
+                    <div class="card-body">
+                        <h4 class="card-title">${p.nombre}</h4>
+                        <p class="card-info">${p.descripcion}</p>
+                        <p class="card-info" style="color:var(--accent-glow)">Precio: <b>$${p.precio}</b></p>
+                        <span class="badge">${p.estado}</span>
+                        ${isClientView ? `<button class="btn-primary" style="margin-top:auto;" onclick="solicitarProducto('${p.id}')">Solicitar Compra</button>` : ''}
+                    </div>
+                </div>
+            `;
+        }
     });
 }
 
-// CONTROL DE MODAL INTERACTIVO
-function alternarModalAdmin(mostrar) {
-    document.getElementById("modal-admin").style.display = mostrar ? "flex" : "none";
+// LOGUEOS Y SESIONES
+function setupForms() {
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const type = document.getElementById('login-type').value;
+        const pass = document.getElementById('login-pass').value;
+        const phone = document.getElementById('login-phone').value;
+
+        const res = await callAPI('login', { type, pass, phone });
+        if(res.status === 'success') {
+            currentUser = res.user;
+            userType = type;
+            document.getElementById('btn-logout').classList.remove('hidden');
+            if(type === 'client') {
+                loadClientPanel();
+            } else {
+                loadAdminPanel();
+            }
+        } else {
+            showToast(res.message, "error");
+        }
+    });
 }
 
-function procesarLoginAdmin() {
-    const pass = document.getElementById("admin-key").value;
-    if(pass === "Edimar2026*") { // Validación Local rápida antes de sesión abierta
-        sesionAdminActiva = true;
-        document.getElementById("admin-login-view").style.display = "none";
-        document.getElementById("admin-console-view").style.display = "block";
-        cambiarFormulario('sanes');
-    } else {
-        alert("Clave Maestra Inválida. Acceso Restringido.");
+async function loadClientPanel() {
+    showView('view-client');
+    document.getElementById('client-name').innerText = currentUser.nombre;
+    const res = await callAPI('getClientData', { clientId: currentUser.id });
+    // Aquí renderizarías sus pagos pendientes y sanes activos apuntando a elementos del view-client
+}
+
+async function loadAdminPanel() {
+    showView('view-admin');
+    const res = await callAPI('getAdminData');
+    if(res.status === 'success') {
+        // Renderizar tablas dinámicas de control absoluto para La Patrona
+        renderAdminSanes(res.sanes);
     }
 }
 
-function cerrarSesionAdmin() {
-    sesionAdminActiva = false;
-    document.getElementById("admin-key").value = "";
-    document.getElementById("admin-console-view").style.display = "none";
-    document.getElementById("admin-login-view").style.display = "block";
-    alternarModalAdmin(false);
+function logout() {
+    currentUser = null;
+    userType = null;
+    document.getElementById('btn-logout').classList.add('hidden');
+    showView('view-home');
+    document.getElementById('btn-home').classList.add('active');
 }
 
-function cambiarFormulario(tipo) {
-    tipoFormularioActual = tipo;
-    const btns = document.querySelectorAll(".tab-btn");
-    btns[0].classList.toggle("active", tipo === 'sanes');
-    btns[1].classList.toggle("active", tipo === 'productos');
-    
-    const wrapper = document.getElementById("campos-dinamicos");
-    if(tipo === 'sanes') {
-        wrapper.innerHTML = `
-            <div class="input-wrapper"><label>Nombre del San</label><input type="text" id="f-nombre" required placeholder="Ej: San Oro Semanal"></div>
-            <div class="input-wrapper"><label>Monto del Ciclo ($)</label><input type="number" id="f-monto" required placeholder="200"></div>
-            <div class="input-wrapper"><label>Turno Inicial</label><input type="text" id="f-turno" value="1" required></div>
-        `;
-    } else {
-        wrapper.innerHTML = `
-            <div class="input-wrapper"><label>Nombre del Artículo</label><input type="text" id="f-articulo" required placeholder="Ej: Smart TV 42 pulgadas"></div>
-            <div class="input-wrapper"><label>Precio de Venta ($)</label><input type="number" id="f-precio" required placeholder="350"></div>
-            <div class="input-wrapper"><label>Financiamiento Máximo (Cuotas)</label><input type="number" id="f-cuotas" value="4" required></div>
-        `;
-    }
-}
+// MODALES CONTROL
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', (e) => { if (e.target === m) m.classList.add('hidden'); }));
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-// Envío de Operaciones a Google Sheets sin recargar pantalla
-async function enviarDatosConsola(event) {
-    event.preventDefault();
-    forzarLoader(true);
-    
-    let filaNueva = [];
-    let destinoTabla = "";
-    
-    if(tipoFormularioActual === 'sanes') {
-        destinoTabla = "Sanes";
-        filaNueva = [
-            document.getElementById("f-nombre").value,
-            document.getElementById("f-monto").value,
-            document.getElementById("f-turno").value,
-            "Activo"
-        ];
-    } else {
-        destinoTabla = "Productos";
-        filaNueva = [
-            document.getElementById("f-articulo").value,
-            document.getElementById("f-precio").value,
-            document.getElementById("f-cuotas").value
-        ];
-    }
-    
-    const token = document.getElementById("admin-key").value;
-    const payload = {
-        action: "ejecutarComandoAdmin",
-        password: token,
-        subAction: "registrarOperacion",
-        tabla: destinoTabla,
-        fila: filaNueva
-    };
-    
-    const ejecucion = await consultarServidor(payload);
-    forzarLoader(false);
-    
-    if(ejecucion && ejecucion.success) {
-        alert(ejecucion.message);
-        document.getElementById("form-registro").reset();
-        cambiarFormulario(tipoFormularioActual);
-        importarDatosEstadisticas(); // Refresca vitrina al instante
-    } else {
-        alert("Error en procesamiento: " + ejecucion.error);
-    }
+// TOAST SYSTEMS
+function showToast(text, type = "success") {
+    const container = document.getElementById('toast-container');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerText = text;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
 }
