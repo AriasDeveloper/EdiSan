@@ -7,7 +7,7 @@ export const ADMIN_CONFIG = {
 
 // Rutas de conexión con el backend de Google Sheets
 export const API_CONFIG = {
-    URL_APPS_SCRIPT: "TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI" 
+    URL_APPS_SCRIPT: "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec" 
 };
 
 // Frases Premium interactivas para la pantalla de carga completa
