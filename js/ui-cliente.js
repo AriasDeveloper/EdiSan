@@ -64,9 +64,15 @@ function abrirModalInscripcionPublico(sanId, nombreSan) {
     const modal = document.getElementById('modal-premium');
     document.getElementById('modal-titulo').innerText = `Inscripción: ${nombreSan}`;
     document.getElementById('modal-cuerpo').innerHTML = `
-        <form id="form-solicitar-nuevo" class="premium-form">
-            <div class="form-group"><label>Tu Nombre y Apellido</label><input type="text" id="sol-nombre" required></div>
-            <div class="form-group"><label>Número de WhatsApp / Teléfono</label><input type="text" id="sol-telef" placeholder="Ej. +58412..." required></div>
+        <form id="form-solicitar-nuevo" class="premium-form" title="Formulario de inscripción para nuevos clientes">
+            <div class="form-group">
+                <label for="sol-nombre">Tu Nombre y Apellido</label>
+                <input type="text" id="sol-nombre" name="sol-nombre" placeholder="Ej. Juan Pérez" title="Ingresa tu nombre y apellido completo" required>
+            </div>
+            <div class="form-group">
+                <label for="sol-telef">Número de WhatsApp / Teléfono</label>
+                <input type="text" id="sol-telef" name="sol-telef" placeholder="Ej. +584120000000" title="Ingresa tu número de teléfono con código de área" required>
+            </div>
             <p style="font-size:0.8rem; color:var(--texto-secundario); line-height:1.4; margin-top:5px;">Tu información pasará a aprobación de la directiva.</p>
             <button type="submit" class="btn-primary" style="width:100%; justify-content:center; margin-top:10px;">Enviar Solicitud</button>
         </form>
@@ -167,8 +173,11 @@ function abrirModalSubirComprobante(registroId) {
     const modal = document.getElementById('modal-premium');
     document.getElementById('modal-titulo').innerText = "Cargar Comprobante de Pago";
     document.getElementById('modal-cuerpo').innerHTML = `
-        <form id="form-subir-comprobante" class="premium-form">
-            <div class="form-group"><label>Número de Referencia o URL de Captura</label><input type="text" id="comprobante-link" placeholder="Ej. Ref: 492042" required></div>
+        <form id="form-subir-comprobante" class="premium-form" title="Formulario para registrar recibo de pago">
+            <div class="form-group">
+                <label for="comprobante-link">Número de Referencia o URL de Captura</label>
+                <input type="text" id="comprobante-link" name="comprobante-link" placeholder="Ej. Ref: 492042 o enlace de imagen" title="Escribe el número de referencia de la transacción o el enlace de tu captura" required>
+            </div>
             <button type="submit" class="btn-primary" style="width:100%; justify-content:center; margin-top:10px;">Enviar Comprobante</button>
         </form>
     `;

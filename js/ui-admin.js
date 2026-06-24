@@ -54,9 +54,13 @@ export function renderizarAdminTodo() {
         let compHtml = reg.Comprobante ? `<button class="btn-secondary btn-ver-comp" data-link="${reg.Comprobante}" data-id="${reg.Registro_ID}">Ver Recibo</button>` : '<i>Ninguno</i>';
 
         return `<tr>
-            <td><b>${san.Nombre_San}</b></td><td>${cli.Nombre_Completo}</td><td>Turno ${reg.Numero_Turno}</td><td><span class="badge-estado ${reg.Estado_Pago}">${reg.Estado_Pago}</span></td><td>${compHtml}</td>
+            <td><b>${san.Nombre_San}</b></td>
+            <td>${cli.Nombre_Completo}</td>
+            <td>Turno ${reg.Numero_Turno}</td>
+            <td><span class="badge-estado ${reg.Estado_Pago}">${reg.Estado_Pago}</span></td>
+            <td>${compHtml}</td>
             <td>
-                <select class="sel-cambiar-estado" data-id="${reg.Registro_ID}">
+                <select class="sel-cambiar-estado" data-id="${reg.Registro_ID}" title="Cambiar estado de pago para el cliente ${cli.Nombre_Completo}">
                     <option value="pendiente" ${reg.Estado_Pago==='pendiente'?'selected':''}>Pendiente</option>
                     <option value="pagado" ${reg.Estado_Pago==='pagado'?'selected':''}>Pagado</option>
                     <option value="atrasado" ${reg.Estado_Pago==='atrasado'?'selected':''}>Atrasado</option>

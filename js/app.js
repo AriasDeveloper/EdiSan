@@ -89,9 +89,15 @@ function abrirModalLogin() {
     let opciones = DB.clientes.map(c => `<option value="${c.Cliente_ID}">${c.Nombre_Completo}</option>`).join('');
     
     document.getElementById('modal-cuerpo').innerHTML = `
-        <form id="form-autenticar" class="premium-form">
-            <div class="form-group"><label>Usuario</label><select id="login-id">${opciones}</select></div>
-            <div class="form-group"><label>Contraseña</label><input type="password" id="login-pass" required></div>
+        <form id="form-autenticar" class="premium-form" title="Inicio de sesión de usuarios">
+            <div class="form-group">
+                <label for="login-id">Usuario registrado</label>
+                <select id="login-id" name="login-id" title="Selecciona tu nombre de usuario de la lista">${opciones}</select>
+            </div>
+            <div class="form-group">
+                <label for="login-pass">Contraseña privada</label>
+                <input type="password" id="login-pass" name="login-pass" placeholder="••••••••" title="Introduce tu contraseña de acceso" required>
+            </div>
             <button type="submit" class="btn-primary" style="width:100%; justify-content:center; margin-top:10px;">Entrar</button>
         </form>
     `;
