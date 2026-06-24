@@ -243,4 +243,3 @@ body {
 .admin-table { width: 100%; border-collapse: collapse; margin-top: 1rem; background: rgba(255,255,255,0.02); }
 .admin-table th, .admin-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--glass-border); }
 .admin-table th { background: rgba(139, 92, 246, 0.1); color: #fff; }
-</style>
