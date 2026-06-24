@@ -1,4 +1,4 @@
-const API_URL = "CONECTAR_AQUI_TU_URL_DE_EXEC_GOOGLE_APPS_SCRIPT";
+const API_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
 
 let currentUser = null;
 let userType = null; // 'client' o 'admin'
