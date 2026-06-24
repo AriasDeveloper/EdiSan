@@ -448,3 +448,17 @@ body {
 .toast.success { border-left-color: var(--exito); }
 .toast.error { border-left-color: var(--peligro); }
 .toast.warning { border-left-color: var(--alerta); }
+
+/* ================================================================= */
+/* CORRECCIÓN CRÍTICA PARA CONTROLAR EL DESVANECIMIENTO DE CARGA     */
+/* ================================================================= */
+
+/* Por defecto, la pantalla de carga y los modales inician ocultos */
+#pantalla-carga, #modal-premium {
+    display: none !important;
+}
+
+/* Cuando el JavaScript les añade la clase "modal-active", se muestran con flex */
+#pantalla-carga.modal-active, #modal-premium.modal-active {
+    display: flex !important;
+}
