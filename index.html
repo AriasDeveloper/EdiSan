@@ -8,17 +8,19 @@
 </head>
 <body>
 
+    <!-- PANEL SUPERIOR -->
     <header class="top-bar">
         <div class="logo-container">
             <div class="logo-icon"></div>
             <h1>Sitec <span>con la Patrona</span></h1>
         </div>
         <div class="user-profile-status">
-            <span class="status-indicator"></span> BaseEdimar En Línea
+            <span class="status-indicator"></span> BaseEdimar Activa (2026)
         </div>
     </header>
 
     <div class="app-layout">
+        <!-- MENÚ LATERAL RETRÁCTIL -->
         <nav>
             <ul>
                 <li><a href="#sanes" class="active"><span>Sanes</span></a></li>
@@ -30,11 +32,13 @@
             </ul>
         </nav>
 
+        <!-- CONTENEDOR PRINCIPAL -->
         <main>
 
+            <!-- PESTAÑA 1: SANES -->
             <section id="sanes">
                 <h2>Pestaña: Sanes</h2>
-                <button type="button" onclick="abrirFormulario('form-san-container')">+ Agregar San</button>
+                <button type="button" class="btn-main" onclick="abrirFormularioSan()">+ Agregar San</button>
                 
                 <table>
                     <thead>
@@ -46,32 +50,20 @@
                             <th>Total_Turnos</th>
                             <th>Estado</th>
                             <th>Ciclo</th>
-                            <th>Imagen/Icono</th>
+                            <th>Visual</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-sanes-body">
-                        <tr>
-                            <td>SAN-001</td>
-                            <td>San Oro Premium</td>
-                            <td>$50</td>
-                            <td>2026-07-01</td>
-                            <td>5</td>
-                            <td>Activo</td>
-                            <td>Semanal</td>
-                            <td><span class="icono-celda-muestra" data-icon="oro"></span></td>
-                            <td>
-                                <button type="button" class="btn-edit" onclick="abrirFormulario('form-san-container', 'SAN-001')">Editar</button>
-                                <button type="button" class="btn-delete" onclick="eliminarFila('SAN-001')">Eliminar</button>
-                            </td>
-                        </tr>
+                        <!-- Render dinámico -->
                     </tbody>
                 </table>
             </section>
 
+            <!-- PESTAÑA 2: CLIENTES -->
             <section id="clientes">
                 <h2>Pestaña: Clientes</h2>
-                <button type="button" onclick="abrirFormulario('form-cliente-container')">+ Agregar Cliente</button>
+                <button type="button" class="btn-main" onclick="abrirFormularioCliente()">+ Agregar Cliente</button>
                 
                 <table>
                     <thead>
@@ -83,52 +75,21 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>CLI-001</td>
-                            <td>Juan Pérez</td>
-                            <td>04120000000</td>
-                            <td>••••</td>
-                            <td>
-                                <button type="button" class="btn-edit" onclick="abrirFormulario('form-cliente-container')">Editar</button>
-                                <button type="button" class="btn-delete">Eliminar</button>
-                            </td>
-                        </tr>
+                    <tbody id="tabla-clientes-body">
+                        <!-- Render dinámico -->
                     </tbody>
                 </table>
             </section>
 
+            <!-- PESTAÑA 3: REGISTROS DE TURNOS (BLOQUES POR SANES) -->
             <section id="turnos">
                 <h2>Monitoreo de Turnos por Sanes</h2>
                 <div id="contenedor-bloques-sanes">
-                    <div class="san-block-card">
-                        <div class="san-block-header">
-                            <h3>SAN-001: San Oro Premium</h3>
-                            <span class="badge-info">Corte base: 2026-07-01 (Semanal)</span>
-                        </div>
-                        <div class="turnos-grid-puestos">
-                            
-                            <div class="puesto-item asignado">
-                                <div class="puesto-num">Puesto 1</div>
-                                <div class="puesto-cliente">Juan Pérez (CLI-001)</div>
-                                <div class="puesto-meta">Corte: 2026-07-01</div>
-                                <span class="puesto-pago status-pago-completo">Pago: Al Día</span>
-                                <button type="button" onclick="abrirAsignacionPuesto('SAN-001', 1, 'CLI-001')">Cambiar</button>
-                            </div>
-
-                            <div class="puesto-item libre">
-                                <div class="puesto-num">Puesto 2</div>
-                                <div class="puesto-cliente">Vacante (Disponible)</div>
-                                <div class="puesto-meta">Corte: 2026-07-08</div>
-                                <span class="puesto-pago status-pago-vacio">Sin Pago</span>
-                                <button type="button" onclick="abrirAsignacionPuesto('SAN-001', 2, '')">Asignar Cliente</button>
-                            </div>
-
-                        </div>
-                    </div>
+                    <!-- Bloques automáticos dinámicos -->
                 </div>
             </section>
 
+            <!-- PESTAÑA 4: SOLICITUDES NUEVOS -->
             <section id="solicitudes-nuevos">
                 <h2>Solicitudes de Clientes Externos</h2>
                 <table>
@@ -142,22 +103,13 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr id="fila-sol-001">
-                            <td>SOL-001</td>
-                            <td>María Gómez</td>
-                            <td>04241112233</td>
-                            <td>SAN-001</td>
-                            <td>2</td>
-                            <td>
-                                <button type="button" class="btn-approve" onclick="procesarSolicitudNuevo('SOL-001', 'María Gómez', '04241112233', 'SAN-001', 2)">Aprobar</button>
-                                <button type="button" class="btn-delete" onclick="rechazarSolicitud('fila-sol-001')">Rechazar</button>
-                            </td>
-                        </tr>
+                    <tbody id="tabla-solicitudes-nuevos-body">
+                        <!-- Render dinámico -->
                     </tbody>
                 </table>
             </section>
 
+            <!-- PESTAÑA 5: SOLICITUDES INSCRITOS -->
             <section id="solicitudes-inscritos">
                 <h2>Solicitudes de Clientes Registrados</h2>
                 <table>
@@ -167,29 +119,19 @@
                             <th>Cliente_ID</th>
                             <th>San_ID</th>
                             <th>Fecha_Solicitud</th>
-                            <th>Turno_Deseado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr id="fila-prop-001">
-                            <td>PROP-001</td>
-                            <td>CLI-001</td>
-                            <td>SAN-001</td>
-                            <td>2026-07-01</td>
-                            <td>2</td>
-                            <td>
-                                <button type="button" class="btn-approve" onclick="procesarSolicitudInscrito('PROP-001', 'CLI-001', 'SAN-001', 2)">Validar y Pautar</button>
-                                <button type="button" class="btn-delete" onclick="rechazarSolicitud('fila-prop-001')">Rechazar</button>
-                            </td>
-                        </tr>
+                    <tbody id="tabla-solicitudes-inscritos-body">
+                        <!-- Render dinámico -->
                     </tbody>
                 </table>
             </section>
 
+            <!-- PESTAÑA 6: PRODUCTOS -->
             <section id="productos">
                 <h2>Pestaña: Productos</h2>
-                <button type="button" onclick="abrirFormulario('form-producto-container')">+ Agregar Producto</button>
+                <button type="button" class="btn-main" onclick="abrirFormularioProducto()">+ Agregar Producto</button>
                 
                 <table>
                     <thead>
@@ -198,26 +140,14 @@
                             <th>Nombre</th>
                             <th>Descripción</th>
                             <th>Precio</th>
-                            <th>Imagen/Icono</th>
+                            <th>Visual</th>
                             <th>Stock</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>PROD-001</td>
-                            <td>Artículo de Lujo</td>
-                            <td>Descripción premium</td>
-                            <td>$100</td>
-                            <td><span class="icono-celda-muestra" data-icon="producto"></span></td>
-                            <td>12</td>
-                            <td>Disponible</td>
-                            <td>
-                                <button type="button" class="btn-edit" onclick="abrirFormulario('form-producto-container')">Editar</button>
-                                <button type="button" class="btn-delete">Eliminar</button>
-                            </td>
-                        </tr>
+                    <tbody id="tabla-productos-body">
+                        <!-- Render dinámico -->
                     </tbody>
                 </table>
             </section>
@@ -225,86 +155,113 @@
         </main>
     </div>
 
+    <!-- =================================================== -->
+    <!-- FORMULARIOS MODALES REESTRUCTURADOS (INTEGRALES) -->
+    <!-- =================================================== -->
+
+    <!-- Formulario Sanes -->
     <div id="form-san-container" class="modal-form">
-        <h3>Gestionar San (BaseEdimar ID Auto)</h3>
+        <h3 id="san-modal-title">Agregar Nuevo San</h3>
         <form id="form-san">
-            <label>Nombre del San:</label> <input type="text" required><br>
-            <label>Monto Cuota ($):</label> <input type="number" required><br>
-            <label>Fecha Inicio:</label> <input type="date" required><br>
-            <label>Total Turnos (Puestos a crear):</label> <input type="number" id="san-total-turnos" required><br>
-            <label>Estado:</label> <input type="text" value="Activo"><br>
+            <input type="hidden" id="san-edit-id">
+            <label>Nombre del San:</label> <input type="text" id="san-nombre" required><br>
+            <label>Monto Cuota ($):</label> <input type="number" id="san-cuota" required><br>
+            <label>Fecha Inicio:</label> <input type="date" id="san-inicio" required><br>
+            <label id="label-total-turnos">Total Turnos (Puestos a crear):</label> <input type="number" id="san-total-turnos" required><br>
+            <label>Estado:</label> <input type="text" id="san-estado" value="Activo"><br>
             <label>Ciclo:</label> 
-            <select>
+            <select id="san-ciclo">
                 <option value="Semanal">Semanal</option>
                 <option value="Quincenal">Quincenal</option>
                 <option value="Mensual">Mensual</option>
             </select><br><br>
             
-            <label>Identificador Visual (URL o Selector):</label>
+            <label>Multimedia (Imagen URL o selecciona un icono abajo):</label>
             <div class="media-toggle-container">
-                <input type="text" id="san-media-input" placeholder="Pega una URL o selecciona un icono abajo">
-                <div class="icon-selector-grid">
-                    <span class="icon-opt" onclick="setVisualValue('san-media-input', 'icon:oro')">👑 Oro</span>
-                    <span class="icon-opt" onclick="setVisualValue('san-media-input', 'icon:plata')">🥈 Plata</span>
-                    <span class="icon-opt" onclick="setVisualValue('san-media-input', 'icon:diamante')">💎 Diamante</span>
-                    <span class="icon-opt" onclick="setVisualValue('san-media-input', 'icon:ahorro')">💰 Ahorro</span>
+                <input type="text" id="san-media-input" placeholder="Pega una URL o código de icono">
+                <div class="icon-selector-grid" data-input="san-media-input">
+                    <!-- Iconos cargados dinámicamente -->
                 </div>
             </div>
 
-            <button type="submit">Guardar Registros</button>
-            <button type="button">Cancelar</button>
+            <button type="submit" class="btn-submit">Guardar Registros</button>
+            <button type="button" class="btn-close-modal" onclick="ocultarTodosLosFormularios()">Cancelar</button>
         </form>
     </div>
 
+    <!-- Formulario Clientes -->
     <div id="form-cliente-container" class="modal-form">
-        <h3>Formulario: Clientes</h3>
-        <form>
-            <label>Nombre Completo:</label> <input type="text" required><br>
-            <label>Teléfono:</label> <input type="text" required><br>
-            <label>Contraseña Acceso:</label> <input type="password" required><br>
-            <button type="submit">Guardar</button>
-            <button type="button">Cancelar</button>
+        <h3 id="cliente-modal-title">Agregar Nuevo Cliente</h3>
+        <form id="form-cliente">
+            <input type="hidden" id="cliente-edit-id">
+            <label>Nombre Completo:</label> <input type="text" id="cliente-nombre" required><br>
+            <label>Teléfono:</label> <input type="text" id="cliente-telefono" required><br>
+            <label>Contraseña Acceso:</label> <input type="text" id="cliente-pass" required><br>
+            <button type="submit" class="btn-submit">Guardar Cliente</button>
+            <button type="button" class="btn-close-modal" onclick="ocultarTodosLosFormularios()">Cancelar</button>
         </form>
     </div>
 
+    <!-- Formulario Productos -->
     <div id="form-producto-container" class="modal-form">
-        <h3>Gestionar Producto</h3>
-        <form>
-            <label>Nombre del Producto:</label> <input type="text" required><br>
-            <label>Descripción:</label> <textarea></textarea><br>
-            <label>Precio ($):</label> <input type="number" required><br>
-            <label>Stock Físico:</label> <input type="number" required><br>
-            <label>Estado Emisión:</label> <input type="text" value="Disponible"><br>
+        <h3 id="producto-modal-title">Agregar Producto</h3>
+        <form id="form-producto">
+            <input type="hidden" id="producto-edit-id">
+            <label>Nombre del Producto:</label> <input type="text" id="producto-nombre" required><br>
+            <label>Descripción:</label> <textarea id="producto-descripcion"></textarea><br>
+            <label>Precio ($):</label> <input type="number" id="producto-precio" required><br>
+            <label>Stock Físico:</label> <input type="number" id="producto-stock" required><br>
+            <label>Estado Emisión:</label> <input type="text" id="producto-estado" value="Disponible"><br>
             
-            <label>Multimedia del Artículo:</label>
+            <label>Multimedia del Artículo (URL o selecciona un icono abajo):</label>
             <div class="media-toggle-container">
-                <input type="text" id="prod-media-input" placeholder="URL de imagen o selector de icono">
-                <div class="icon-selector-grid">
-                    <span class="icon-opt" onclick="setVisualValue('prod-media-input', 'icon:producto')">📦 Caja</span>
-                    <span class="icon-opt" onclick="setVisualValue('prod-media-input', 'icon:estrella')">⭐ Destacado</span>
-                    <span class="icon-opt" onclick="setVisualValue('prod-media-input', 'icon:fuego')">🔥 Oferta</span>
+                <input type="text" id="prod-media-input" placeholder="URL de imagen o código de icono">
+                <div class="icon-selector-grid" data-input="prod-media-input">
+                    <!-- Iconos cargados dinámicamente -->
                 </div>
             </div>
 
-            <button type="submit">Guardar</button>
-            <button type="button">Cancelar</button>
+            <button type="submit" class="btn-submit">Guardar Producto</button>
+            <button type="button" class="btn-close-modal" onclick="ocultarTodosLosFormularios()">Cancelar</button>
         </form>
     </div>
 
+    <!-- Formulario para Asignar Puestos Libres (Lista Desplegable Inteligente) -->
     <div id="form-asignacion-puesto-container" class="modal-form">
         <h3>Pautar Puesto en la Cadena</h3>
         <form id="form-pautar-puesto">
             <input type="hidden" id="puesto-san-id">
             <input type="hidden" id="puesto-numero">
-            <label>ID del Cliente para ocupar el puesto:</label>
-            <input type="text" id="puesto-cliente-id" placeholder="Ej: CLI-001" required>
-            <label>Estado Inicial de Pago:</label>
-            <select id="puesto-estado-pago">
-                <option value="Pendiente">Pendiente</option>
-                <option value="Al Día">Al Día</option>
+            
+            <p id="info-puesto-pautar" style="margin-bottom: 12px; color: var(--morado-brillante); font-weight: bold;"></p>
+
+            <label>Seleccionar Cliente de la Lista:</label>
+            <select id="puesto-cliente-select" required>
+                <!-- Opciones cargadas dinámicamente -->
             </select><br><br>
-            <button type="submit">Confirmar Asignación Única</button>
-            <button type="button">Cancelar</button>
+            
+            <button type="submit" class="btn-submit">Confirmar Asignación Única</button>
+            <button type="button" class="btn-close-modal" onclick="ocultarTodosLosFormularios()">Cancelar</button>
+        </form>
+    </div>
+
+    <!-- Modal para Procesar Aprobación de Solicitud de Inscritos (Asignación guiada) -->
+    <div id="form-aprobar-inscrito-container" class="modal-form">
+        <h3>Aprobar Solicitud de Inscrito</h3>
+        <form id="form-aprobar-inscrito">
+            <input type="hidden" id="modal-inscrito-prop-id">
+            <input type="hidden" id="modal-inscrito-cliente-id">
+            <input type="hidden" id="modal-inscrito-san-id">
+            
+            <p id="info-solicitud-inscrito-texto" style="margin-bottom: 12px; font-size:14px; color: var(--texto-secundario);"></p>
+            
+            <label>Asignar Puesto Libre Disponible:</label>
+            <select id="modal-inscrito-puesto-select" required>
+                <!-- Se rellena dinámicamente solo con vacantes del San deseado -->
+            </select><br><br>
+            
+            <button type="submit" class="btn-submit">Aprobar y Registrar Turno</button>
+            <button type="button" class="btn-close-modal" onclick="ocultarTodosLosFormularios()">Cancelar</button>
         </form>
     </div>
 
