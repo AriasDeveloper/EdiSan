@@ -53,51 +53,44 @@ function actualizarEstadoDB(estado) {
     }
 }
 
-// LECTURA OPTIMIZADA CON MANEJO DE REDIRECCIÓN (CORS)
+// LECTURA CORREGIDA PARA EVITAR EL PREFLIGHT DE CORS
 async function cargarDatosDesdeBD() {
     try {
-        // Configuramos la petición para que permita la redirección segura de Google Sheets
-        const opcionesFetch = {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        };
+        // Al NO enviar headers ni configuraciones complejas, evitamos el bloqueo OPTIONS previo
+        const urlSanes = `${GOOGLE_SCRIPT_URL}?tabla=sanes`;
+        const urlClientes = `${GOOGLE_SCRIPT_URL}?tabla=clientes`;
+        const urlTurnos = `${GOOGLE_SCRIPT_URL}?tabla=turnos_puestos`;
+        const urlSolNuevos = `${GOOGLE_SCRIPT_URL}?tabla=solicitudes_nuevos`;
+        const urlProd = `${GOOGLE_SCRIPT_URL}?tabla=productos`;
 
-        // Cargamos todas las tablas en paralelo
+        // Cargamos todas las tablas en paralelo de forma simple
         const [resSanes, resClientes, resTurnos, resSolNuevos, resProd] = await Promise.all([
-            fetch(`${GOOGLE_SCRIPT_URL}?tabla=sanes`, opcionesFetch).then(r => r.json()),
-            fetch(`${GOOGLE_SCRIPT_URL}?tabla=clientes`, opcionesFetch).then(r => r.json()),
-            fetch(`${GOOGLE_SCRIPT_URL}?tabla=turnos_puestos`, opcionesFetch).then(r => r.json()),
-            fetch(`${GOOGLE_SCRIPT_URL}?tabla=solicitudes_nuevos`, opcionesFetch).then(r => r.json()),
-            fetch(`${GOOGLE_SCRIPT_URL}?tabla=productos`, opcionesFetch).then(r => r.json())
+            fetch(urlSanes).then(r => r.json()),
+            fetch(urlClientes).then(r => r.json()),
+            fetch(urlTurnos).then(r => r.json()),
+            fetch(urlSolNuevos).then(r => r.json()),
+            fetch(urlProd).then(r => r.json())
         ]);
 
-        // Verificación de posibles errores devueltos en el JSON por Google Apps Script
         if (resSanes.error || resClientes.error || resTurnos.error) {
             actualizarEstadoDB("error");
             console.error("Error devuelto por la API de Google:", resSanes.error || resClientes.error);
             return;
         }
 
-        // Asignamos las respuestas a la caché global de la app
         window.baseSanes = Array.isArray(resSanes) ? resSanes : [];
         window.baseClientes = Array.isArray(resClientes) ? resClientes : [];
         window.baseTurnosPuestos = Array.isArray(resTurnos) ? resTurnos : [];
         window.baseSolicitudesNuevos = Array.isArray(resSolNuevos) ? resSolNuevos : [];
         window.baseProductos = Array.isArray(resProd) ? resProd : [];
 
-        // Si todo va bien, renderizamos la UI y encendemos el botón verde
         renderizarUI();
         actualizarEstadoDB("conectado");
     } catch (err) {
-        // Si el navegador bloquea la petición, caerá aquí
         actualizarEstadoDB("error");
-        console.error("Fallo de red o bloqueo CORS al conectar con Google Sheets:", err);
+        console.error("Fallo de red o bloqueo CORS real:", err);
     }
 }
-
 function renderizarUI() {
     calcularEstadosSanesAutomaticamente();
     actualizarTablaSanesUI();
