@@ -133,6 +133,27 @@ function setupForms() {
             showToast(res.message, "error");
         }
     });
+    // Manejo del Guardado de Sanes desde el Modal Administrador
+    document.getElementById('form-san').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const san = {
+            id: document.getElementById('san-id').value,
+            nombre: document.getElementById('san-name').value,
+            cuota: document.getElementById('san-cuota').value,
+            fecha: document.getElementById('san-date').value,
+            puestos: document.getElementById('san-puestos').value,
+            imagen: document.getElementById('san-img').value
+        };
+
+        const res = await callAPI('createOrUpdateSan', { san });
+        if(res.status === 'success') {
+            showToast("¡San guardado con éxito!");
+            closeModal('modal-san');
+            loadAdminPanel(); // Recarga las tablas del panel
+        } else {
+            showToast(res.message, "error");
+        }
+    });
 }
 
 async function loadClientPanel() {
