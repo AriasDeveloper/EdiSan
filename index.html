@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - BaseEdimar</title>
     <link rel="stylesheet" href="styles.css">
-    <title>Estructura HTML - BaseEdimar</title>
 </head>
 <body>
 
     <nav>
-        <h2>BaseEdimar Admin</h2>
+        <h2>BaseEdimar</h2>
         <ul>
-            <li><a href="#sanes">Sanes</a></li>
-            <li><a href="#clientes">Clientes</a></li>
-            <li><a href="#turnos">Registros de Turnos</a></li>
-            <li><a href="#solicitudes-nuevos">Solicitudes Nuevos</a></li>
-            <li><a href="#solicitudes-inscritos">Solicitudes Inscritos</a></li>
-            <li><a href="#productos">Productos</a></li>
+            <li><a href="#sanes" class="active"><span>Sanes</span></a></li>
+            <li><a href="#clientes"><span>Clientes</span></a></li>
+            <li><a href="#turnos"><span>Registros de Turnos</span></a></li>
+            <li><a href="#solicitudes-nuevos"><span>Solicitudes Nuevos</span></a></li>
+            <li><a href="#solicitudes-inscritos"><span>Solicitudes Inscritos</span></a></li>
+            <li><a href="#productos"><span>Productos</span></a></li>
         </ul>
     </nav>
 
@@ -24,7 +24,7 @@
 
         <section id="sanes">
             <h2>Pestaña: Sanes</h2>
-            <button type="button">+ Agregar San</button>
+            <button type="button" onclick="abrirFormulario('form-san-container')">+ Agregar San</button>
             
             <table border="1">
                 <thead>
@@ -50,7 +50,7 @@
                         <td>Activo</td>
                         <td>Semanal</td>
                         <td>url_imagen</td>
-                        <td><button type="button">Editar</button></td>
+                        <td><button type="button" onclick="abrirFormulario('form-san-container')">Editar</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -58,7 +58,7 @@
 
         <section id="clientes">
             <h2>Pestaña: Clientes</h2>
-            <button type="button">+ Agregar Cliente</button>
+            <button type="button" onclick="abrirFormulario('form-cliente-container')">+ Agregar Cliente</button>
             
             <table border="1">
                 <thead>
@@ -76,7 +76,7 @@
                         <td>Juan Pérez</td>
                         <td>04120000000</td>
                         <td>1234</td>
-                        <td><button type="button">Editar</button></td>
+                        <td><button type="button" onclick="abrirFormulario('form-cliente-container')">Editar</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -84,7 +84,7 @@
 
         <section id="turnos">
             <h2>Pestaña: Registros de Turnos</h2>
-            <button type="button">+ Asignar Turno</button>
+            <button type="button" onclick="abrirFormulario('form-turno-container')">+ Asignar Turno</button>
             
             <table border="1">
                 <thead>
@@ -108,7 +108,7 @@
                         <td>2026-07-15</td>
                         <td>Pendiente</td>
                         <td>Ninguno</td>
-                        <td><button type="button">Editar</button></td>
+                        <td><button type="button" onclick="abrirFormulario('form-turno-container')">Editar</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -116,7 +116,7 @@
 
         <section id="solicitudes-nuevos">
             <h2>Pestaña: Solicitudes Nuevos</h2>
-            <button type="button">+ Nueva Solicitud Externo</button>
+            <button type="button" onclick="abrirFormulario('form-solicitud-nuevo-container')">+ Nueva Solicitud Externo</button>
             
             <table border="1">
                 <thead>
@@ -136,7 +136,7 @@
                         <td>04240000000</td>
                         <td>SAN-001</td>
                         <td>5</td>
-                        <td><button type="button">Editar</button></td>
+                        <td><button type="button" onclick="abrirFormulario('form-solicitud-nuevo-container')">Editar</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -144,7 +144,7 @@
 
         <section id="solicitudes-inscritos">
             <h2>Pestaña: Solicitudes Inscritos</h2>
-            <button type="button">+ Nueva Propuesta Cliente</button>
+            <button type="button" onclick="abrirFormulario('form-solicitud-inscrito-container')">+ Nueva Propuesta Cliente</button>
             
             <table border="1">
                 <thead>
@@ -164,7 +164,7 @@
                         <td>SAN-001</td>
                         <td>2026-07-01</td>
                         <td>2</td>
-                        <td><button type="button">Editar</button></td>
+                        <td><button type="button" onclick="abrirFormulario('form-solicitud-inscrito-container')">Editar</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -172,7 +172,7 @@
 
         <section id="productos">
             <h2>Pestaña: Productos</h2>
-            <button type="button">+ Agregar Producto</button>
+            <button type="button" onclick="abrirFormulario('form-producto-container')">+ Agregar Producto</button>
             
             <table border="1">
                 <thead>
@@ -196,7 +196,7 @@
                         <td>url_imagen</td>
                         <td>5</td>
                         <td>Disponible</td>
-                        <td><button type="button">Editar</button></td>
+                        <td><button type="button" onclick="abrirFormulario('form-producto-container')">Editar</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -281,6 +281,7 @@
             <button type="button">Cancelar</button>
         </form>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>
