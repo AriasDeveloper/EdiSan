@@ -3,281 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control - BaseEdimar</title>
+    <title>Panel de Control - Sitec con la Patrona</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <nav>
-        <h2>BaseEdimar</h2>
-        <ul>
-            <li><a href="#sanes" class="active"><span>Sanes</span></a></li>
-            <li><a href="#clientes"><span>Clientes</span></a></li>
-            <li><a href="#turnos"><span>Registros de Turnos</span></a></li>
-            <li><a href="#solicitudes-nuevos"><span>Solicitudes Nuevos</span></a></li>
-            <li><a href="#solicitudes-inscritos"><span>Solicitudes Inscritos</span></a></li>
-            <li><a href="#productos"><span>Productos</span></a></li>
-        </ul>
-    </nav>
+    <header class="top-bar">
+        <div class="logo-container">
+            <div class="logo-icon"></div>
+            <h1>Sitec <span>con la Patrona</span></h1>
+        </div>
+        <div class="user-profile-status">
+            <span class="status-indicator"></span> BaseEdimar En Línea
+        </div>
+    </header>
 
-    <main>
+    <div class="app-layout">
+        <nav>
+            <ul>
+                <li><a href="#sanes" class="active"><span>Sanes</span></a></li>
+                <li><a href="#clientes"><span>Clientes</span></a></li>
+                <li><a href="#turnos"><span>Registros de Turnos</span></a></li>
+                <li><a href="#solicitudes-nuevos"><span>Solicitudes Nuevos</span></a></li>
+                <li><a href="#solicitudes-inscritos"><span>Solicitudes Inscritos</span></a></li>
+                <li><a href="#productos"><span>Productos</span></a></li>
+            </ul>
+        </nav>
 
-        <section id="sanes">
-            <h2>Pestaña: Sanes</h2>
-            <button type="button" onclick="abrirFormulario('form-san-container')">+ Agregar San</button>
+        <main>
+
+            <section id="sanes">
+                <h2>Pestaña: Sanes</h2>
+                <button type="button" onclick="abrirFormulario('form-san-container')">+ Agregar San</button>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>San_ID</th>
+                            <th>Nombre_San</th>
+                            <th>Monto_Cuota</th>
+                            <th>Fecha_Inicio</th>
+                            <th>Total_Turnos</th>
+                            <th>Estado</th>
+                            <th>Ciclo</th>
+                            <th>Imagen/Icono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-sanes-body">
+                        <tr>
+                            <td>SAN-001</td>
+                            <td>San Oro Premium</td>
+                            <td>$50</td>
+                            <td>2026-07-01</td>
+                            <td>5</td>
+                            <td>Activo</td>
+                            <td>Semanal</td>
+                            <td><span class="icono-celda-muestra" data-icon="oro"></span></td>
+                            <td>
+                                <button type="button" class="btn-edit" onclick="abrirFormulario('form-san-container', 'SAN-001')">Editar</button>
+                                <button type="button" class="btn-delete" onclick="eliminarFila('SAN-001')">Eliminar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="clientes">
+                <h2>Pestaña: Clientes</h2>
+                <button type="button" onclick="abrirFormulario('form-cliente-container')">+ Agregar Cliente</button>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente_ID</th>
+                            <th>Nombre_Completo</th>
+                            <th>Teléfono</th>
+                            <th>Contraseña</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CLI-001</td>
+                            <td>Juan Pérez</td>
+                            <td>04120000000</td>
+                            <td>••••</td>
+                            <td>
+                                <button type="button" class="btn-edit" onclick="abrirFormulario('form-cliente-container')">Editar</button>
+                                <button type="button" class="btn-delete">Eliminar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="turnos">
+                <h2>Monitoreo de Turnos por Sanes</h2>
+                <div id="contenedor-bloques-sanes">
+                    <div class="san-block-card">
+                        <div class="san-block-header">
+                            <h3>SAN-001: San Oro Premium</h3>
+                            <span class="badge-info">Corte base: 2026-07-01 (Semanal)</span>
+                        </div>
+                        <div class="turnos-grid-puestos">
+                            
+                            <div class="puesto-item asignado">
+                                <div class="puesto-num">Puesto 1</div>
+                                <div class="puesto-cliente">Juan Pérez (CLI-001)</div>
+                                <div class="puesto-meta">Corte: 2026-07-01</div>
+                                <span class="puesto-pago status-pago-completo">Pago: Al Día</span>
+                                <button type="button" onclick="abrirAsignacionPuesto('SAN-001', 1, 'CLI-001')">Cambiar</button>
+                            </div>
+
+                            <div class="puesto-item libre">
+                                <div class="puesto-num">Puesto 2</div>
+                                <div class="puesto-cliente">Vacante (Disponible)</div>
+                                <div class="puesto-meta">Corte: 2026-07-08</div>
+                                <span class="puesto-pago status-pago-vacio">Sin Pago</span>
+                                <button type="button" onclick="abrirAsignacionPuesto('SAN-001', 2, '')">Asignar Cliente</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="solicitudes-nuevos">
+                <h2>Solicitudes de Clientes Externos</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Solicitud_ID</th>
+                            <th>Nombre_Completo</th>
+                            <th>Teléfono</th>
+                            <th>San_Deseado</th>
+                            <th>Turno_Puesto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="fila-sol-001">
+                            <td>SOL-001</td>
+                            <td>María Gómez</td>
+                            <td>04241112233</td>
+                            <td>SAN-001</td>
+                            <td>2</td>
+                            <td>
+                                <button type="button" class="btn-approve" onclick="procesarSolicitudNuevo('SOL-001', 'María Gómez', '04241112233', 'SAN-001', 2)">Aprobar</button>
+                                <button type="button" class="btn-delete" onclick="rechazarSolicitud('fila-sol-001')">Rechazar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="solicitudes-inscritos">
+                <h2>Solicitudes de Clientes Registrados</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Propuesta_ID</th>
+                            <th>Cliente_ID</th>
+                            <th>San_ID</th>
+                            <th>Fecha_Solicitud</th>
+                            <th>Turno_Deseado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="fila-prop-001">
+                            <td>PROP-001</td>
+                            <td>CLI-001</td>
+                            <td>SAN-001</td>
+                            <td>2026-07-01</td>
+                            <td>2</td>
+                            <td>
+                                <button type="button" class="btn-approve" onclick="procesarSolicitudInscrito('PROP-001', 'CLI-001', 'SAN-001', 2)">Validar y Pautar</button>
+                                <button type="button" class="btn-delete" onclick="rechazarSolicitud('fila-prop-001')">Rechazar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="productos">
+                <h2>Pestaña: Productos</h2>
+                <button type="button" onclick="abrirFormulario('form-producto-container')">+ Agregar Producto</button>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto_ID</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Precio</th>
+                            <th>Imagen/Icono</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PROD-001</td>
+                            <td>Artículo de Lujo</td>
+                            <td>Descripción premium</td>
+                            <td>$100</td>
+                            <td><span class="icono-celda-muestra" data-icon="producto"></span></td>
+                            <td>12</td>
+                            <td>Disponible</td>
+                            <td>
+                                <button type="button" class="btn-edit" onclick="abrirFormulario('form-producto-container')">Editar</button>
+                                <button type="button" class="btn-delete">Eliminar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+        </main>
+    </div>
+
+    <div id="form-san-container" class="modal-form">
+        <h3>Gestionar San (BaseEdimar ID Auto)</h3>
+        <form id="form-san">
+            <label>Nombre del San:</label> <input type="text" required><br>
+            <label>Monto Cuota ($):</label> <input type="number" required><br>
+            <label>Fecha Inicio:</label> <input type="date" required><br>
+            <label>Total Turnos (Puestos a crear):</label> <input type="number" id="san-total-turnos" required><br>
+            <label>Estado:</label> <input type="text" value="Activo"><br>
+            <label>Ciclo:</label> 
+            <select>
+                <option value="Semanal">Semanal</option>
+                <option value="Quincenal">Quincenal</option>
+                <option value="Mensual">Mensual</option>
+            </select><br><br>
             
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>San_ID</th>
-                        <th>Nombre_San</th>
-                        <th>Monto_Cuota</th>
-                        <th>Fecha_Inicio</th>
-                        <th>Total_Turnos</th>
-                        <th>Estado</th>
-                        <th>Ciclo</th>
-                        <th>Imagen_URL</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>SAN-001</td>
-                        <td>San Ejemplo</td>
-                        <td>50</td>
-                        <td>2026-07-01</td>
-                        <td>10</td>
-                        <td>Activo</td>
-                        <td>Semanal</td>
-                        <td>url_imagen</td>
-                        <td><button type="button" onclick="abrirFormulario('form-san-container')">Editar</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
+            <label>Identificador Visual (URL o Selector):</label>
+            <div class="media-toggle-container">
+                <input type="text" id="san-media-input" placeholder="Pega una URL o selecciona un icono abajo">
+                <div class="icon-selector-grid">
+                    <span class="icon-opt" onclick="setVisualValue('san-media-input', 'icon:oro')">👑 Oro</span>
+                    <span class="icon-opt" onclick="setVisualValue('san-media-input', 'icon:plata')">🥈 Plata</span>
+                    <span class="icon-opt" onclick="setVisualValue('san-media-input', 'icon:diamante')">💎 Diamante</span>
+                    <span class="icon-opt" onclick="setVisualValue('san-media-input', 'icon:ahorro')">💰 Ahorro</span>
+                </div>
+            </div>
 
-        <section id="clientes">
-            <h2>Pestaña: Clientes</h2>
-            <button type="button" onclick="abrirFormulario('form-cliente-container')">+ Agregar Cliente</button>
-            
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Cliente_ID</th>
-                        <th>Nombre_Completo</th>
-                        <th>Telefono</th>
-                        <th>Contrasena</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>CLI-001</td>
-                        <td>Juan Pérez</td>
-                        <td>04120000000</td>
-                        <td>1234</td>
-                        <td><button type="button" onclick="abrirFormulario('form-cliente-container')">Editar</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <section id="turnos">
-            <h2>Pestaña: Registros de Turnos</h2>
-            <button type="button" onclick="abrirFormulario('form-turno-container')">+ Asignar Turno</button>
-            
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Registro_ID</th>
-                        <th>San_ID</th>
-                        <th>Cliente_ID</th>
-                        <th>Numero_Turno</th>
-                        <th>Fecha_Limite</th>
-                        <th>Estado_Pago</th>
-                        <th>Comprobante</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>REG-001</td>
-                        <td>SAN-001</td>
-                        <td>CLI-001</td>
-                        <td>3</td>
-                        <td>2026-07-15</td>
-                        <td>Pendiente</td>
-                        <td>Ninguno</td>
-                        <td><button type="button" onclick="abrirFormulario('form-turno-container')">Editar</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <section id="solicitudes-nuevos">
-            <h2>Pestaña: Solicitudes Nuevos</h2>
-            <button type="button" onclick="abrirFormulario('form-solicitud-nuevo-container')">+ Nueva Solicitud Externo</button>
-            
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Solicitud_ID</th>
-                        <th>Nombre_Completo</th>
-                        <th>Telefono</th>
-                        <th>San_ID</th>
-                        <th>Turno_Deseado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>SOL-001</td>
-                        <td>María Gómez</td>
-                        <td>04240000000</td>
-                        <td>SAN-001</td>
-                        <td>5</td>
-                        <td><button type="button" onclick="abrirFormulario('form-solicitud-nuevo-container')">Editar</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <section id="solicitudes-inscritos">
-            <h2>Pestaña: Solicitudes Inscritos</h2>
-            <button type="button" onclick="abrirFormulario('form-solicitud-inscrito-container')">+ Nueva Propuesta Cliente</button>
-            
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Propuesta_ID</th>
-                        <th>Cliente_ID</th>
-                        <th>San_ID</th>
-                        <th>Fecha_Solicitud</th>
-                        <th>Turno_Deseado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>PROP-001</td>
-                        <td>CLI-001</td>
-                        <td>SAN-001</td>
-                        <td>2026-07-01</td>
-                        <td>2</td>
-                        <td><button type="button" onclick="abrirFormulario('form-solicitud-inscrito-container')">Editar</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <section id="productos">
-            <h2>Pestaña: Productos</h2>
-            <button type="button" onclick="abrirFormulario('form-producto-container')">+ Agregar Producto</button>
-            
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Producto_ID</th>
-                        <th>Nombre</th>
-                        <th>Descripcion</th>
-                        <th>Precio</th>
-                        <th>Imagen_URL</th>
-                        <th>Stock</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>PROD-001</td>
-                        <td>Artículo A</td>
-                        <td>Descripción breve</td>
-                        <td>100</td>
-                        <td>url_imagen</td>
-                        <td>5</td>
-                        <td>Disponible</td>
-                        <td><button type="button" onclick="abrirFormulario('form-producto-container')">Editar</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-    </main>
-
-    <div id="form-san-container">
-        <h3>Formulario: Sanes</h3>
-        <form>
-            <label>Nombre del San:</label> <input type="text"><br>
-            <label>Monto Cuota:</label> <input type="number"><br>
-            <label>Fecha Inicio:</label> <input type="date"><br>
-            <label>Total Turnos:</label> <input type="number"><br>
-            <label>Estado:</label> <input type="text"><br>
-            <label>Ciclo:</label> <input type="text"><br>
-            <label>Imagen URL:</label> <input type="text"><br>
-            <button type="submit">Guardar</button>
+            <button type="submit">Guardar Registros</button>
             <button type="button">Cancelar</button>
         </form>
     </div>
 
-    <div id="form-cliente-container">
+    <div id="form-cliente-container" class="modal-form">
         <h3>Formulario: Clientes</h3>
         <form>
-            <label>Nombre Completo:</label> <input type="text"><br>
-            <label>Teléfono:</label> <input type="text"><br>
-            <label>Contraseña:</label> <input type="password"><br>
+            <label>Nombre Completo:</label> <input type="text" required><br>
+            <label>Teléfono:</label> <input type="text" required><br>
+            <label>Contraseña Acceso:</label> <input type="password" required><br>
             <button type="submit">Guardar</button>
             <button type="button">Cancelar</button>
         </form>
     </div>
 
-    <div id="form-turno-container">
-        <h3>Formulario: Registros de Turnos</h3>
+    <div id="form-producto-container" class="modal-form">
+        <h3>Gestionar Producto</h3>
         <form>
-            <label>San ID:</label> <input type="text"><br>
-            <label>Cliente ID:</label> <input type="text"><br>
-            <label>Número Turno:</label> <input type="number"><br>
-            <label>Fecha Límite:</label> <input type="date"><br>
-            <label>Estado Pago:</label> <input type="text"><br>
-            <label>Comprobante:</label> <input type="text"><br>
-            <button type="submit">Guardar</button>
-            <button type="button">Cancelar</button>
-        </form>
-    </div>
-
-    <div id="form-solicitud-nuevo-container">
-        <h3>Formulario: Solicitudes Nuevos</h3>
-        <form>
-            <label>Nombre Completo:</label> <input type="text"><br>
-            <label>Teléfono:</label> <input type="text"><br>
-            <label>San ID:</label> <input type="text"><br>
-            <label>Turno Deseado:</label> <input type="number"><br>
-            <button type="submit">Guardar</button>
-            <button type="button">Cancelar</button>
-        </form>
-    </div>
-
-    <div id="form-solicitud-inscrito-container">
-        <h3>Formulario: Solicitudes Inscritos</h3>
-        <form>
-            <label>Cliente ID:</label> <input type="text"><br>
-            <label>San ID:</label> <input type="text"><br>
-            <label>Fecha Solicitud:</label> <input type="date"><br>
-            <label>Turno Deseado:</label> <input type="number"><br>
-            <button type="submit">Guardar</button>
-            <button type="button">Cancelar</button>
-        </form>
-    </div>
-
-    <div id="form-producto-container">
-        <h3>Formulario: Productos</h3>
-        <form>
-            <label>Nombre:</label> <input type="text"><br>
+            <label>Nombre del Producto:</label> <input type="text" required><br>
             <label>Descripción:</label> <textarea></textarea><br>
-            <label>Precio:</label> <input type="number"><br>
-            <label>Imagen URL:</label> <input type="text"><br>
-            <label>Stock:</label> <input type="number"><br>
-            <label>Estado:</label> <input type="text"><br>
+            <label>Precio ($):</label> <input type="number" required><br>
+            <label>Stock Físico:</label> <input type="number" required><br>
+            <label>Estado Emisión:</label> <input type="text" value="Disponible"><br>
+            
+            <label>Multimedia del Artículo:</label>
+            <div class="media-toggle-container">
+                <input type="text" id="prod-media-input" placeholder="URL de imagen o selector de icono">
+                <div class="icon-selector-grid">
+                    <span class="icon-opt" onclick="setVisualValue('prod-media-input', 'icon:producto')">📦 Caja</span>
+                    <span class="icon-opt" onclick="setVisualValue('prod-media-input', 'icon:estrella')">⭐ Destacado</span>
+                    <span class="icon-opt" onclick="setVisualValue('prod-media-input', 'icon:fuego')">🔥 Oferta</span>
+                </div>
+            </div>
+
             <button type="submit">Guardar</button>
+            <button type="button">Cancelar</button>
+        </form>
+    </div>
+
+    <div id="form-asignacion-puesto-container" class="modal-form">
+        <h3>Pautar Puesto en la Cadena</h3>
+        <form id="form-pautar-puesto">
+            <input type="hidden" id="puesto-san-id">
+            <input type="hidden" id="puesto-numero">
+            <label>ID del Cliente para ocupar el puesto:</label>
+            <input type="text" id="puesto-cliente-id" placeholder="Ej: CLI-001" required>
+            <label>Estado Inicial de Pago:</label>
+            <select id="puesto-estado-pago">
+                <option value="Pendiente">Pendiente</option>
+                <option value="Al Día">Al Día</option>
+            </select><br><br>
+            <button type="submit">Confirmar Asignación Única</button>
             <button type="button">Cancelar</button>
         </form>
     </div>
