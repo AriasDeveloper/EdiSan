@@ -312,13 +312,15 @@ async function simularLlegadaDeCortes() {
         alert("Escáner Finalizado: Todos los registros se encuentran al día.");
     }
 }
+// Agrega esta llamada dentro de cada uno de tus formularios de escritura.js justo antes de hacer los fetch()
+actualizarEstadoDB("guardando");
 
-// Cierre fluido de formularios con reconexión limpia a la carga masiva
+// Modifica la función de cierre existente al final del archivo para re-sincronizar el botón verde al terminar
 function finalizarEscrituraFluidos() {
     setTimeout(async () => {
         if (typeof cargarDatosDesdeBD === "function") {
-            await cargarDatosDesdeBD();
+            await cargarDatosDesdeBD(); // Esto recargará los datos y pondrá el botón en verde de nuevo
         }
         ocultarTodosLosFormularios();
-    }, 450); // Tiempo de espera prudencial para mitigar la latencia de procesamiento asíncrono de Google Sheets
+    }, 600); // Subido ligeramente el tiempo para garantizar el guardado completo en la hoja
 }

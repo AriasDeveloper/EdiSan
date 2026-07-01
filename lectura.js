@@ -1,21 +1,18 @@
 // URL DE TU APLICACIÓN WEB DE GOOGLE APP SCRIPT
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
+const GOOGLE_SCRIPT_URL = "TU_URL_DE_GOOGLEhttps://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec_APPS_SCRIPT_AQUÍ";
 
 const LIBRERIA_ICONOS = {
     "👑": "Oro/Corona", "💎": "Plata/Diamante", "💰": "Ahorro/Hucha", "📈": "Inversión",
     "📺": "TV/Smart", "📱": "Celular", "💻": "Laptop/PC", "🧺": "Lavadora"
 };
 
-// Caché global para renderizado inmediato compartida entre scripts
 window.baseSanes = [];
 window.baseClientes = [];
 window.baseTurnosPuestos = [];
 window.baseSolicitudesNuevos = [];
-window.baseSolicitudesInscritos = [];
 window.baseProductos = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // Sistema navegación tabs original
     const enlacesMenu = document.querySelectorAll("nav ul li a");
     const secciones = document.querySelectorAll("main section");
 
@@ -30,17 +27,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     inicializarGridIconos();
-    // Carga inicial optimizada desde Google Sheets
     await cargarDatosDesdeBD();
     secciones[0].style.display = "block";
 });
 
-// ==========================================================================
-// LECTURA EFICIENTE DESDE GOOGLE SHEETS (GET)
-// ==========================================================================
+// FUNCIÓN PARA CONTROLAR EL ESTADO VISIBLE DE LA BASE DE DATOS
+function actualizarEstadoDB(estado) {
+    const indicador = document.getElementById("db-status-indicator");
+    const texto = document.getElementById("db-status-text");
+    
+    if (!indicador || !texto) return;
+
+    if (estado === "conectado") {
+        indicador.style.background = "#3aed97";
+        indicador.style.boxShadow = "0 0 8px #3aed97";
+        texto.innerText = "BaseEdimar Cloud (Sincronizado)";
+    } else if (estado === "guardando") {
+        indicador.style.background = "#ebb35e";
+        indicador.style.boxShadow = "0 0 8px #ebb35e";
+        texto.innerText = "Guardando cambios en Google Sheets...";
+    } else if (estado === "error") {
+        indicador.style.background = "#eb5e5e";
+        indicador.style.boxShadow = "0 0 8px #eb5e5e";
+        texto.innerText = "Error de conexión con Google Sheets";
+    }
+}
+
+// LECTURA CORREGIDA CONTRA SUB-PROPIEDADES UNDEFINED
 async function cargarDatosDesdeBD() {
     try {
-        // Cargamos todas las tablas en paralelo para no ralentizar la interfaz
         const [resSanes, resClientes, resTurnos, resSolNuevos, resProd] = await Promise.all([
             fetch(`${GOOGLE_SCRIPT_URL}?tabla=sanes`).then(r => r.json()),
             fetch(`${GOOGLE_SCRIPT_URL}?tabla=clientes`).then(r => r.json()),
@@ -49,6 +64,13 @@ async function cargarDatosDesdeBD() {
             fetch(`${GOOGLE_SCRIPT_URL}?tabla=productos`).then(r => r.json())
         ]);
 
+        // Verificación de errores en las respuestas de Google
+        if (resSanes.error || resClientes.error || resTurnos.error) {
+            actualizarEstadoDB("error");
+            console.error("Error devuelto por la API:", resSanes.error || resClientes.error);
+            return;
+        }
+
         window.baseSanes = Array.isArray(resSanes) ? resSanes : [];
         window.baseClientes = Array.isArray(resClientes) ? resClientes : [];
         window.baseTurnosPuestos = Array.isArray(resTurnos) ? resTurnos : [];
@@ -56,7 +78,9 @@ async function cargarDatosDesdeBD() {
         window.baseProductos = Array.isArray(resProd) ? resProd : [];
 
         renderizarUI();
+        actualizarEstadoDB("conectado");
     } catch (err) {
+        actualizarEstadoDB("error");
         console.error("Error al sincronizar con Google Sheets:", err);
     }
 }
@@ -67,11 +91,9 @@ function renderizarUI() {
     actualizarTablaClientesUI();
     dibujarBloquesDeTurnos();
     actualizarTablaSolicitudesNuevosUI();
-    actualizarTablaSolicitudesInscritosUI();
     actualizarTablaProductosUI();
 }
 
-// LÓGICA AUTOMÁTICA DE ESTADOS
 function calcularEstadosSanesAutomaticamente() {
     const fechaActual = new Date();
     window.baseSanes.forEach(async (san) => {
@@ -81,7 +103,6 @@ function calcularEstadosSanesAutomaticamente() {
         const fechaInicioSan = new Date(san.inicio);
         
         let nuevoEstado = "Activo";
-
         if (ocupados < totalPuestos && fechaActual < fechaInicioSan) {
             nuevoEstado = "A la espera de clientes";
         } else if (ocupados === totalPuestos && fechaActual < fechaInicioSan) {
@@ -92,7 +113,6 @@ function calcularEstadosSanesAutomaticamente() {
 
         if(san.estado !== nuevoEstado) {
             san.estado = nuevoEstado;
-            // Envía la actualización a Google Sheets en segundo plano sin congelar la app
             fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -102,15 +122,12 @@ function calcularEstadosSanesAutomaticamente() {
     });
 }
 
-// ==========================================================================
-// COMPONENTES DE RENDERIZACIÓN DE TABLAS DE INTERFAZ (UI)
-// ==========================================================================
 function actualizarTablaSanesUI() {
     const tbody = document.getElementById("tabla-sanes-body"); 
     if(!tbody) return;
     tbody.innerHTML = "";
     window.baseSanes.forEach(s => {
-        tbody.innerHTML += `<tr><td>${s.id}</td><td><b>${s.nombre}</b></td><td>$${s.cuota}</td><td>${s.inicio}</td><td>${s.puestos}</td><td><span class="badge-status-san" data-state="${s.estado}">${s.estado}</span></td><td>${s.ciclo}</td><td>${obtenerCeldaMultimedia(s.visual)}</td><td><button type="button" class="btn-edit" onclick="abrirFormularioSan('${s.id}')">Editar</button></td></tr>`;
+        tbody.innerHTML += `<tr><td>${s.id || s.san_id}</td><td><b>${s.nombre || s.nombre_san}</b></td><td>$${s.cuota || s.monto_cuota}</td><td>${s.inicio || s.fecha_inicio}</td><td>${s.puestos || s.total_turnos}</td><td><span class="badge-status-san" data-state="${s.estado}">${s.estado}</span></td><td>${s.ciclo}</td><td>${obtenerCeldaMultimedia(s.visual)}</td><td><button type="button" class="btn-edit" onclick="abrirFormularioSan('${s.id || s.san_id}')">Editar</button></td></tr>`;
     });
 }
 
@@ -120,14 +137,15 @@ function dibujarBloquesDeTurnos() {
     contenedor.innerHTML = "";
     
     window.baseSanes.forEach(san => {
+        const targetId = san.id || san.san_id;
         const tarjeta = document.createElement("div"); 
         tarjeta.className = "san-block-card";
-        tarjeta.innerHTML = `<div class="san-block-header"><h3>${san.id}: ${san.nombre}</h3><span class="badge-info">Ciclo: ${san.ciclo}</span></div>`;
+        tarjeta.innerHTML = `<div class="san-block-header"><h3>${targetId}: ${san.nombre || san.nombre_san}</h3><span class="badge-info">Ciclo: ${san.ciclo}</span></div>`;
         
         const malla = document.createElement("div"); 
         malla.className = "turnos-grid-puestos";
 
-        const puestos = window.baseTurnosPuestos.filter(t => t.san_id === san.id);
+        const puestos = window.baseTurnosPuestos.filter(t => t.san_id === targetId);
         puestos.forEach(p => {
             const item = document.createElement("div");
             const esLibre = !p.cliente_id;
@@ -160,7 +178,7 @@ function actualizarTablaClientesUI() {
     if(!tbody) return;
     tbody.innerHTML = "";
     window.baseClientes.forEach(c => { 
-        tbody.innerHTML += `<tr><td>${c.id}</td><td><b>${c.nombre}</b></td><td>${c.telefono}</td><td><code>${c.contrasena}</code></td><td><button type="button" class="btn-edit" onclick="abrirFormularioCliente('${c.id}')">Editar</button></td></tr>`; 
+        tbody.innerHTML += `<tr><td>${c.id || c.cliente_id}</td><td><b>${c.nombre || c.nombre_completo}</b></td><td>${c.telefono}</td><td><code>${c.contrasena}</code></td><td><button type="button" class="btn-edit" onclick="abrirFormularioCliente('${c.id || c.cliente_id}')">Editar</button></td></tr>`; 
     });
 }
 
@@ -169,14 +187,8 @@ function actualizarTablaSolicitudesNuevosUI() {
     if(!tbody) return;
     tbody.innerHTML = "";
     window.baseSolicitudesNuevos.forEach(sol => {
-        tbody.innerHTML += `<tr><td>${sol.id}</td><td>${sol.nombre}</td><td>${sol.telefono}</td><td>${sol.san_id}</td><td><button type="button" class="btn-approve" onclick="abrirAprobacionNuevoModal('${sol.id}')">Elegir Puesto</button></td></tr>`;
+        tbody.innerHTML += `<tr><td>${sol.id || sol.solicitud_id}</td><td>${sol.nombre || sol.nombre_completo}</td><td>${sol.telefono}</td><td>${sol.san_id}</td><td><button type="button" class="btn-approve" onclick="abrirAprobacionNuevoModal('${sol.id || sol.solicitud_id}')">Elegir Puesto</button></td></tr>`;
     });
-}
-
-function actualizarTablaSolicitudesInscritosUI() {
-    const tbody = document.getElementById("tabla-solicitudes-inscritos-body"); 
-    if(!tbody) return;
-    tbody.innerHTML = ""; // Se mantiene limpio listo para uso futuro
 }
 
 function actualizarTablaProductosUI() {
@@ -184,11 +196,10 @@ function actualizarTablaProductosUI() {
     if(!tbody) return;
     tbody.innerHTML = "";
     window.baseProductos.forEach(p => { 
-        tbody.innerHTML += `<tr><td>${p.id}</td><td><b>${p.nombre}</b></td><td>${p.descripcion}</td><td>$${p.precio}</td><td>${obtenerCeldaMultimedia(p.visual)}</td><td>${p.stock}</td><td>${p.estado}</td><td><button type="button" class="btn-edit" onclick="abrirFormularioProducto('${p.id}')">Editar</button></td></tr>`; 
+        tbody.innerHTML += `<tr><td>${p.id || p.producto_id}</td><td><b>${p.nombre}</b></td><td>${p.descripcion}</td><td>$${p.precio}</td><td>${obtenerCeldaMultimedia(p.visual)}</td><td>${p.stock}</td><td>${p.estado}</td><td><button type="button" class="btn-edit" onclick="abrirFormularioProducto('${p.id || p.producto_id}')">Editar</button></td></tr>`; 
     });
 }
 
-// FUNCIONES AUXILIARES DE INTERFAZ
 function inicializarGridIconos() {
     document.querySelectorAll(".icon-selector-grid").forEach(grid => {
         grid.innerHTML = ""; 
@@ -202,12 +213,5 @@ function inicializarGridIconos() {
         });
     });
 }
-
-function obtenerCeldaMultimedia(valor) { 
-    if (!valor) return `📦`; 
-    return valor; 
-}
-
-function ocultarTodosLosFormularios() { 
-    document.querySelectorAll(".modal-form").forEach(m => m.style.display = "none"); 
-}
+function obtenerCeldaMultimedia(valor) { if (!valor) return `📦`; return valor; }
+function ocultarTodosLosFormularios() { document.querySelectorAll(".modal-form").forEach(m => m.style.display = "none"); }
