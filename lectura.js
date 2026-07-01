@@ -53,42 +53,72 @@ function actualizarEstadoDB(estado) {
     }
 }
 
-// LECTURA CORREGIDA PARA EVITAR EL PREFLIGHT DE CORS
+// CONTROLLER DE CONSULTAS ASÍNCRONAS MEDIANTE RECURSO SCRIPT (JSONP)
+function solicitarTablaJSONP(tablaNombre) {
+    return new Promise((resolve, reject) => {
+        // Generar un nombre único global para la función de respuesta
+        const nombreCallback = `jsonp_callback_${tablaNombre}_${Date.now()}`;
+        
+        // Crear el puente global que recibirá los datos desde Google
+        window[nombreCallback] = function(datos) {
+            cleanup();
+            resolve(datos);
+        };
+
+        // En caso de fallo drástico de red
+        const timeoutId = setTimeout(() => {
+            cleanup();
+            reject(new Error(`Tiempo de espera agotado para la tabla: ${tablaNombre}`));
+        }, 8000);
+
+        // Limpieza de memoria eliminando elementos del DOM
+        function cleanup() {
+            clearTimeout(timeoutId);
+            if (script && script.parentNode) script.parentNode.removeChild(script);
+            delete window[nombreCallback];
+        }
+
+        // Inyección del tag script dinámico para saltar CORS
+        const script = document.createElement('script');
+        script.src = `${GOOGLE_SCRIPT_URL}?tabla=${tablaNombre}&callback=${nombreCallback}`;
+        script.async = true;
+        script.onerror = () => { cleanup(); reject(new Error(`Fallo de carga en el script de ${tablaNombre}`)); };
+        
+        document.head.appendChild(script);
+    });
+}
+
+// NUEVA FUNCIÓN DE CARGA INMUNE A CORS
 async function cargarDatosDesdeBD() {
     try {
-        // Al NO enviar headers ni configuraciones complejas, evitamos el bloqueo OPTIONS previo
-        const urlSanes = `${GOOGLE_SCRIPT_URL}?tabla=sanes`;
-        const urlClientes = `${GOOGLE_SCRIPT_URL}?tabla=clientes`;
-        const urlTurnos = `${GOOGLE_SCRIPT_URL}?tabla=turnos_puestos`;
-        const urlSolNuevos = `${GOOGLE_SCRIPT_URL}?tabla=solicitudes_nuevos`;
-        const urlProd = `${GOOGLE_SCRIPT_URL}?tabla=productos`;
-
-        // Cargamos todas las tablas en paralelo de forma simple
+        // Ejecutamos las llamadas inyectando scripts simultáneos en el head
         const [resSanes, resClientes, resTurnos, resSolNuevos, resProd] = await Promise.all([
-            fetch(urlSanes).then(r => r.json()),
-            fetch(urlClientes).then(r => r.json()),
-            fetch(urlTurnos).then(r => r.json()),
-            fetch(urlSolNuevos).then(r => r.json()),
-            fetch(urlProd).then(r => r.json())
+            solicitarTablaJSONP("sanes"),
+            solicitarTablaJSONP("clientes"),
+            solicitarTablaJSONP("turnos_puestos"),
+            solicitarTablaJSONP("solicitudes_nuevos"),
+            solicitarTablaJSONP("productos")
         ]);
 
         if (resSanes.error || resClientes.error || resTurnos.error) {
             actualizarEstadoDB("error");
-            console.error("Error devuelto por la API de Google:", resSanes.error || resClientes.error);
+            console.error("Error lógico en Sheets:", resSanes.error || resClientes.error);
             return;
         }
 
+        // Mapeo seguro a la caché global
         window.baseSanes = Array.isArray(resSanes) ? resSanes : [];
         window.baseClientes = Array.isArray(resClientes) ? resClientes : [];
         window.baseTurnosPuestos = Array.isArray(resTurnos) ? resTurnos : [];
         window.baseSolicitudesNuevos = Array.isArray(resSolNuevos) ? resSolNuevos : [];
         window.baseProductos = Array.isArray(resProd) ? resProd : [];
 
+        // Pintar la interfaz y activar el botón verde
         renderizarUI();
         actualizarEstadoDB("conectado");
     } catch (err) {
         actualizarEstadoDB("error");
-        console.error("Fallo de red o bloqueo CORS real:", err);
+        console.error("Error crítico en la pasarela JSONP:", err);
     }
 }
 function renderizarUI() {
