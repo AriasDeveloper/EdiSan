@@ -53,35 +53,48 @@ function actualizarEstadoDB(estado) {
     }
 }
 
-// LECTURA CORREGIDA CONTRA SUB-PROPIEDADES UNDEFINED
+// LECTURA OPTIMIZADA CON MANEJO DE REDIRECCIÓN (CORS)
 async function cargarDatosDesdeBD() {
     try {
+        // Configuramos la petición para que permita la redirección segura de Google Sheets
+        const opcionesFetch = {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        // Cargamos todas las tablas en paralelo
         const [resSanes, resClientes, resTurnos, resSolNuevos, resProd] = await Promise.all([
-            fetch(`${GOOGLE_SCRIPT_URL}?tabla=sanes`).then(r => r.json()),
-            fetch(`${GOOGLE_SCRIPT_URL}?tabla=clientes`).then(r => r.json()),
-            fetch(`${GOOGLE_SCRIPT_URL}?tabla=turnos_puestos`).then(r => r.json()),
-            fetch(`${GOOGLE_SCRIPT_URL}?tabla=solicitudes_nuevos`).then(r => r.json()),
-            fetch(`${GOOGLE_SCRIPT_URL}?tabla=productos`).then(r => r.json())
+            fetch(`${GOOGLE_SCRIPT_URL}?tabla=sanes`, opcionesFetch).then(r => r.json()),
+            fetch(`${GOOGLE_SCRIPT_URL}?tabla=clientes`, opcionesFetch).then(r => r.json()),
+            fetch(`${GOOGLE_SCRIPT_URL}?tabla=turnos_puestos`, opcionesFetch).then(r => r.json()),
+            fetch(`${GOOGLE_SCRIPT_URL}?tabla=solicitudes_nuevos`, opcionesFetch).then(r => r.json()),
+            fetch(`${GOOGLE_SCRIPT_URL}?tabla=productos`, opcionesFetch).then(r => r.json())
         ]);
 
-        // Verificación de errores en las respuestas de Google
+        // Verificación de posibles errores devueltos en el JSON por Google Apps Script
         if (resSanes.error || resClientes.error || resTurnos.error) {
             actualizarEstadoDB("error");
-            console.error("Error devuelto por la API:", resSanes.error || resClientes.error);
+            console.error("Error devuelto por la API de Google:", resSanes.error || resClientes.error);
             return;
         }
 
+        // Asignamos las respuestas a la caché global de la app
         window.baseSanes = Array.isArray(resSanes) ? resSanes : [];
         window.baseClientes = Array.isArray(resClientes) ? resClientes : [];
         window.baseTurnosPuestos = Array.isArray(resTurnos) ? resTurnos : [];
         window.baseSolicitudesNuevos = Array.isArray(resSolNuevos) ? resSolNuevos : [];
         window.baseProductos = Array.isArray(resProd) ? resProd : [];
 
+        // Si todo va bien, renderizamos la UI y encendemos el botón verde
         renderizarUI();
         actualizarEstadoDB("conectado");
     } catch (err) {
+        // Si el navegador bloquea la petición, caerá aquí
         actualizarEstadoDB("error");
-        console.error("Error al sincronizar con Google Sheets:", err);
+        console.error("Fallo de red o bloqueo CORS al conectar con Google Sheets:", err);
     }
 }
 
