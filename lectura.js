@@ -1,4 +1,3 @@
-// URL DE TU APLICACIÓN WEB DE GOOGLE APP SCRIPT
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
 
 const LIBRERIA_ICONOS = {
@@ -31,11 +30,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     secciones[0].style.display = "block";
 });
 
-// FUNCIÓN PARA CONTROLAR EL ESTADO VISIBLE DE LA BASE DE DATOS
 function actualizarEstadoDB(estado) {
     const indicador = document.getElementById("db-status-indicator");
     const texto = document.getElementById("db-status-text");
-    
     if (!indicador || !texto) return;
 
     if (estado === "conectado") {
@@ -53,74 +50,50 @@ function actualizarEstadoDB(estado) {
     }
 }
 
-// CONTROLLER DE CONSULTAS ASÍNCRONAS MEDIANTE RECURSO SCRIPT (JSONP)
-function solicitarTablaJSONP(tablaNombre) {
-    return new Promise((resolve, reject) => {
-        // Generar un nombre único global para la función de respuesta
-        const nombreCallback = `jsonp_callback_${tablaNombre}_${Date.now()}`;
+// MOTOR DE CONEXIÓN ÚNICA EN CAPA SEGURA JSONP
+async function cargarDatosDesdeBD() {
+    return new Promise((resolve) => {
+        const nombreCallback = `jsonp_callback_global_${Date.now()}`;
         
-        // Crear el puente global que recibirá los datos desde Google
-        window[nombreCallback] = function(datos) {
+        window[nombreCallback] = function(paquete) {
+            if (paquete.error) {
+                actualizarEstadoDB("error");
+                console.error("Error lógico en Google Sheets:", paquete.error);
+                return resolve();
+            }
+
+            // Repartir el paquete en la caché global sin romper ninguna vista
+            window.baseSanes = Array.isArray(paquete.sanes) ? paquete.sanes : [];
+            window.baseClientes = Array.isArray(paquete.clientes) ? paquete.clientes : [];
+            window.baseTurnosPuestos = Array.isArray(paquete.turnos_puestos) ? paquete.turnos_puestos : [];
+            window.baseSolicitudesNuevos = Array.isArray(paquete.solicitudes_nuevos) ? paquete.solicitudes_nuevos : [];
+            window.baseProductos = Array.isArray(paquete.productos) ? paquete.productos : [];
+
+            renderizarUI();
+            actualizarEstadoDB("conectado");
             cleanup();
-            resolve(datos);
+            resolve();
         };
 
-        // En caso de fallo drástico de red
-        const timeoutId = setTimeout(() => {
-            cleanup();
-            reject(new Error(`Tiempo de espera agotado para la tabla: ${tablaNombre}`));
-        }, 8000);
-
-        // Limpieza de memoria eliminando elementos del DOM
         function cleanup() {
-            clearTimeout(timeoutId);
             if (script && script.parentNode) script.parentNode.removeChild(script);
             delete window[nombreCallback];
         }
 
-        // Inyección del tag script dinámico para saltar CORS
         const script = document.createElement('script');
-        script.src = `${GOOGLE_SCRIPT_URL}?tabla=${tablaNombre}&callback=${nombreCallback}`;
+        script.src = `${GOOGLE_SCRIPT_URL}?callback=${nombreCallback}`;
         script.async = true;
-        script.onerror = () => { cleanup(); reject(new Error(`Fallo de carga en el script de ${tablaNombre}`)); };
+        script.onerror = () => {
+            actualizarEstadoDB("error");
+            console.error("Fallo de red crítico al descargar BaseEdimar");
+            cleanup();
+            resolve();
+        };
         
         document.head.appendChild(script);
     });
 }
 
-// NUEVA FUNCIÓN DE CARGA INMUNE A CORS
-async function cargarDatosDesdeBD() {
-    try {
-        // Ejecutamos las llamadas inyectando scripts simultáneos en el head
-        const [resSanes, resClientes, resTurnos, resSolNuevos, resProd] = await Promise.all([
-            solicitarTablaJSONP("sanes"),
-            solicitarTablaJSONP("clientes"),
-            solicitarTablaJSONP("turnos_puestos"),
-            solicitarTablaJSONP("solicitudes_nuevos"),
-            solicitarTablaJSONP("productos")
-        ]);
-
-        if (resSanes.error || resClientes.error || resTurnos.error) {
-            actualizarEstadoDB("error");
-            console.error("Error lógico en Sheets:", resSanes.error || resClientes.error);
-            return;
-        }
-
-        // Mapeo seguro a la caché global
-        window.baseSanes = Array.isArray(resSanes) ? resSanes : [];
-        window.baseClientes = Array.isArray(resClientes) ? resClientes : [];
-        window.baseTurnosPuestos = Array.isArray(resTurnos) ? resTurnos : [];
-        window.baseSolicitudesNuevos = Array.isArray(resSolNuevos) ? resSolNuevos : [];
-        window.baseProductos = Array.isArray(resProd) ? resProd : [];
-
-        // Pintar la interfaz y activar el botón verde
-        renderizarUI();
-        actualizarEstadoDB("conectado");
-    } catch (err) {
-        actualizarEstadoDB("error");
-        console.error("Error crítico en la pasarela JSONP:", err);
-    }
-}
 function renderizarUI() {
     calcularEstadosSanesAutomaticamente();
     actualizarTablaSanesUI();
@@ -133,10 +106,11 @@ function renderizarUI() {
 function calcularEstadosSanesAutomaticamente() {
     const fechaActual = new Date();
     window.baseSanes.forEach(async (san) => {
-        const puestosId = window.baseTurnosPuestos.filter(t => t.san_id === san.id);
+        const targetId = san.id || san.san_id;
+        const puestosId = window.baseTurnosPuestos.filter(t => t.san_id === targetId);
         const totalPuestos = puestosId.length;
         const ocupados = puestosId.filter(t => t.cliente_id && t.cliente_id !== "").length;
-        const fechaInicioSan = new Date(san.inicio);
+        const fechaInicioSan = new Date(san.inicio || san.fecha_inicio);
         
         let nuevoEstado = "Activo";
         if (ocupados < totalPuestos && fechaActual < fechaInicioSan) {
@@ -152,7 +126,8 @@ function calcularEstadosSanesAutomaticamente() {
             fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
-                body: JSON.stringify({ tabla: "sanes", accion: "editar", datos: { id: san.id, estado: nuevoEstado } })
+                headers: { "Content-Type": "text/plain" },
+                body: JSON.stringify({ tabla: "sanes", accion: "editar", datos: { id: targetId, estado: nuevoEstado } })
             });
         }
     });
@@ -163,7 +138,8 @@ function actualizarTablaSanesUI() {
     if(!tbody) return;
     tbody.innerHTML = "";
     window.baseSanes.forEach(s => {
-        tbody.innerHTML += `<tr><td>${s.id || s.san_id}</td><td><b>${s.nombre || s.nombre_san}</b></td><td>$${s.cuota || s.monto_cuota}</td><td>${s.inicio || s.fecha_inicio}</td><td>${s.puestos || s.total_turnos}</td><td><span class="badge-status-san" data-state="${s.estado}">${s.estado}</span></td><td>${s.ciclo}</td><td>${obtenerCeldaMultimedia(s.visual)}</td><td><button type="button" class="btn-edit" onclick="abrirFormularioSan('${s.id || s.san_id}')">Editar</button></td></tr>`;
+        const id = s.id || s.san_id;
+        tbody.innerHTML += `<tr><td>${id}</td><td><b>${s.nombre || s.nombre_san}</b></td><td>$${s.cuota || s.monto_cuota}</td><td>${s.inicio || s.fecha_inicio}</td><td>${s.puestos || s.total_turnos}</td><td><span class="badge-status-san" data-state="${s.estado}">${s.estado}</span></td><td>${s.ciclo}</td><td>${obtenerCeldaMultimedia(s.visual)}</td><td><button type="button" class="btn-edit" onclick="abrirFormularioSan('${id}')">Editar</button></td></tr>`;
     });
 }
 
@@ -179,6 +155,7 @@ function dibujarBloquesDeTurnos() {
         tarjeta.innerHTML = `<div class="san-block-header"><h3>${targetId}: ${san.nombre || san.nombre_san}</h3><span class="badge-info">Ciclo: ${san.ciclo}</span></div>`;
         
         const malla = document.createElement("div"); 
+        malle = "turnos-grid-puestos";
         malla.className = "turnos-grid-puestos";
 
         const puestos = window.baseTurnosPuestos.filter(t => t.san_id === targetId);
@@ -188,8 +165,8 @@ function dibujarBloquesDeTurnos() {
             item.className = `puesto-item ${esLibre ? 'libre' : 'assigned'}`;
             if(!esLibre) item.style.border = "1px solid var(--morado-neon)";
 
-            const clienteObj = window.baseClientes.find(c => c.id === p.cliente_id);
-            const nombreMostrar = clienteObj ? `${clienteObj.nombre}` : "❌ Vacante (Disponible)";
+            const clienteObj = window.baseClientes.find(c => (c.id || c.cliente_id) === p.cliente_id);
+            const nombreMostrar = clienteObj ? `${clienteObj.nombre || clienteObj.nombre_completo}` : "❌ Vacante (Disponible)";
 
             item.innerHTML = `
                 <div class="puesto-num">Puesto ${p.puesto}</div>
@@ -214,7 +191,7 @@ function actualizarTablaClientesUI() {
     if(!tbody) return;
     tbody.innerHTML = "";
     window.baseClientes.forEach(c => { 
-        tbody.innerHTML += `<tr><td>${c.id || c.cliente_id}</td><td><b>${c.nombre || c.nombre_completo}</b></td><td>${c.telefono}</td><td><code>${c.contrasena}</code></td><td><button type="button" class="btn-edit" onclick="abrirFormularioCliente('${c.id || c.cliente_id}')">Editar</button></td></tr>`; 
+        tbody.innerHTML += `<tr><td>${c.id || c.cliente_id}</td><td><b>${c.nombre || c.nombre_completo}</b></td><td>${c.telefono}</td><td><code>${c.contrasena || c.contraseña}</code></td><td><button type="button" class="btn-edit" onclick="abrirFormularioCliente('${c.id || c.cliente_id}')">Editar</button></td></tr>`; 
     });
 }
 
@@ -223,7 +200,8 @@ function actualizarTablaSolicitudesNuevosUI() {
     if(!tbody) return;
     tbody.innerHTML = "";
     window.baseSolicitudesNuevos.forEach(sol => {
-        tbody.innerHTML += `<tr><td>${sol.id || sol.solicitud_id}</td><td>${sol.nombre || sol.nombre_completo}</td><td>${sol.telefono}</td><td>${sol.san_id}</td><td><button type="button" class="btn-approve" onclick="abrirAprobacionNuevoModal('${sol.id || sol.solicitud_id}')">Elegir Puesto</button></td></tr>`;
+        const id = sol.id || sol.solicitud_id;
+        tbody.innerHTML += `<tr><td>${id}</td><td>${sol.nombre || sol.nombre_completo}</td><td>${sol.telefono}</td><td>${sol.san_id}</td><td><button type="button" class="btn-approve" onclick="abrirAprobacionNuevoModal('${id}')">Elegir Puesto</button></td></tr>`;
     });
 }
 
@@ -232,7 +210,8 @@ function actualizarTablaProductosUI() {
     if(!tbody) return;
     tbody.innerHTML = "";
     window.baseProductos.forEach(p => { 
-        tbody.innerHTML += `<tr><td>${p.id || p.producto_id}</td><td><b>${p.nombre}</b></td><td>${p.descripcion}</td><td>$${p.precio}</td><td>${obtenerCeldaMultimedia(p.visual)}</td><td>${p.stock}</td><td>${p.estado}</td><td><button type="button" class="btn-edit" onclick="abrirFormularioProducto('${p.id || p.producto_id}')">Editar</button></td></tr>`; 
+        const id = p.id || p.producto_id;
+        tbody.innerHTML += `<tr><td>${id}</td><td><b>${p.nombre}</b></td><td>${p.descripcion}</td><td>$${p.precio}</td><td>${obtenerCeldaMultimedia(p.visual)}</td><td>${p.stock}</td><td>${p.estado}</td><td><button type="button" class="btn-edit" onclick="abrirFormularioProducto('${id}')">Editar</button></td></tr>`; 
     });
 }
 
