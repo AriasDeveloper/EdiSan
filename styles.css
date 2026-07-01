@@ -1,0 +1,322 @@
+/* ==========================================================================
+   1. VARIABLES DE DISEÑO (PALETA PREMIUM & GLASSMORPHISM)
+   ========================================================================== */
+:root {
+    --bg-principal: #090514;       /* Fondo oscuro profundo */
+    --bg-superficie: rgba(25, 18, 46, 0.45); /* Base para Glassmorphism */
+    --morado-neon: #9d4edd;        /* Morado eléctrico principal */
+    --morado-brillante: #c77dff;   /* Acentos de luz violeta */
+    --texto-principal: #f3f0fa;    /* Blanco empolvado premium */
+    --texto-secundario: #a49cb3;   /* Gris violeta para datos menos relevantes */
+    --borde-cristal: rgba(157, 78, 221, 0.2); /* Bordes ultrafinos semi-transparentes */
+    --shadow-premium: 0 8px 32px 0 rgba(12, 4, 28, 0.6);
+    --blur-efecto: blur(12px);     /* Desenfoque de fondo */
+    
+    /* Variables de control para el menú retráctil */
+    --sidebar-ancho: 280px;
+    --sidebar-colapsado: 70px;
+    --transicion-suave: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ==========================================================================
+   2. ESTILOS BASE Y REINICIO
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--bg-principal);
+    color: var(--texto-principal);
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Halos Dinámicos de Fondo (Glows de Ambientación) */
+body::before, body::after {
+    content: "";
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(157, 78, 221, 0.15) 0%, rgba(9, 5, 20, 0) 70%);
+    z-index: -1;
+    pointer-events: none;
+    animation: flotarGlow 12s infinite alternate ease-in-out;
+}
+body::before { top: -10%; left: -10%; }
+body::after { bottom: -10%; right: -10%; animation-delay: 6s; }
+
+@keyframes flotarGlow {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(50px, 30px) scale(1.2); }
+}
+
+/* ==========================================================================
+   3. PANEL DE PESTAÑAS RETRÁCTIL (SIDEBAR)
+   ========================================================================== */
+nav {
+    width: var(--sidebar-ancho);
+    background: rgba(15, 10, 30, 0.75);
+    backdrop-filter: var(--blur-efecto);
+    -webkit-backdrop-filter: var(--blur-efecto);
+    border-right: 1px solid var(--borde-cristal);
+    padding: 25px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    transition: var(--transicion-suave);
+    z-index: 100;
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* ESTADO COLAPSADO (Se activa aplicando la clase .collapsed al <nav>) */
+nav.collapsed {
+    width: var(--sidebar-colapsado);
+    padding: 25px 10px;
+}
+
+nav h2 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--morado-brillante);
+    text-shadow: 0 0 10px rgba(199, 125, 255, 0.4);
+    white-space: nowrap;
+    transition: var(--transicion-suave);
+    overflow: hidden;
+}
+
+nav.collapsed h2 {
+    opacity: 0;
+    transform: translateX(-20px);
+    pointer-events: none;
+}
+
+/* Lista de Pestañas */
+nav ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+nav ul li a {
+    color: var(--texto-secundario);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: var(--transicion-suave);
+    border: 1px solid transparent;
+}
+
+/* Efectos de Hover y Pestaña Activa */
+nav ul li a:hover, nav ul li a.active {
+    color: #fff;
+    background: rgba(157, 78, 221, 0.15);
+    border-color: rgba(157, 78, 221, 0.3);
+    box-shadow: inset 0 0 15px rgba(157, 78, 221, 0.1);
+}
+
+nav ul li a.active {
+    border-color: var(--morado-neon);
+    background: linear-gradient(90deg, rgba(157, 78, 221, 0.25) 0%, rgba(9, 5, 20, 0) 100%);
+}
+
+/* ==========================================================================
+   4. CONTENEDOR PRINCIPAL DE CONTENIDO
+   ========================================================================== */
+main {
+    flex-grow: 1;
+    padding: 40px;
+    max-width: calc(100vw - var(--sidebar-colapsado));
+    transition: var(--transicion-suave);
+}
+
+section {
+    margin-bottom: 50px;
+}
+
+section h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #fff;
+    border-left: 4px solid var(--morado-neon);
+    padding-left: 12px;
+}
+
+/* ==========================================================================
+   5. COMPONENTES: TABLAS SUPER PREMIUM (ESTILO FILAS/TARJETAS)
+   ========================================================================== */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px; /* Separación para crear el efecto de "Fila flotante" */
+    margin-top: 15px;
+}
+
+th {
+    color: var(--texto-secundario);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px 20px;
+    border: none;
+}
+
+td {
+    background: var(--bg-superficie);
+    backdrop-filter: var(--blur-efecto);
+    -webkit-backdrop-filter: var(--blur-efecto);
+    border-top: 1px solid var(--borde-cristal);
+    border-bottom: 1px solid var(--borde-cristal);
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--texto-principal);
+    transition: var(--transicion-suave);
+}
+
+/* Redondear las esquinas de cada fila independiente */
+td:first-child {
+    border-left: 1px solid var(--borde-cristal);
+    border-radius: 12px 0 0 12px;
+}
+
+td:last-child {
+    border-right: 1px solid var(--borde-cristal);
+    border-radius: 0 12px 12px 0;
+}
+
+/* Iluminación sutil al pasar el mouse por encima de la fila */
+tr:hover td {
+    background: rgba(157, 78, 221, 0.12);
+    border-color: rgba(157, 78, 221, 0.4);
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   6. COMPONENTES: BOTONES E INPUTS DEL SISTEMA
+   ========================================================================== */
+button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transicion-suave);
+    border: 1px solid transparent;
+}
+
+/* Botón Agregar (+ Nuevo) */
+button[type="button"]:not(td button) {
+    background: var(--morado-neon);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
+    margin-bottom: 20px;
+}
+
+button[type="button"]:not(td button):hover {
+    background: #b55fe6;
+    box-shadow: 0 6px 20px rgba(157, 78, 221, 0.6);
+}
+
+/* Botón Editar dentro de las filas */
+td button {
+    background: transparent;
+    color: var(--morado-brillante);
+    border: 1px solid var(--borde-cristal);
+    padding: 6px 14px;
+}
+
+td button:hover {
+    background: var(--morado-neon);
+    color: #fff;
+    border-color: var(--morado-neon);
+    box-shadow: 0 0 12px rgba(157, 78, 221, 0.5);
+}
+
+/* ==========================================================================
+   7. COMPONENTES: CONTENEDORES DE FORMULARIO (ESTILO LIMPIO)
+   ========================================================================== */
+[id*="container"] {
+    background: rgba(20, 14, 38, 0.8);
+    backdrop-filter: var(--blur-efecto);
+    -webkit-backdrop-filter: var(--blur-efecto);
+    border: 1px solid var(--borde-cristal);
+    padding: 30px;
+    border-radius: 16px;
+    margin-top: 30px;
+    max-width: 550px;
+    box-shadow: var(--shadow-premium);
+}
+
+[id*="container"] h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: var(--morado-brillante);
+}
+
+form label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--texto-secundario);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+form input, form textarea {
+    width: 100%;
+    background: rgba(9, 5, 20, 0.6);
+    border: 1px solid var(--borde-cristal);
+    padding: 12px 14px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    margin-bottom: 18px;
+    transition: var(--transicion-suave);
+}
+
+form input:focus, form textarea:focus {
+    outline: none;
+    border-color: var(--morado-neon);
+    box-shadow: 0 0 8px rgba(157, 78, 221, 0.3);
+    background: rgba(9, 5, 20, 0.8);
+}
+
+/* Botones de acción del Formulario */
+form button[type="submit"] {
+    background: var(--morado-neon);
+    color: #fff;
+    margin-right: 10px;
+}
+
+form button[type="submit"]:hover {
+    background: #b55fe6;
+}
+
+form button:last-child {
+    background: transparent;
+    color: var(--texto-secundario);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+form button:last-child:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}

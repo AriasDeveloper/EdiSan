@@ -3,163 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>La Patrona - Sanes & Productos</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <title>Estructura HTML - BaseEdimar</title>
 </head>
 <body>
 
-    <div id="toast-container"></div>
-
-    <nav class="navbar">
-        <div class="logo">La Patrona</div>
-        <div class="nav-actions">
-            <button id="btn-home" class="nav-btn active"><i class="fas fa-home"></i> Inicio</button>
-            <button id="btn-login-client" class="nav-btn"><i class="fas fa-user"></i> Cliente</button>
-            <button id="btn-login-admin" class="nav-icon-btn" title="Administración"><i class="fas fa-key"></i></button>
-            <button id="btn-logout" class="nav-btn hidden"><i class="fas fa-sign-out-alt"></i> Salir</button>
-        </div>
+    <nav>
+        <h2>BaseEdimar Admin</h2>
+        <ul>
+            <li><a href="#sanes">Sanes</a></li>
+            <li><a href="#clientes">Clientes</a></li>
+            <li><a href="#turnos">Registros de Turnos</a></li>
+            <li><a href="#solicitudes-nuevos">Solicitudes Nuevos</a></li>
+            <li><a href="#solicitudes-inscritos">Solicitudes Inscritos</a></li>
+            <li><a href="#productos">Productos</a></li>
+        </ul>
     </nav>
 
-    <main class="main-content">
+    <main>
 
-        <section id="view-home" class="view">
-            <header class="hero">
-                <h1>Exclusividad, Confianza y Gestión de Sanes</h1>
-                <p>Explora nuestros productos premium y participa en los mejores sanes activos.</p>
-            </header>
+        <section id="sanes">
+            <h2>Pestaña: Sanes</h2>
+            <button type="button">+ Agregar San</button>
             
-            <h2 class="section-title">Nuestros Sanes Disponibles</h2>
-            <div id="grid-sanes-public" class="grid-container"></div>
-
-            <h2 class="section-title">Productos Destacados</h2>
-            <div id="grid-productos-public" class="grid-container"></div>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>San_ID</th>
+                        <th>Nombre_San</th>
+                        <th>Monto_Cuota</th>
+                        <th>Fecha_Inicio</th>
+                        <th>Total_Turnos</th>
+                        <th>Estado</th>
+                        <th>Ciclo</th>
+                        <th>Imagen_URL</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SAN-001</td>
+                        <td>San Ejemplo</td>
+                        <td>50</td>
+                        <td>2026-07-01</td>
+                        <td>10</td>
+                        <td>Activo</td>
+                        <td>Semanal</td>
+                        <td>url_imagen</td>
+                        <td><button type="button">Editar</button></td>
+                    </tr>
+                </tbody>
+            </table>
         </section>
 
-        <section id="view-login" class="view hidden">
-            <div class="login-card">
-                <h2 id="login-title">Iniciar Sesión</h2>
-                <form id="form-login">
-                    <input type="hidden" id="login-type" value="client">
-                    <div class="input-group" id="group-phone">
-                        <label>Teléfono</label>
-                        <input type="tel" id="login-phone" placeholder="Ej. 04141234567">
-                    </div>
-                    <div class="input-group">
-                        <label>Contraseña (PIN 4 dígitos)</label>
-                        <input type="password" id="login-pass" maxlength="4" placeholder="••••">
-                    </div>
-                    <button type="submit" class="btn-primary">Ingresar</button>
-                </form>
-            </div>
-        </section>
-
-        <section id="view-client" class="view hidden">
-            <div class="welcome-bar">
-                <h2>Bienvenido, <span id="client-name">Cliente</span></h2>
-            </div>
+        <section id="clientes">
+            <h2>Pestaña: Clientes</h2>
+            <button type="button">+ Agregar Cliente</button>
             
-            <h3 class="section-title">Mis Sanes (Participando)</h3>
-            <div id="client-my-sanes" class="grid-container"></div>
-
-            <h3 class="section-title">Sanes Activos Disponibles</h3>
-            <div id="client-sanes-available" class="grid-container"></div>
-
-            <h3 class="section-title">Productos en Oferta</h3>
-            <div id="client-products" class="grid-container"></div>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Cliente_ID</th>
+                        <th>Nombre_Completo</th>
+                        <th>Telefono</th>
+                        <th>Contrasena</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>CLI-001</td>
+                        <td>Juan Pérez</td>
+                        <td>04120000000</td>
+                        <td>1234</td>
+                        <td><button type="button">Editar</button></td>
+                    </tr>
+                </tbody>
+            </table>
         </section>
 
-        <section id="view-admin" class="view hidden">
-            <div class="admin-tabs">
-                <button class="tab-btn active" data-tab="tab-sanes">Sanes</button>
-                <button class="tab-btn" data-tab="tab-productos">Productos</button>
-                <button class="tab-btn" data-tab="tab-clientes">Clientes & Claves</button>
-                <button class="tab-btn" data-tab="tab-solicitudes">Solicitudes</button>
-            </div>
+        <section id="turnos">
+            <h2>Pestaña: Registros de Turnos</h2>
+            <button type="button">+ Asignar Turno</button>
+            
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Registro_ID</th>
+                        <th>San_ID</th>
+                        <th>Cliente_ID</th>
+                        <th>Numero_Turno</th>
+                        <th>Fecha_Limite</th>
+                        <th>Estado_Pago</th>
+                        <th>Comprobante</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>REG-001</td>
+                        <td>SAN-001</td>
+                        <td>CLI-001</td>
+                        <td>3</td>
+                        <td>2026-07-15</td>
+                        <td>Pendiente</td>
+                        <td>Ninguno</td>
+                        <td><button type="button">Editar</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
 
-            <div id="tab-sanes" class="tab-content">
-                <div class="tab-header">
-                    <h3>Gestión de Sanes</h3>
-                    <button class="btn-primary" onclick="openModal('modal-san')">Nuevo San</button>
-                </div>
-                <div id="admin-sanes-list" class="table-responsive"></div>
-            </div>
+        <section id="solicitudes-nuevos">
+            <h2>Pestaña: Solicitudes Nuevos</h2>
+            <button type="button">+ Nueva Solicitud Externo</button>
+            
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Solicitud_ID</th>
+                        <th>Nombre_Completo</th>
+                        <th>Telefono</th>
+                        <th>San_ID</th>
+                        <th>Turno_Deseado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SOL-001</td>
+                        <td>María Gómez</td>
+                        <td>04240000000</td>
+                        <td>SAN-001</td>
+                        <td>5</td>
+                        <td><button type="button">Editar</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
 
-            <div id="tab-productos" class="tab-content hidden">
-                <div class="tab-header">
-                    <h3>Gestión de Productos</h3>
-                    <button class="btn-primary" onclick="openModal('modal-producto')">Nuevo Producto</button>
-                </div>
-                <div id="admin-productos-list" class="table-responsive"></div>
-            </div>
+        <section id="solicitudes-inscritos">
+            <h2>Pestaña: Solicitudes Inscritos</h2>
+            <button type="button">+ Nueva Propuesta Cliente</button>
+            
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Propuesta_ID</th>
+                        <th>Cliente_ID</th>
+                        <th>San_ID</th>
+                        <th>Fecha_Solicitud</th>
+                        <th>Turno_Deseado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>PROP-001</td>
+                        <td>CLI-001</td>
+                        <td>SAN-001</td>
+                        <td>2026-07-01</td>
+                        <td>2</td>
+                        <td><button type="button">Editar</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
 
-            <div id="tab-clientes" class="tab-content hidden">
-                <h3>Clientes Registrados</h3>
-                <div id="admin-clientes-list" class="table-responsive"></div>
-            </div>
-
-            <div id="tab-solicitudes" class="tab-content hidden">
-                <h3>Solicitudes de Nuevos Clientes</h3>
-                <div id="admin-req-nuevos" class="table-responsive"></div>
-                <br>
-                <h3>Solicitudes de Inscripción a Sanes</h3>
-                <div id="admin-req-inscritos" class="table-responsive"></div>
-            </div>
+        <section id="productos">
+            <h2>Pestaña: Productos</h2>
+            <button type="button">+ Agregar Producto</button>
+            
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Producto_ID</th>
+                        <th>Nombre</th>
+                        <th>Descripcion</th>
+                        <th>Precio</th>
+                        <th>Imagen_URL</th>
+                        <th>Stock</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>PROD-001</td>
+                        <td>Artículo A</td>
+                        <td>Descripción breve</td>
+                        <td>100</td>
+                        <td>url_imagen</td>
+                        <td>5</td>
+                        <td>Disponible</td>
+                        <td><button type="button">Editar</button></td>
+                    </tr>
+                </tbody>
+            </table>
         </section>
 
     </main>
 
-    <div id="modal-san" class="modal hidden">
-        <div class="modal-content">
-            <h3>Crear / Editar San</h3>
-            <form id="form-san">
-                <input type="hidden" id="san-id">
-                <input type="text" id="san-name" placeholder="Nombre del San" required>
-                <input type="number" id="san-cuota" placeholder="Cuota ($)" required>
-                <input type="date" id="san-date" required>
-                <input type="number" id="san-puestos" placeholder="Cantidad de Puestos" required>
-                <input type="text" id="san-img" placeholder="URL de la Imagen" required>
-                <div class="modal-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal('modal-san')">Cancelar</button>
-                    <button type="submit" class="btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
+    <div id="form-san-container">
+        <h3>Formulario: Sanes</h3>
+        <form>
+            <label>Nombre del San:</label> <input type="text"><br>
+            <label>Monto Cuota:</label> <input type="number"><br>
+            <label>Fecha Inicio:</label> <input type="date"><br>
+            <label>Total Turnos:</label> <input type="number"><br>
+            <label>Estado:</label> <input type="text"><br>
+            <label>Ciclo:</label> <input type="text"><br>
+            <label>Imagen URL:</label> <input type="text"><br>
+            <button type="submit">Guardar</button>
+            <button type="button">Cancelar</button>
+        </form>
     </div>
 
-    <div id="modal-producto" class="modal hidden">
-        <div class="modal-content">
-            <h3>Crear / Editar Producto</h3>
-            <form id="form-producto">
-                <input type="hidden" id="prod-id">
-                <input type="text" id="prod-name" placeholder="Nombre del Producto" required>
-                <textarea id="prod-desc" placeholder="Descripción" required></textarea>
-                <input type="number" id="prod-price" placeholder="Precio ($)" required>
-                <input type="text" id="prod-img" placeholder="URL de la Imagen" required>
-                <input type="number" id="prod-stock" placeholder="Stock" required>
-                <select id="prod-status">
-                    <option value="Activo">Activo</option>
-                    <option value="Oferta">En Oferta</option>
-                    <option value="Agotado">Agotado</option>
-                </select>
-                <div class="modal-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal('modal-producto')">Cancelar</button>
-                    <button type="submit" class="btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
+    <div id="form-cliente-container">
+        <h3>Formulario: Clientes</h3>
+        <form>
+            <label>Nombre Completo:</label> <input type="text"><br>
+            <label>Teléfono:</label> <input type="text"><br>
+            <label>Contraseña:</label> <input type="password"><br>
+            <button type="submit">Guardar</button>
+            <button type="button">Cancelar</button>
+        </form>
     </div>
 
-    <div id="modal-turnos" class="modal hidden">
-        <div class="modal-content large">
-            <h3>Asignación de Turnos: <span id="turno-san-title"></span></h3>
-            <div id="turno-slots-container"></div>
-            <div class="modal-actions">
-                <button type="button" class="btn-secondary" onclick="closeModal('modal-turnos')">Cerrar</button>
-            </div>
-        </div>
+    <div id="form-turno-container">
+        <h3>Formulario: Registros de Turnos</h3>
+        <form>
+            <label>San ID:</label> <input type="text"><br>
+            <label>Cliente ID:</label> <input type="text"><br>
+            <label>Número Turno:</label> <input type="number"><br>
+            <label>Fecha Límite:</label> <input type="date"><br>
+            <label>Estado Pago:</label> <input type="text"><br>
+            <label>Comprobante:</label> <input type="text"><br>
+            <button type="submit">Guardar</button>
+            <button type="button">Cancelar</button>
+        </form>
     </div>
 
+    <div id="form-solicitud-nuevo-container">
+        <h3>Formulario: Solicitudes Nuevos</h3>
+        <form>
+            <label>Nombre Completo:</label> <input type="text"><br>
+            <label>Teléfono:</label> <input type="text"><br>
+            <label>San ID:</label> <input type="text"><br>
+            <label>Turno Deseado:</label> <input type="number"><br>
+            <button type="submit">Guardar</button>
+            <button type="button">Cancelar</button>
+        </form>
+    </div>
+
+    <div id="form-solicitud-inscrito-container">
+        <h3>Formulario: Solicitudes Inscritos</h3>
+        <form>
+            <label>Cliente ID:</label> <input type="text"><br>
+            <label>San ID:</label> <input type="text"><br>
+            <label>Fecha Solicitud:</label> <input type="date"><br>
+            <label>Turno Deseado:</label> <input type="number"><br>
+            <button type="submit">Guardar</button>
+            <button type="button">Cancelar</button>
+        </form>
+    </div>
+
+    <div id="form-producto-container">
+        <h3>Formulario: Productos</h3>
+        <form>
+            <label>Nombre:</label> <input type="text"><br>
+            <label>Descripción:</label> <textarea></textarea><br>
+            <label>Precio:</label> <input type="number"><br>
+            <label>Imagen URL:</label> <input type="text"><br>
+            <label>Stock:</label> <input type="number"><br>
+            <label>Estado:</label> <input type="text"><br>
+            <button type="submit">Guardar</button>
+            <button type="button">Cancelar</button>
+        </form>
+    </div>
     <script src="app.js"></script>
 </body>
 </html>
