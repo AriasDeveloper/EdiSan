@@ -2,17 +2,16 @@
    1. VARIABLES DE DISEÑO (PALETA PREMIUM & GLASSMORPHISM)
    ========================================================================== */
 :root {
-    --bg-principal: #090514;       /* Fondo oscuro profundo */
-    --bg-superficie: rgba(25, 18, 46, 0.45); /* Base para Glassmorphism */
-    --morado-neon: #9d4edd;        /* Morado eléctrico principal */
-    --morado-brillante: #c77dff;   /* Acentos de luz violeta */
-    --texto-principal: #f3f0fa;    /* Blanco empolvado premium */
-    --texto-secundario: #a49cb3;   /* Gris violeta para datos menos relevantes */
-    --borde-cristal: rgba(157, 78, 221, 0.2); /* Bordes ultrafinos semi-transparentes */
+    --bg-principal: #090514;       
+    --bg-superficie: rgba(25, 18, 46, 0.45); 
+    --morado-neon: #9d4edd;        
+    --morado-brillante: #c77dff;   
+    --texto-principal: #f3f0fa;    
+    --texto-secundario: #a49cb3;   
+    --borde-cristal: rgba(157, 78, 221, 0.2); 
     --shadow-premium: 0 8px 32px 0 rgba(12, 4, 28, 0.6);
-    --blur-efecto: blur(12px);     /* Desenfoque de fondo */
+    --blur-efecto: blur(12px);     
     
-    /* Variables de control para el menú retráctil */
     --sidebar-ancho: 280px;
     --sidebar-colapsado: 75px;
     --transicion-suave: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
@@ -37,7 +36,6 @@ body {
     position: relative;
 }
 
-/* Halos Dinámicos de Fondo (Glows de Ambientación) */
 body::before, body::after {
     content: "";
     position: fixed;
@@ -76,7 +74,6 @@ nav {
     position: relative;
 }
 
-/* ESTADO COLAPSADO (Se activa aplicando la clase .collapsed al <nav> desde JS) */
 nav.collapsed {
     width: var(--sidebar-colapsado);
     padding: 25px 12px;
@@ -95,13 +92,11 @@ nav h2 {
     text-align: center;
 }
 
-/* Cuando se colapsa, el título principal cambia por una versión corta o desaparece sutilmente */
 nav.collapsed h2 {
     font-size: 14px;
     letter-spacing: 0px;
 }
 
-/* Lista de Pestañas */
 nav ul {
     list-style: none;
     display: flex;
@@ -114,7 +109,7 @@ nav ul li a {
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 15px; /* Espacio entre icono y texto */
+    gap: 15px; 
     padding: 14px 18px;
     border-radius: 10px;
     font-weight: 600;
@@ -124,7 +119,6 @@ nav ul li a {
     border: 1px solid transparent;
 }
 
-/* Inyección de Iconos Mediante Pseudo-elementos (Máscaras SVG) */
 nav ul li a::before {
     content: "";
     display: inline-block;
@@ -135,27 +129,25 @@ nav ul li a::before {
     flex-shrink: 0;
 }
 
-/* Asignación de diseño de icono según el enlace (Usando selectores de atributo href) */
 nav ul li a[href="#sanes"]::before {
-    clip-path: path('M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'); /* Icono Corazón/Comunidad */
+    clip-path: path('M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
 }
 nav ul li a[href="#clientes"]::before {
-    clip-path: path('M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'); /* Icono Usuario */
+    clip-path: path('M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z');
 }
 nav ul li a[href="#turnos"]::before {
-    clip-path: path('M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z'); /* Icono Calendario */
+    clip-path: path('M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z');
 }
 nav ul li a[href="#solicitudes-nuevos"]::before {
-    clip-path: path('M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z'); /* Icono Más / Registro */
+    clip-path: path('M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z');
 }
 nav ul li a[href="#solicitudes-inscritos"]::before {
-    clip-path: path('M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'); /* Icono Información/Alerta */
+    clip-path: path('M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z');
 }
 nav ul li a[href="#productos"]::before {
-    clip-path: path('M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z'); /* Icono Carrito */
+    clip-path: path('M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z');
 }
 
-/* Efectos de Hover y Pestaña Activa */
 nav ul li a:hover, nav ul li a.active {
     color: #fff;
     background: rgba(157, 78, 221, 0.15);
@@ -170,14 +162,14 @@ nav ul li a.active {
     background: linear-gradient(90deg, rgba(157, 78, 221, 0.25) 0%, rgba(9, 5, 20, 0) 100%);
 }
 
-/* OCULTAR EL TEXTO CUANDO EL PANEL ESTÁ COLAPSADO */
+/* OCULTADO DINÁMICO DEL TEXTO EN MODO RETRÁCTIL */
 nav.collapsed ul li a {
     justify-content: center;
     padding: 14px 0;
     gap: 0;
 }
 nav.collapsed ul li a span {
-    display: none; /* Desaparece el texto por completo */
+    display: none; 
 }
 
 /* ==========================================================================
@@ -204,12 +196,12 @@ section h2 {
 }
 
 /* ==========================================================================
-   5. COMPONENTES: TABLAS SUPER PREMIUM (ESTILO FILAS/TARJETAS)
+   5. COMPONENTES: TABLAS SUPER PREMIUM
    ========================================================================== */
 table {
     width: 100%;
     border-collapse: separate;
-    border-spacing: 0 10px; /* Separación para crear el efecto de "Fila flotante" */
+    border-spacing: 0 10px; 
     margin-top: 15px;
 }
 
@@ -235,7 +227,6 @@ td {
     transition: var(--transicion-suave);
 }
 
-/* Redondear las esquinas de cada fila independiente */
 td:first-child {
     border-left: 1px solid var(--borde-cristal);
     border-radius: 12px 0 0 12px;
@@ -245,7 +236,6 @@ td:last-child {
     border-radius: 0 12px 12px 0;
 }
 
-/* Iluminación sutil al pasar el mouse por encima de la fila */
 tr:hover td {
     background: rgba(157, 78, 221, 0.12);
     border-color: rgba(157, 78, 221, 0.4);
@@ -253,7 +243,7 @@ tr:hover td {
 }
 
 /* ==========================================================================
-   6. COMPONENTES: BOTONES E INPUTS DEL SISTEMA
+   6. COMPONENTES: BOTONES E INPUTS
    ========================================================================== */
 button {
     padding: 10px 20px;
@@ -265,7 +255,6 @@ button {
     border: 1px solid transparent;
 }
 
-/* Botón Agregar (+ Nuevo) */
 button[type="button"]:not(td button) {
     background: var(--morado-neon);
     color: #fff;
@@ -277,7 +266,6 @@ button[type="button"]:not(td button):hover {
     box-shadow: 0 6px 20px rgba(157, 78, 221, 0.6);
 }
 
-/* Botón Editar dentro de las filas */
 td button {
     background: transparent;
     color: var(--morado-brillante);
@@ -292,7 +280,7 @@ td button:hover {
 }
 
 /* ==========================================================================
-   7. COMPONENTES: CONTENEDORES DE FORMULARIO (ESTILO LIMPIO)
+   7. CONTENEDORES DE FORMULARIO Ocultos al inicio
    ========================================================================== */
 [id*="container"] {
     background: rgba(20, 14, 38, 0.8);
@@ -304,7 +292,7 @@ td button:hover {
     margin-top: 30px;
     max-width: 550px;
     box-shadow: var(--shadow-premium);
-    display: none; /* Inicia oculto */
+    display: none; 
 }
 
 [id*="container"] h3 {
@@ -356,7 +344,7 @@ form button:last-child {
 form button:last-child:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
 
 /* ==========================================================================
-   8. ADAPTACIÓN PARA PANTALLAS MÓVILES (RESPONSIVE)
+   8. MEDIA QUERIES (ADAPTACIÓN COMPLETA PARA MÓVILES)
    ========================================================================== */
 @media (max-width: 768px) {
     body { flex-direction: column; }
@@ -378,7 +366,7 @@ form button:last-child:hover { background: rgba(255, 255, 255, 0.05); color: #ff
         padding-bottom: 5px;
     }
     nav ul li a { padding: 8px 14px; font-size: 13px; gap: 8px; }
-    nav.collapsed ul li a span { display: inline; /* En móvil forzamos que se lea completo el menú horizontal */ }
+    nav.collapsed ul li a span { display: inline; }
     main { padding: 20px 15px; max-width: 100vw; }
     table { display: block; width: 100%; overflow-x: auto; white-space: nowrap; }
     [id*="container"] { padding: 20px; width: 100%; max-width: 100%; }
