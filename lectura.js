@@ -28,21 +28,37 @@ function actualizarEstadoDB(estado) {
 async function cargarDatosDesdeBD() {
     return new Promise((resolve) => {
         const nombreCallback = `jsonp_${Date.now()}`;
+        
+        // Timeout de seguridad: Si pasan 5 segundos y no responde, avisar
+        const timeout = setTimeout(() => {
+            console.error("Error: Tiempo de espera agotado. Verifica tu URL o permisos de publicación.");
+            actualizarEstadoDB("error");
+            document.getElementById("db-status-text").innerText = "Error de conexión";
+            resolve();
+        }, 5000);
+
         window[nombreCallback] = function(paquete) {
+            clearTimeout(timeout); // Cancela el timeout si llegó respuesta
             window.baseSanes = paquete.sanes || [];
             window.baseClientes = paquete.clientes || [];
             window.baseTurnosPuestos = paquete.turnos_puestos || [];
             window.baseSolicitudesNuevos = paquete.solicitudes_nuevos || [];
             window.baseProductos = paquete.productos || [];
+            
             renderizarUI();
             actualizarEstadoDB("conectado");
-            document.head.removeChild(script);
+            
+            if (script && script.parentNode) document.head.removeChild(script);
             delete window[nombreCallback];
             resolve();
         };
 
         const script = document.createElement('script');
         script.src = `${GOOGLE_SCRIPT_URL}?callback=${nombreCallback}`;
+        script.onerror = () => { 
+            clearTimeout(timeout); 
+            console.error("Error al cargar el script. Verifica la URL."); 
+        };
         document.head.appendChild(script);
     });
 }
