@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Control - Sitec con la Patrona</title>
+    <title>BaseEdimar - Panel de Control Cloud</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
     <header class="top-bar">
-        <div class="logo-container">
-            <div class="logo-icon"></div>
-            <h1>Sitec <span>con la Patrona</span></h1>
+        <div class="logo-area">
+            <h2>🔮 BaseEdimar</h2>
         </div>
         <div class="user-profile-status" id="db-status-container">
             <span class="status-indicator" id="db-status-indicator"></span> 
@@ -19,233 +18,327 @@
         </div>
     </header>
 
-    <div class="app-layout">
-        <nav>
+    <div class="app-container">
+        <nav class="side-nav">
             <ul>
-                <li><a href="#sanes" class="active"><span>Sanes</span></a></li>
-                <li><a href="#clientes"><span>Clientes</span></a></li>
-                <li><a href="#turnos"><span>Registros de Turnos</span></a></li>
-                <li><a href="#solicitudes-nuevos"><span>Solicitudes Nuevos</span></a></li>
-                <li><a href="#solicitudes-inscritos"><span>Solicitudes Inscritos</span></a></li>
-                <li><a href="#productos"><span>Productos</span></a></li>
+                <li><a href="#sec-dashboard" class="active">📊 Dashboard</a></li>
+                <li><a href="#sec-sanes">🔄 Control de Sanes</a></li>
+                <li><a href="#sec-turnos">🎫 Malla de Turnos</a></li>
+                <li><a href="#sec-clientes">👥 Clientes</a></li>
+                <li><a href="#sec-solicitudes">📩 Solicitudes</a></li>
+                <li><a href="#sec-productos">📦 Productos</a></li>
             </ul>
         </nav>
 
-        <main>
+        <main class="main-content">
 
-            <section id="sanes">
-                <h2>Pestaña: Sanes</h2>
-                <button type="button" class="btn-main" onclick="abrirFormularioSan()">+ Agregar San</button>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>San_ID</th>
-                            <th>Nombre_San</th>
-                            <th>Monto_Cuota</th>
-                            <th>Fecha_Inicio</th>
-                            <th>Total_Turnos</th>
-                            <th>Estado Automático</th>
-                            <th>Ciclo</th>
-                            <th>Visual</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-sanes-body"></tbody>
-                </table>
-            </section>
-
-            <section id="clientes">
-                <h2>Pestaña: Clientes</h2>
-                <button type="button" class="btn-main" onclick="abrirFormularioCliente()">+ Agregar Cliente</button>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Cliente_ID</th>
-                            <th>Nombre_Completo</th>
-                            <th>Teléfono</th>
-                            <th>Contraseña</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-clientes-body"></tbody>
-                </table>
-            </section>
-
-            <section id="turnos">
-                <div class="turnos-actions-header">
-                    <h2>Monitoreo de Turnos por Sanes</h2>
-                    <button type="button" class="btn-time-simulation" onclick="simularLlegadaDeCortes()">⚡ Verificar Fechas de Corte (Simular)</button>
+            <section id="sec-dashboard" class="app-section">
+                <div class="section-header">
+                    <h1>Panel Principal</h1>
                 </div>
-                <div id="contenedor-bloques-sanes"></div>
-            </section>
-
-            <section id="solicitudes-nuevos">
-                <h2>Solicitudes de Clientes Externos</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Solicitud_ID</th>
-                            <th>Nombre_Completo</th>
-                            <th>Teléfono</th>
-                            <th>San_Deseado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-solicitudes-nuevos-body"></tbody>
-                </table>
-            </section>
-
-            <section id="solicitudes-inscritos">
-                <h2>Solicitudes de Clientes Registrados</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Propuesta_ID</th>
-                            <th>Cliente_ID</th>
-                            <th>San_ID</th>
-                            <th>Fecha_Solicitud</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-solicitudes-inscritos-body"></tbody>
-                </table>
-            </section>
-
-            <section id="productos">
-                <h2>Pestaña: Productos</h2>
-                <button type="button" class="btn-main" onclick="abrirFormularioProducto()">+ Agregar Producto</button>
                 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Producto_ID</th>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th>Precio</th>
-                            <th>Visual</th>
-                            <th>Stock</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla-productos-body"></tbody>
-                </table>
+                <div class="calendar-widget-card">
+                    <div class="calendar-header">
+                        <span class="calendar-icon">📅</span>
+                        <h3>Agenda de Cortes y Control</h3>
+                    </div>
+                    <div class="calendar-body">
+                        <input type="date" id="dashboard-main-calendar" class="input-date-custom" value="2026-07-01">
+                        <p class="calendar-note">Utiliza este calendario para validar fechas de inicio y días de corte de los Sanes activos.</p>
+                    </div>
+                </div>
+
+                <div class="welcome-box">
+                    <h3>Bienvenido al Sistema Cloud de BaseEdimar</h3>
+                    <p>Selecciona cualquiera de las opciones del menú lateral para gestionar la base de datos en tiempo real de forma segura y fluida.</p>
+                </div>
+            </section>
+
+            <section id="sec-sanes" class="app-section" style="display: none;">
+                <div class="section-header">
+                    <h1>🔄 Control de Sanes</h1>
+                    <button type="button" class="btn-primary" onclick="abrirFormularioSan('')">+ Crear Nuevo San</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID San</th>
+                                <th>Nombre</th>
+                                <th>Cuota</th>
+                                <th>Fecha Inicio</th>
+                                <th>Total Puestos</th>
+                                <th>Estado</th>
+                                <th>Ciclo</th>
+                                <th>Visual</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-sanes-body">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="sec-turnos" class="app-section" style="display: none;">
+                <div class="section-header">
+                    <h1>🎫 Malla de Distribución de Turnos</h1>
+                </div>
+                <div id="contenedor-bloques-sanes" class="sanes-blocks-container">
+                    </div>
+            </section>
+
+            <section id="sec-clientes" class="app-section" style="display: none;">
+                <div class="section-header">
+                    <h1>👥 Base de Clientes Oficiales</h1>
+                    <button type="button" class="btn-primary" onclick="abrirFormularioCliente('')">+ Registrar Cliente</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Cliente</th>
+                                <th>Nombre Completo</th>
+                                <th>Teléfono</th>
+                                <th>Contraseña Acceso</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-clientes-body">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="sec-solicitudes" class="app-section" style="display: none;">
+                <div class="section-header">
+                    <h1>📩 Solicitudes de Nuevos Postulantes</h1>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Solicitud</th>
+                                <th>Nombre Solicitante</th>
+                                <th>Teléfono</th>
+                                <th>San Destino</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-solicitudes-nuevos-body">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="sec-productos" class="app-section" style="display: none;">
+                <div class="section-header">
+                    <h1>📦 Catálogo de Productos Disponibles</h1>
+                    <button type="button" class="btn-primary" onclick="abrirFormularioProducto('')">+ Añadir Producto</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID Producto</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Precio</th>
+                                <th>Icono/Multimedia</th>
+                                <th>Stock</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-productos-body">
+                            </tbody>
+                    </table>
+                </div>
             </section>
 
         </main>
     </div>
 
-    <div id="form-san-container" class="modal-form">
-        <h3 id="san-modal-title">Agregar Nuevo San</h3>
-        <form id="form-san">
-            <input type="hidden" id="san-edit-id">
-            <label>Nombre del San:</label> <input type="text" id="san-nombre" required><br>
-            <label>Monto Cuota ($):</label> <input type="number" id="san-cuota" required><br>
-            
-            <label>Fecha Inicio (AAAA-MM-DD):</label> <input type="text" id="san-inicio" placeholder="Ej: 2026-07-01" required><br>
-            
-            <label id="label-total-turnos">Total Turnos:</label> <input type="number" id="san-total-turnos" required><br>
-            <label>Ciclo:</label> 
-            <select id="san-ciclo">
-                <option value="Semanal">Semanal</option>
-                <option value="Quincenal">Quincenal</option>
-                <option value="Mensual">Mensual</option>
-            </select><br><br>
-            
-            <label>Multimedia (URL o selecciona un icono):</label>
-            <div class="media-toggle-container">
-                <input type="text" id="san-media-input" placeholder="Código de icono o URL de imagen">
-                <div class="icon-selector-grid" data-input="san-media-input"></div>
-            </div>
-
-            <button type="submit" class="btn-submit">Guardar Registros</button>
-            <button type="button" class="btn-close-modal" onclick="ocultarTodosLosFormularios()">Cancelar</button>
-        </form>
+    <div id="form-san-modal" class="modal-form" style="display: none;">
+        <div class="modal-content">
+            <h2 id="san-titulo-dinamico">✨ Crear Nuevo San</h2>
+            <form onsubmit="event.preventDefault(); procesarGuardarSan();">
+                <input type="hidden" id="san-form-id">
+                <input type="hidden" id="san-form-accion">
+                
+                <div class="form-group">
+                    <label>Nombre del San:</label>
+                    <input type="text" id="san-nombre" required placeholder="Ej: San Oro Especial">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cuota ($):</label>
+                        <input type="number" id="san-cuota" required placeholder="Ej: 20">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Puestos:</label>
+                        <input type="number" id="san-puestos" required placeholder="Ej: 10">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Fecha de Inicio:</label>
+                        <input type="date" id="san-inicio" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ciclo de Cobro:</label>
+                        <select id="san-ciclo">
+                            <option value="Semanal">Semanal</option>
+                            <option value="Quincenal">Quincenal</option>
+                            <option value="Mensual" selected>Mensual</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Icono Identificador Visual:</label>
+                    <input type="text" id="san-visual" placeholder="Selecciona un icono abajo o escribe uno">
+                    <div class="icon-selector-grid" data-input="san-visual"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="ocultarTodosLosFormularios()">Cancelar</button>
+                    <button type="submit" class="btn-success">Guardar en la Nube</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div id="form-cliente-container" class="modal-form">
-        <h3 id="cliente-modal-title">Agregar Nuevo Cliente</h3>
-        <form id="form-cliente">
-            <input type="hidden" id="cliente-edit-id">
-            <label>Nombre Completo:</label> <input type="text" id="cliente-nombre" required><br>
-            <label>Teléfono:</label> <input type="text" id="cliente-telefono" required><br>
-            <label>Contraseña Acceso:</label> <input type="text" id="cliente-pass" required><br>
-            <button type="submit" class="btn-submit">Guardar Cliente</button>
-            <button type="button" class="btn-close-modal" onclick="ocultarTodosLosFormularios()">Cancelar</button>
-        </form>
+    <div id="form-cliente-modal" class="modal-form" style="display: none;">
+        <div class="modal-content">
+            <h2 id="cliente-titulo-dinamico">✨ Registrar Cliente</h2>
+            <form onsubmit="event.preventDefault(); procesarGuardarCliente();">
+                <input type="hidden" id="cliente-form-id">
+                <input type="hidden" id="cliente-form-accion">
+                
+                <div class="form-group">
+                    <label>Nombre Completo:</label>
+                    <input type="text" id="cliente-nombre" required placeholder="Nombre Apellido">
+                </div>
+                <div class="form-group">
+                    <label>Teléfono de Contacto:</label>
+                    <input type="text" id="cliente-telefono" required placeholder="Ej: +584120000000">
+                </div>
+                <div class="form-group">
+                    <label>Contraseña de Acceso:</label>
+                    <input type="text" id="cliente-contrasena" required placeholder="Ej: 5542">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="ocultarTodosLosFormularios()">Cancelar</button>
+                    <button type="submit" class="btn-success">Guardar Cliente</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div id="form-producto-container" class="modal-form">
-        <h3 id="producto-modal-title">Agregar Producto</h3>
-        <form id="form-producto">
-            <input type="hidden" id="producto-edit-id">
-            <label>Nombre del Producto:</label> <input type="text" id="producto-nombre" required><br>
-            <label>Descripción:</label> <textarea id="producto-descripcion"></textarea><br>
-            <label>Precio ($):</label> <input type="number" id="producto-precio" required><br>
-            <label>Stock Físico:</label> <input type="number" id="producto-stock" required><br>
-            <label>Estado Emisión:</label> <input type="text" id="producto-estado" value="Disponible"><br>
-            
-            <label>Multimedia del Artículo:</label>
-            <div class="media-toggle-container">
-                <input type="text" id="prod-media-input" placeholder="URL de imagen o código de icono">
-                <div class="icon-selector-grid" data-input="prod-media-input"></div>
-            </div>
-
-            <button type="submit" class="btn-submit">Guardar Producto</button>
-            <button type="button" class="btn-close-modal" onclick="ocultarTodosLosFormularios()">Cancelar</button>
-        </form>
+    <div id="form-producto-modal" class="modal-form" style="display: none;">
+        <div class="modal-content">
+            <h2 id="producto-titulo-dinamico">✨ Añadir Producto</h2>
+            <form onsubmit="event.preventDefault(); procesarGuardarProducto();">
+                <input type="hidden" id="producto-form-id">
+                <input type="hidden" id="producto-form-accion">
+                
+                <div class="form-group">
+                    <label>Nombre del Producto:</label>
+                    <input type="text" id="producto-nombre" required placeholder="Ej: Smart TV 43 Pulgadas">
+                </div>
+                <div class="form-group">
+                    <label>Descripción Corta:</label>
+                    <input type="text" id="producto-descripcion" placeholder="Detalles de marca, modelo o color">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Precio de Venta ($):</label>
+                        <input type="number" id="producto-precio" required placeholder="Ej: 250">
+                    </div>
+                    <div class="form-group">
+                        <label>Cantidad en Stock:</label>
+                        <input type="number" id="producto-stock" required placeholder="Ej: 5">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Estado Inicial:</label>
+                    <select id="producto-estado">
+                        <option value="Disponible" selected>Disponible</option>
+                        <option value="Agotado">Agotado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Icono Multimedia representativo:</label>
+                    <input type="text" id="producto-visual" placeholder="Elige un icono abajo">
+                    <div class="icon-selector-grid" data-input="producto-visual"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="ocultarTodosLosFormularios()">Cancelar</button>
+                    <button type="submit" class="btn-success">Guardar Producto</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div id="form-asignacion-puesto-container" class="modal-form">
-        <h3>Gestionar Puesto de la Cadena</h3>
-        <form id="form-pautar-puesto">
-            <input type="hidden" id="puesto-san-id">
-            <input type="hidden" id="puesto-numero">
-            
-            <p id="info-puesto-pautar" style="margin-bottom: 12px; color: var(--morado-brillante); font-weight: bold;"></p>
-
-            <label>Seleccionar Ocupante:</label>
-            <select id="puesto-cliente-select">
-                </select><br><br>
-            
-            <button type="submit" class="btn-submit">Guardar Cambios</button>
-            <button type="button" class="btn-close-modal" onclick="ocultarTodosLosFormularios()">Cancelar</button>
-        </form>
+    <div id="form-puesto-modal" class="modal-form" style="display: none;">
+        <div class="modal-content">
+            <h2>🎫 Modificar Estado del Puesto</h2>
+            <form onsubmit="event.preventDefault(); procesarAsignacionPuestoManual();">
+                <input type="hidden" id="puesto-form-san-id">
+                <input type="hidden" id="puesto-form-num">
+                
+                <div class="form-group">
+                    <label>Asignar Cliente:</label>
+                    <select id="puesto-select-cliente">
+                        </select>
+                </div>
+                <div class="form-group">
+                    <label>Fecha Próximo Corte:</label>
+                    <input type="date" id="puesto-corte">
+                </div>
+                <div class="form-group">
+                    <label>Estado de Pago General:</label>
+                    <select id="puesto-pago">
+                        <option value="Sin Pago">Sin Pago</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Al Día">Al Día</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="ocultarTodosLosFormularios()">Cerrar</button>
+                    <button type="submit" class="btn-success">Actualizar Puesto</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div id="form-aprobar-nuevo-container" class="modal-form">
-        <h3>Aprobar e Inscribir Cliente Nuevo</h3>
-        <form id="form-aprobar-nuevo">
-            <input type="hidden" id="modal-nuevo-sol-id">
-            <input type="hidden" id="modal-nuevo-san-id">
-            
-            <p id="info-solicitud-nuevo-texto" style="margin-bottom: 12px; font-size:14px; color: var(--morado-brillante); font-weight: bold;"></p>
-            
-            <label>Asignar Puesto Libre Disponible:</label>
-            <select id="modal-nuevo-puesto-select" required></select><br><br>
-            
-            <button type="submit" class="btn-submit">Dar de Alta y Asignar Turno</button>
-            <button type="button" class="btn-close-modal" onclick="ocultarTodosLosFormularios()">Cancelar</button>
-        </form>
-    </div>
-
-    <div id="form-aprobar-inscrito-container" class="modal-form">
-        <h3>Aprobar Solicitud de Inscrito</h3>
-        <form id="form-aprobar-inscrito">
-            <input type="hidden" id="modal-inscrito-prop-id">
-            <input type="hidden" id="modal-inscrito-cliente-id">
-            <input type="hidden" id="modal-inscrito-san-id">
-            
-            <p id="info-solicitud-inscrito-texto" style="margin-bottom: 12px; font-size:14px; color: var(--texto-secundario);"></p>
-            
-            <label>Asignar Puesto Libre Disponible:</label>
-            <select id="modal-inscrito-puesto-select" required></select><br><br>
-            
-            <button type="submit" class="btn-submit">Aprobar y Registrar Turno</button>
-            <button type="button" class="btn-close-modal" onclick="ocultarTodosLosFormularios()">Cancelar</button>
-        </form>
+    <div id="form-aprobacion-modal" class="modal-form" style="display: none;">
+        <div class="modal-content">
+            <h2>📩 Procesar Ingreso de Solicitante</h2>
+            <form onsubmit="event.preventDefault(); procesarAprobacionSolicitud();">
+                <input type="hidden" id="aprobacion-solicitud-id">
+                <input type="hidden" id="aprobacion-san-target">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre del Nuevo Cliente:</label>
+                        <input type="text" id="aprobacion-nombre" readonly class="input-readonly">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono:</label>
+                        <input type="text" id="aprobacion-telefono" readonly class="input-readonly">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label style="color: var(--morado-neon); font-weight: bold;">Seleccionar Puesto Libre Disponible:</label>
+                    <select id="aprobacion-select-puesto" required>
+                        </select>
+                </div>
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="btn-secondary" onclick="ocultarTodosLosFormularios()">Rechazar / Cancelar</button>
+                    <button type="submit" class="btn-approve">Aprobar e Integrar a la Red</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="lectura.js"></script>
