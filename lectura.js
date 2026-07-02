@@ -1,8 +1,6 @@
 // BASEEDIMAR LECTURA.JS V2 - INTEGRACIÓN DE ELIMINACIÓN Y RENDER RÁPIDO
 // ==========================================================================
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwUuT3PK1sh9z-Pt5pHMNzFmV4euI-n5u-S4zCyu0VaU4tAUUwqwkJCnBOuL6iZsEuQ/exec";
-// ==========================================================================
-
 
 window.baseSanes = [];
 window.baseClientes = [];
