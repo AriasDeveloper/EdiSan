@@ -468,3 +468,13 @@ input:focus, select:focus { border-color: var(--morado-neon); }
     transition: all 0.2s;
 }
 .icon-opt:hover { border-color: var(--morado-neon); background-color: rgba(167, 139, 250, 0.1); transform: scale(1.1); }
+.btn-delete { 
+    background: var(--rojo-error) !important; 
+    color: white !important; 
+    padding: 6px 14px !important; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer;
+    margin-left: 5px;
+}
+.btn-delete:hover { background: #c62828 !important; }
