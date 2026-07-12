@@ -4,7 +4,7 @@ async function enviarDatosAlServidor(datos) {
   
   const respuesta = await fetch(url, {
     method: 'POST', // El método POST es para enviar datos privados
-    mode: 'no-cors', // A veces necesario con Apps Script, si da error cámbialo a 'cors'
+    mode: 'cors', // A veces necesario con Apps Script, si da error cámbialo a 'cors'
     headers: {
       'Content-Type': 'application/json'
     },
