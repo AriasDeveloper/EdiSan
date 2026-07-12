@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="login.css">
+
+    <title>Edimar La Patrona | Iniciar Sesión</title>
+    <meta name="description" content="Sistema de Gestion de SANES y Productos">
+
+    <link rel="icon" href="Images/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <img src="Imagenes/splash.png" alt="Edimar la Patrona" id="logoEmpresa">
+        <h1>Edimar La Patrona</h1>
+        <h2>Sistema de Gestión de SANES y Productos</h2>
+    </header>
+    <main>
+        <section id="login">
+            <form id="formlogin">
+                <h3>Iniciar Sesión</h3>
+
+                <label for="usuario"> 
+                    Usuario
+                </label>
+                <input type="text" id="usuario" name="usuario" autocomplete="username" required>
+
+                <label for="password"> 
+                    Contraseña
+                </label>
+                    <div class="password">
+                        <input type="password" id="password" name="password" autocomplete="current-password" required>
+
+                        <button type="button" id="mostrarPassword">
+                            👁
+                        </button>
+                    </div>
+                
+                <label class="recordar">
+                    <input type="checkbox" id="recordarme">
+                    Recordarme
+                </label>
+                <button type="submit" id="btnIngresar">
+                    Iniciar Sesion
+                </button>
+                <p id="mensaje"></p>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>
+            © 2026 Edimar La Patrona
+        </p>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/utilidades.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</html>
