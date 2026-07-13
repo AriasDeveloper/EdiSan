@@ -22,7 +22,7 @@ document.getElementById('formlogin').addEventListener('submit', async function(e
     if (datos.autenticado === 1) {
        window.location.href = 'cliente.html'; // Cambia la dirección 
     } 
-    else {
+    if (datos.autenticado === 0) {
         alert("Usuario o contraseña incorrectos");
     }
 });
