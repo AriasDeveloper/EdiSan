@@ -8,11 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (inputPassword.type === 'password') {
             // Si es password, lo cambiamos a texto para que se vea
             inputPassword.type = 'text';
-            btnMostrar.textContent = '🙈'; // Cambiamos el icono para indicar que ahora oculta
+            btnMostrar.textContent = '☑︎'; // Cambiamos el icono para indicar que ahora oculta
         } else {
             // Si es texto, lo regresamos a password para ocultarlo
             inputPassword.type = 'password';
-            btnMostrar.textContent = '👁'; // Regresamos al icono original
+            btnMostrar.textContent = '◻︎'; // Regresamos al icono original
         }
     });
 });
