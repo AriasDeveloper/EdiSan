@@ -18,12 +18,9 @@ document.getElementById('formlogin').addEventListener('submit', async function(e
   // 4. Lógica de redirección
   if (datos.autenticado === 2) {
     window.location.href = 'admin.html'; // Cambia la dirección
-  } else {
-    if (datos.autenticado === 1) {
+  } else if (datos.autenticado === 1) {
        window.location.href = 'cliente.html'; // Cambia la dirección 
-    }
-    else {
+    } else {
         alert("Usuario o contraseña incorrectos");
     }
-  }
 });
