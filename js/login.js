@@ -18,11 +18,12 @@ document.getElementById('formlogin').addEventListener('submit', async function(e
   // 4. Lógica de redirección
   if (datos.autenticado === 2) {
     window.location.href = 'admin.html'; // Cambia la dirección
-  } 
-    if (datos.autenticado === 1) {
+  } else if (datos.autenticado === 1) {
        window.location.href = 'cliente.html'; // Cambia la dirección 
-    } 
-    if (datos.autenticado === 0) {
+    } else {
         alert("Usuario o contraseña incorrectos");
+    } catch (error) {
+        console.error("Error al procesar la solicitud:", error);
+        alert("Ocurrió un error al procesar la solicitud. Por favor, inténtalo de nuevo más tarde.");
     }
 });
